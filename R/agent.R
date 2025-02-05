@@ -11,7 +11,8 @@ Agent <- R6Class(classname="Agent", public = list(
   curr_behavior = "",
   next_behavior = "",
   neighbors = c(),
-  fitness = 0.0,
+  curr_fitness = 0.0,
+  next_fitness = 0.0,
   name = "",
 
   #' @description
@@ -37,7 +38,7 @@ Agent <- R6Class(classname="Agent", public = list(
   },
   set_fitness = function(fitness) {
     
-    self$fitness = fitness
+    self$curr_fitness = fitness
     
     invisible(self)
   }
