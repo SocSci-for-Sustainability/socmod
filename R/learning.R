@@ -44,7 +44,7 @@ frequency_bias_interact <- function(learner, ., model) {
     behavior_counts <- 
       dplyr::count(tibble(
         curr_behavior = 
-          map_vec(learner$neighbors$agents, 
+          purrr::map_vec(learner$neighbors$agents, 
                   \(n) {n$curr_behavior}),
       ), curr_behavior)
     
@@ -69,7 +69,7 @@ success_bias_select_teacher <- function(learner, model) {
 
   total_fitness <- sum(neighbor_fitnesses)
 
-  neighbor_probs <- map(neighbor_fitnesses, \(f) { f / total_fitness })
+  neighbor_probs <- purrr::map(neighbor_fitnesses, \(f) { f / total_fitness })
 
   return (sample(neighbor_agents, 1, prob = neighbor_probs)[[1]])
 }

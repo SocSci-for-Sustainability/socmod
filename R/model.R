@@ -44,7 +44,7 @@ AgentBasedModel <- R6Class(classname="AgentBasedModel",
             
             # Create new agents defaulting to Legacy behavior on init.
             self$add_agents( 
-              map(
+              purrr::map(
                 V(network), \(n) { 
                   Agent$new("Legacy", name=n$name)
                 }
@@ -54,7 +54,7 @@ AgentBasedModel <- R6Class(classname="AgentBasedModel",
           names(self$agents) <- V(network)$name
           for (agent in self$agents) {
             net_neighbors <- neighbors(network, agent$name)
-            agent_neighbors <- map(net_neighbors, \(n) { self$get_agent(n$name) })
+            agent_neighbors <- purrr::map(net_neighbors, \(n) { self$get_agent(n$name) })
             agent$add_neighbors(agent_neighbors)
           }
             
@@ -71,7 +71,7 @@ AgentBasedModel <- R6Class(classname="AgentBasedModel",
           
           # Initialize agents.
           self$add_agents(
-            map(
+            purrr::map(
               1:n_agents, \(ii) { 
                 Agent$new("Legacy", name=ii)
               }
@@ -81,7 +81,7 @@ AgentBasedModel <- R6Class(classname="AgentBasedModel",
           # After all agents added to the model, set network neighbor agents.
           for (agent in self$agents) { 
             agent$add_neighbors(
-              map(neighbors(self$network, agent$name), 
+              purrr::map(neighbors(self$network, agent$name), 
                   \(n) { self$get_agent(n) })
             )
           }

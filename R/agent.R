@@ -1,3 +1,4 @@
+library(purrr)
 library(dplyr)
 library(R6)
 library(igraph)
@@ -8,7 +9,7 @@ library(igraph)
   curr_behaviors <- agent$neighbors$map(\(a) { a$curr_behavior })
   
   n_neighbors_adopted <- sum(
-    map_vec(curr_behaviors, \(b) { ifelse(b == "Adaptive", 1, 0) })
+    purrr::map_vec(curr_behaviors, \(b) { ifelse(b == "Adaptive", 1, 0) })
   )
   
   return (n_neighbors_adopted / agent$neighbors$n)

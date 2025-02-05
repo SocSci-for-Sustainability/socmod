@@ -1,4 +1,4 @@
-
+library(tibble)
 # Set up empty stubs for default model subroutines.
 
 #' @export
@@ -40,7 +40,7 @@ run <- function(model, max_its = 1,
   if (is.null(model$output)) {
     # If there is no output yet for the model, initialize a new output tibble.
     tmax <- max_its
-    model$output <- tibble(t = 0:tmax,
+    model$output <- tibble::tibble(t = 0:tmax,
                            A = rep(0.0, tmax + 1))
 
     model$output[1, "t"] <- 0
@@ -56,7 +56,7 @@ run <- function(model, max_its = 1,
 
     # Allocate more space for new output data.
     model$output <- 
-      rbind(model$output, tibble(t = tmin:tmax, A = rep(0.0, max_its)))
+      rbind(model$output, tibble::tibble(t = tmin:tmax, A = rep(0.0, max_its)))
   }
 
   model$step <- 1
