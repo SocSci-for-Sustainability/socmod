@@ -1,7 +1,10 @@
-library(purrr, include.only = c("map"))
+library(dplyr, include.only = c("count", "slice_max"))
+library(purrr, include.only = c("map", "map_vec"))
+library(tibble)
 
+source("R/run.R")
 
-# The iterative learning 
+# The iterating learning is the same in either case.
 iterate_learning_model <- function(model) {
   
   for (agent in model$agents) {
@@ -11,15 +14,49 @@ iterate_learning_model <- function(model) {
 }
 
 
+### ------ FREQUENCY BIAS --------
+# Frequency bias partner selection is just the default that returns NULL
+# expecting to not be used for selecting interaction partner.
+frequency_bias_select_teacher <- partner_selection_default
 
-frequency_bias_select_partner <- function(learner, model) {
-  
+
+#' Interaction function for frequency-biased adaptive learning.
+#'
+#' @param learner Agent currently selected as learner.
+#' @param . No selected teacher with frequency-biased learning.
+#' @param model Model variable will be the agent-based model.
+#'
+#' @return NULL
+#' @export
+#'
+#' @examples
+frequency_bias_interact <- function(learner, ., model) {
+  if (is.null(model$learning_prob) || (runif(1) < model$learning_prob)) {
+    
+    neighbor_agents <- learner$neighbors$agents
+    n_neighbors <- length(neighbor_agents)
+    
+    # Count neighbors doing behaviors.
+    behavior_counts <- 
+      dplyr::count(tibble(
+        curr_behavior = 
+          map_vec(learner$neighbors$agents, 
+                  \(n) {n$curr_behavior}),
+      ), curr_behavior)
+    
+    # Calculate the probability of selecting each one, appending to behavior_counts.
+    behavior_counts$selection_prob <- behavior_counts$n / n_neighbors
+    
+    # Next behavior selected via weighted random sampling.
+    learner$next_behavior <- 
+      sample(behavior_counts$curr_behavior, 1, 
+             prob = behavior_counts$selection_prob)[[1]]
+  }
 }
-frequency_bias_interact <- function(learner, ., model) {}
 
+count
 
-
-###----- SUCCESS BIAS --------
+### ----- SUCCESS BIAS --------
 success_bias_select_teacher <- function(learner, model) {
 
   neighbor_agents <- learner$neighbors$agents

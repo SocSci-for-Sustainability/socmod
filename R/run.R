@@ -1,6 +1,6 @@
 
 # Set up empty stubs for default model subroutines.
-partner_selection_default = function(agent, model) {}
+partner_selection_default = function(agent, model) { return (NULL) }
 interaction_default       = function(agent1, agent2, model) {}
 iterate_model_default     = function(model) {}
 # The default stop_cond.
