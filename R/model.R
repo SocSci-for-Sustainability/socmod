@@ -31,8 +31,9 @@ AgentBasedModel <- R6Class(classname="AgentBasedModel",
           }
 
           for (agent_idx in 1:length(agents)) {
-            agents[[agent_idx]]$neighbors <- 
+            agents[[agent_idx]]$add_neighbors(
               igraph::neighbors(self$network, agent_idx)
+            )
           }
 
           self$agents <- agents
@@ -40,21 +41,21 @@ AgentBasedModel <- R6Class(classname="AgentBasedModel",
         # Now dealing with the case where `agents` is null, but network not.
 
             # Create new agents defaulting to Legacy behavior on init.
-            self$agents <- 
-              purrr::map(
-                V(network)$name, \(n) { 
+            self$add_agents( 
+              map(
+                V(network), \(n) { 
                   Agent$new("Legacy", 
                             name=n, 
                             neighbors=neighbors(network, n))
                 }
               )
+            )
 
             # Make agents into named list so graph names can look up agents.
             names(self$agents) <- V(network)$name
-        }
-        # Finally deal with the case where only number of agents is provided.
-        else if (!is.null(n_agents)) {
-          
+
+        # Finally deal with the case where only number of agents is provided. 
+        }  else if (!is.null(n_agents)) {
           # Initialize default complete network.
           self$network <- igraph::make_full_graph(n_agents)
           
@@ -62,16 +63,17 @@ AgentBasedModel <- R6Class(classname="AgentBasedModel",
           self$add_agents(
             map(
               1:n_agents, \(ii) { 
-                Agent$new("DEFAULT", name=ii)
+                Agent$new("Legacy", name=ii)
               }
-            ))
+            )
+          )
            
           # After all agents added to the model, set network neighbor agents.
           for (agent in self$agents) { 
             agent$add_neighbors(
               map(neighbors(self$network, agent$name), 
                   \(n) { self$get_agent(n) })
-              )
+            )
           }
         }
 
@@ -80,6 +82,5 @@ AgentBasedModel <- R6Class(classname="AgentBasedModel",
 
         invisible(self)
       }
-  ), 
-  private = list()
+  )
 )

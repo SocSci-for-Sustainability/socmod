@@ -24,14 +24,16 @@ Agent <- R6Class(classname="Agent", public = list(
   #' @return A new `Agent` object.
   initialize = 
     function(behavior = "", fitness = 0.0, name = "", neighbors = c()) {
-
-      self$curr_behavior <- behavior
+      
       self$prev_behavior <- behavior
+      self$curr_behavior <- behavior
+      self$next_behavior <- behavior
+      
       self$name <- name
       self$add_neighbors(neighbors)  
     },
   add_neighbors = function(new_neighbors) {
-    self$neighbors <- Neighbors$new(c(self$neighbors$agents, new_neighbors))
+    self$neighbors <- Neighbors$new(c(self$agents, new_neighbors))
   },  
   exposure_prob = function() {
     return (.agent_exposure_prob(self))
@@ -49,9 +51,10 @@ Neighbors <- R6Class(classname = "Neighbors", public = list(
   
   # Track neighbor Agents.
   agents = c(),
-  
+  n = 0,
   initialize = function(agents) { 
     self$agents <- agents 
+    self$n <- length(agents)
     invisible(self)
   },
   
@@ -64,5 +67,9 @@ Neighbors <- R6Class(classname = "Neighbors", public = list(
   map = function(f) { 
     purrr::map(self$agents, f) 
     invisible(self)
+  },
+
+  contains = function(name) {
+    return (name %in% names(self$agents))
   }
 ))
