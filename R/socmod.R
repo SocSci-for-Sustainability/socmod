@@ -16,16 +16,6 @@ Behavior <- R6Class(classname = "Behavior", public = list(
   initialize = function(payoff = 1.0) {self$payoff = payoff}
 ))
 
-.agent_exposure_prob <- function(agent) {
-
-  neighbors <- agent$neighbors
-
-  n_neighbors_adopted <- 
-    sum(map_vec(neighbors, \(n) { n$behavior == "Adaptive" }))
-
-  return (n_neighbors_adopted / length(neighbors))
-}
-
 
 
 

@@ -1,3 +1,5 @@
+library(purrr)
+library(dplyr)
 test_that("Network construction helpers work as expected", {
 
   # Get all possible undirected edges for graph vertices.

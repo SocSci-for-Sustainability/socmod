@@ -1,3 +1,4 @@
+library(dplyr)
 library(R6, quietly = TRUE)
 library(purrr, include.only = "map", quietly = TRUE)
 
@@ -14,7 +15,7 @@ AgentBasedModel <- R6Class(classname="AgentBasedModel",
       invisible(self)
     },                    
     get_agent = function(name) {
-      return (self$agents[[name]])
+      invisible (self$agents[[name]])
     },
     initialize = 
       function(agents = NULL, network = NULL, n_agents = NULL, ...) {
@@ -39,20 +40,29 @@ AgentBasedModel <- R6Class(classname="AgentBasedModel",
           self$agents <- agents
         } else if (!is.null(network)) {
         # Now dealing with the case where `agents` is null, but network not.
-
+            self$network <- network
+            
             # Create new agents defaulting to Legacy behavior on init.
             self$add_agents( 
               map(
                 V(network), \(n) { 
-                  Agent$new("Legacy", 
-                            name=n, 
-                            neighbors=neighbors(network, n))
+                  Agent$new("Legacy", name=n$name)
                 }
               )
             )
+          # Neighbors$new(neighbors(network, n))
+          names(self$agents) <- V(network)$name
+          for (agent in self$agents) {
+            net_neighbors <- neighbors(network, agent$name)
+            agent_neighbors <- map(net_neighbors, \(n) { self$get_agent(n$name) })
+            agent$add_neighbors(agent_neighbors)
+          }
+            
+            # map(self$agents, \(a) { a$add_neighbors()
 
             # Make agents into named list so graph names can look up agents.
-            names(self$agents) <- V(network)$name
+            
+            
 
         # Finally deal with the case where only number of agents is provided. 
         }  else if (!is.null(n_agents)) {

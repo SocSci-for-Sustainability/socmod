@@ -1,4 +1,19 @@
+library(dplyr)
 library(R6)
+library(igraph)
+
+
+.agent_exposure_prob <- function(agent) {
+  
+  curr_behaviors <- agent$neighbors$map(\(a) { a$curr_behavior })
+  
+  n_neighbors_adopted <- sum(
+    map_vec(curr_behaviors, \(b) { ifelse(b == "Adaptive", 1, 0) })
+  )
+  
+  return (n_neighbors_adopted / agent$neighbors$n)
+}
+
 
 #' Agent for use with AgentBasedModel instances
 #' 
@@ -33,7 +48,8 @@ Agent <- R6Class(classname="Agent", public = list(
       self$add_neighbors(neighbors)  
     },
   add_neighbors = function(new_neighbors) {
-    self$neighbors <- Neighbors$new(c(self$agents, new_neighbors))
+    
+    self$neighbors <- Neighbors$new(c(self$neighbors$agents, new_neighbors))
   },  
   exposure_prob = function() {
     return (.agent_exposure_prob(self))
@@ -65,8 +81,9 @@ Neighbors <- R6Class(classname = "Neighbors", public = list(
   
   # Wrap purrr::map to apply function to all neighbor agents.
   map = function(f) { 
-    purrr::map(self$agents, f) 
-    invisible(self)
+    
+    return(purrr::map(self$agents, f))
+    
   },
 
   contains = function(name) {
