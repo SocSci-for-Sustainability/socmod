@@ -1,14 +1,22 @@
 
 # Set up empty stubs for default model subroutines.
+
+#' @export
 partner_selection_default = function(agent, model) { return (NULL) }
+
+#' @export
 interaction_default       = function(agent1, agent2, model) {}
+
+#' @export
 iterate_model_default     = function(model) {}
 # The default stop_cond.
+
+#' @export
 stop_cond_default <- function(model) { return (FALSE) }
 
 
 
-
+#' @export
 run <- function(model, max_its = 1, 
                 partner_selection = partner_selection_default,
                 interaction = interaction_default, 

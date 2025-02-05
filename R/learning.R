@@ -5,6 +5,8 @@ library(tibble)
 source("R/run.R")
 
 # The iterating learning is the same in either case.
+
+#' @export
 iterate_learning_model <- function(model) {
   
   for (agent in model$agents) {
@@ -17,6 +19,8 @@ iterate_learning_model <- function(model) {
 ### ------ FREQUENCY BIAS --------
 # Frequency bias partner selection is just the default that returns NULL
 # expecting to not be used for selecting interaction partner.
+
+#' @export
 frequency_bias_select_teacher <- partner_selection_default
 
 
@@ -54,9 +58,9 @@ frequency_bias_interact <- function(learner, ., model) {
   }
 }
 
-count
-
 ### ----- SUCCESS BIAS --------
+
+#' @export
 success_bias_select_teacher <- function(learner, model) {
 
   neighbor_agents <- learner$neighbors$agents
@@ -71,6 +75,7 @@ success_bias_select_teacher <- function(learner, model) {
 }
 
 
+#' @export
 success_bias_interact <- function(learner, teacher, model) {
   if (is.null(model$learning_prob) || (runif(1) < model$learning_prob)) {
     learner$next_behavior <-  teacher$curr_behavior

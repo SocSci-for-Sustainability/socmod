@@ -21,6 +21,7 @@ library(igraph)
 #' Agent attributes include information about previous, current, and next behaviors, 
 #' neighbors (an instance of the Neighbors class). Methods include 
 #' exposure probability,
+#' @export
 Agent <- R6Class(classname="Agent", public = list(
   prev_behavior = "",
   curr_behavior = "",
@@ -62,7 +63,7 @@ Agent <- R6Class(classname="Agent", public = list(
   }
 ))
 
-
+#' @export
 Neighbors <- R6Class(classname = "Neighbors", public = list(
   
   # Track neighbor Agents.
