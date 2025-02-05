@@ -35,18 +35,6 @@ test_that("Erdős-Rényi random network constructions yield correct network stat
 )
 
 
-test_that("Model initialized as expected", 
-{
-  
-  model <- AgentBasedModel$new()
-
-  expect_true(FALSE)
-
-})
 
 
-test_that("Frequency-biased learning works as expected", 
-{
-  # Define a simple network for frequency-biased teacher selection.
-  expect_true(FALSE)
-})
+

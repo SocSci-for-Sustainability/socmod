@@ -127,12 +127,12 @@ get_all_possible_edges <- function(N, directed = FALSE) {
   # N <- length(verts)
   vert_idxs <- 1:N
   if (directed)
-    return (expand.grid(v1 = vert_idxs, v2 = vert_idxs) %>% filter(v1!=v2))
+    return (expand.grid(v1 = vert_idxs, v2 = vert_idxs) %>% dplyr::filter(v1!=v2))
   else
     return (
-      bind_rows(
+      dplyr::bind_rows(
         map(1:(N-1), \(ii) {tibble(v1 = vert_idxs[1:(N-ii)], v2 = vert_idxs[(1+ii):N])})
-      ) %>% distinct(v1, v2)
+      )
     )
 }
 
