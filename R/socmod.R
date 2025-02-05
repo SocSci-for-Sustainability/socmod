@@ -27,165 +27,7 @@ Behavior <- R6Class(classname = "Behavior", public = list(
 }
 
 
-Agent <- R6Class(classname="Agent", public = list(
-  curr_behavior = NA,
-  prev_behavior = NA,
-  # neighbors = vector(mode = "integer", length = 0),
-  neighbors = c(),
-  fitness = NA,
-  name = "",
-  # vertex = NA,
-  initialize = 
-    function(init_behavior, fitness = NA, name = NA, neighbors = NULL) {
 
-      self$curr_behavior <- init_behavior
-      self$prev_behavior <- init_behavior
-      self$name <- name
-      self$add_neighbors(neighbors)  
-    },
-  add_neighbors = function(new_neighbors) {
-    self$neighbors <- c(self$neighbors, new_neighbors) 
-  },
-  exposure_prob = function() {
-    return (.agent_exposure_prob(self))
-  }
-))
-
-
-# Set up empty stubs for default model subroutines.
-partner_selection_default = function(agent) {}
-interaction_default  = function(agent1, agent2, model) {}
-model_iter_default        = function(model) {}
-# The default stop_cond.
-stop_cond_default <- function(model) { return (FALSE) }
-
-AgentBasedModel <- R6Class(classname="AgentBasedModel",
-  public = list(
-    agents = c(), 
-    step = 0,
-    network = NULL,
-    params = list(),
-    output = NULL,
-    add_agents = function(agents_to_add) {
-      self$agents <- c(self$agents, agents_to_add)
-      invisible(self)
-    },                    
-    initialize = 
-      function(agents = NULL, network = NULL, ...) {
-
-        # Initialize agents and network if the agents were provided. Do nothing
-        # if no agents provided. If agents provided but not network, 
-        # make a complete, undirected network.
-        if (!is.null(agents)) {
-
-          if (is.null(network)) {
-            self$network <- igraph::make_full_graph(length(agents))
-          } else {
-            self$network <- network    
-          }
-
-          for (agent_idx in 1:length(agents)) {
-            agents[[agent_idx]]$neighbors <- 
-              igraph::neighbors(self$network, agent_idx)
-          }
-
-          self$agents <- agents
-        } else {
-          # Now dealing with the case where `agents` is null, but network not.
-          if (!is.null(network)) {
-
-            # Create new agents defaulting to Legacy behavior on init.
-            self$agents <- 
-              purrr::map(
-                V(network)$name, \(n) { 
-                  Agent$new("Legacy", 
-                            name=n, 
-                            neighbors=neighbors(network, n))
-                }
-              )
-
-            # Make agents into named list so graph names can look up agents.
-            names(self$agents) <- V(network)$name
-          }
-        }
-
-        # Keyword arguments in ... become model parameters in named list.
-        self$params = list(...)
-
-        invisible(self)
-      }
-  ), 
-  private = list()
-)
-
-
-run <- function(model, max_its = 1, 
-                partner_selection = partner_selection_default,
-                interaction = interaction_default, 
-                model_iter = model_iter_default, 
-                stop_cond = stop_cond_default) {
-
-  # Check that there are some agents.
-  assert_that(length(model$agents) > 0)
-
-  # Initialize output tibble for this run, starting with default tmin, tmax.
-  tmin <- 0
-  tmax <- max_its
-
-  if (is.null(model$output)) {
-    # If there is no output yet for the model, initialize a new output tibble.
-    tmax <- max_its + 1
-    model$output <- tibble(t = 0:tmax,
-                           A = rep(0.0, tmax + 1))
-
-    total_adoption <- function(agents) {
-      sum(purrr::map_vec(agents, 
-          \(a) { ifelse(a$curr_behavior == "Adaptive", 1, 0) }))
-    }
-  
-
-    model$output[1, ] <- list(0, total_adoption(model$agents))
-
-  } else {
-    # If the model has an output tibble, figure out the last time step and
-    # initialize a new, properly-indexed new tibble to concatenate with previous.
-    prev_tvec <- model$output$t
-    prev_tmax <- model$output$t[length(prev_t)]
-    tmin <- prev_tmax + 1
-    tmax <- tmin + max_its 
-
-    # Allocate more space for new output data.
-    model$output <- 
-      rbind(model$output, tibble(t = tmin:tmax, A = rep(0.0, max_its)))
-  }
-
-  while ((model$step <= tmax) && !stop_cond(model)) {
-    
-    for (learner in sample(model$agents)) {
-      teacher <- partner_selection(learner, model)
-      interaction(learner, teacher, model)
-    }
-
-    model_iter(model)
-
-    # Increment time step.
-    model$step <- model$step + 1
-
-    # Need to add one to current step, i.e., output[1,] was row 1, but tstep 0,
-    # and so when model$step <- model$step + 1 runs for the first time, 
-    # model$step increments from 0 to 1. If we did not have +1, the last 
-    # time step in the output would just be 0 from the initialization of output.
-    model$output[model$step + 1, ] <- 
-      list(model$step, total_adoption(model$agents))
-  }
-
-  return (model)
-}
-
-
-run_trials <- function(model_factory, n_trials = 2, ...) {
-  
-}
 
 
 # Adapted from 
@@ -267,11 +109,7 @@ G_NM <- function(N, M) {
     row <- edges[row_idx, ]
     v1 <- row$v1
     v2 <- row$v2
-    print(v1)
-    print(v2)
-    if (is.na(v1) || is.na(v2)) {
-      print(edges)
-    }
+
     g <- add_edges(g, c(v1, v2))
   }
 
@@ -297,4 +135,8 @@ get_all_possible_edges <- function(N, directed = FALSE) {
       ) %>% distinct(v1, v2)
     )
 }
+
+
+
+
 
