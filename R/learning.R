@@ -28,7 +28,7 @@ frequency_bias_select_teacher <- function(agent, model) { return (NULL) }
 #'
 #' @examples
 frequency_bias_interact <- function(learner, ., model) {
-  if (is.null(model$learning_prob) || (runif(1) < model$learning_prob)) {
+  if (is.null(model$params$learning_prob) || (runif(1) < model$params$learning_prob)) {
     
     neighbor_agents <- learner$neighbors$agents
     n_neighbors <- length(neighbor_agents)
@@ -70,7 +70,7 @@ success_bias_select_teacher <- function(learner, model) {
 
 #' @export
 success_bias_interact <- function(learner, teacher, model) {
-  if (is.null(model$learning_prob) || (runif(1) < model$learning_prob)) {
+  if (is.null(model$params$learning_prob) || (runif(1) < model$params$learning_prob)) {
     learner$next_behavior <-  teacher$curr_behavior
     learner$next_fitness <- teacher$curr_fitness
   }
