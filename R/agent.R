@@ -1,9 +1,3 @@
-library(purrr)
-library(dplyr)
-library(R6)
-library(igraph)
-
-
 .agent_exposure_prob <- function(agent) {
   
   curr_behaviors <- agent$neighbors$map(\(a) { a$curr_behavior })

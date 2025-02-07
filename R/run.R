@@ -1,6 +1,4 @@
-library(tibble)
 # Set up empty stubs for default model subroutines.
-
 #' @export
 partner_selection_default = function(agent, model) { return (NULL) }
 
@@ -9,12 +7,9 @@ interaction_default       = function(agent1, agent2, model) {}
 
 #' @export
 iterate_model_default     = function(model) {}
-# The default stop_cond.
 
 #' @export
 stop_cond_default <- function(model) { return (FALSE) }
-
-
 
 #' @export
 run <- function(model, max_its = 1, 
@@ -33,8 +28,13 @@ run <- function(model, max_its = 1,
   # Set up function to calculate total_adoption of the adaptive behavior.
   total_adoption <- function(agents) {
     
-    sum(purrr::map_vec(agents, 
-                       \(a) { ifelse(!is.null(a$curr_behavior) && (a$curr_behavior == "Adaptive"), 1, 0) }))
+    # TODO: provide Agents wrapper with $map(), $as_list(), $as_tibble() methods.
+    sum(purrr::map_vec(
+      agents, 
+      \(a) { ifelse(
+        !is.null(a$curr_behavior) && (a$curr_behavior == "Adaptive"), 1, 0) 
+      }
+    ))
   }
   
   if (is.null(model$output)) {
@@ -71,7 +71,7 @@ run <- function(model, max_its = 1,
 
     # Need to add one to current step, i.e., output[1,] was row 1, but tstep 0,
     # and so when model$step <- model$step + 1 runs for the first time, 
-    # model$step increments from 0 to 1. If we did not have +1, the last 
+    # model$step increments from 0 to 1. Without +1, the last 
     # time step in the output would just be 0 from the initialization of output.
     model$output[model$step + 1, ] <- 
       list(model$step, total_adoption(model$agents))

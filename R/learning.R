@@ -1,9 +1,3 @@
-library(dplyr, include.only = c("count", "slice_max"))
-library(purrr, include.only = c("map", "map_vec"))
-library(tibble)
-
-source("R/run.R")
-
 # The iterating learning is the same in either case.
 
 #' @export
@@ -21,8 +15,7 @@ iterate_learning_model <- function(model) {
 # expecting to not be used for selecting interaction partner.
 
 #' @export
-frequency_bias_select_teacher <- partner_selection_default
-
+frequency_bias_select_teacher <- function(agent, model) { return (NULL) }
 
 #' Interaction function for frequency-biased adaptive learning.
 #'
@@ -44,7 +37,7 @@ frequency_bias_interact <- function(learner, ., model) {
     behavior_counts <- 
       dplyr::count(tibble(
         curr_behavior = 
-          purrr::map_vec(learner$neighbors$agents, 
+          map_vec(learner$neighbors$agents, 
                   \(n) {n$curr_behavior}),
       ), curr_behavior)
     

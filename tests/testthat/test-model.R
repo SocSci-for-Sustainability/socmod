@@ -1,17 +1,15 @@
-library(purrr)
-
 test_that("ABM initialized by n_agents keyword all Legacy and with N-1 neighbors",
 {
- N <- 10
- model <- AgentBasedModel$new(n_agents = N)
-
- expect_true(
-   all(
-     map_vec(model$agents, \(a) { 
-       (a$curr_behavior == "Legacy") && (a$neighbors$n == 9)
-     })
-   )
- )
+  N <- 10
+  model <- AgentBasedModel$new(n_agents = N)
+ 
+  expect_true(
+    all(
+      map_vec(model$agents, \(a) { 
+        (a$curr_behavior == "Legacy") && (a$neighbors$n == 9)
+      })
+    )
+  )
 })
 
 
@@ -25,7 +23,7 @@ test_that("ABM initialized by agents and network",
         rep("Adaptive", as.integer(N/2)))
     )
 
-  agents <- purrr:::map(behaviors, \(b) { Agent$new(b) })
+  agents <- map(behaviors, \(b) { Agent$new(b) })
 
   model <- AgentBasedModel$new(agents = agents,
                                network = regular_lattice(N, 4),
@@ -55,10 +53,10 @@ test_that("ABM initialized by agents and network",
 test_that("ABM initialized by network",
 {
   # Use Florentine network for fun, check it loaded as expected.
-  library(netrankr)
+  florentine_m <- netrankr::florentine_m
   florentine_m <-
-    delete_vertices(florentine_m, which(degree(florentine_m) == 0))
-  fl_verts <- V(florentine_m)
+    delete_vertices(florentine_m, which(igraph::degree(florentine_m) == 0))
+  fl_verts <- igraph::V(florentine_m)
   n_verts <- length(fl_verts)
   expect_equal(n_verts, 15)
 
@@ -72,12 +70,13 @@ test_that("ABM initialized by network",
 
   n_doing_legacy <-
     sum(
-      purrr::map_vec(
+      map_vec(
         agents,
         \(a) { ifelse(a$curr_behavior == "Legacy", 1, 0) }
       )
     )
 
+  # Check that all agents initialized with legacy behavior.
   expect_equal(n_doing_legacy, n_agents)
 
   # Spot check some neighbors are as expected.

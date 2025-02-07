@@ -1,14 +1,10 @@
-library(dplyr)
-library(netrankr)
-library(purrr)
-library(igraph)
-
 test_that("Exposure probability works as expected",
 {
   # Use Florentine network for fun, check it loaded as expected.
-  florentine_m <- 
-    delete_vertices(florentine_m, which(degree(florentine_m) == 0))
-  fl_verts <- V(florentine_m)
+  florentine_m <- netrankr::florentine_m
+  florentine_m <-
+    delete_vertices(florentine_m, which(igraph::degree(florentine_m) == 0))
+  fl_verts <- igraph::V(florentine_m)
   n_verts <- length(fl_verts)
   expect_equal(n_verts, 15)
   

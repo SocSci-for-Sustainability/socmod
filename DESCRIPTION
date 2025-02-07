@@ -17,6 +17,9 @@ Imports:
     dplyr,
     ggplot2,
     igraph,
+    magrittr,
+    netrankr,
     purrr,
     R6,
+    rlang,
     tibble

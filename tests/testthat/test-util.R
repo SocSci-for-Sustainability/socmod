@@ -1,5 +1,3 @@
-library(purrr)
-library(dplyr)
 test_that("Network construction helpers work as expected", {
 
   # Get all possible undirected edges for graph vertices.
@@ -16,8 +14,8 @@ test_that("Network construction helpers work as expected", {
   expect_equal(nrow(all_possible_edges), expected_E_size_undirected(N))
 
   directed <- TRUE
-  g <- make_empty_graph(N, directed)
-  verts <- V(g)
+  g <- igraph::make_empty_graph(N, directed)
+  verts <- igraph::V(g)
 
   all_possible_directed_edges <- get_all_possible_edges(N, directed)
   expect_equal(nrow(all_possible_directed_edges), expected_E_size_directed(N))
@@ -32,7 +30,7 @@ test_that("Erdős-Rényi random network constructions yield correct network stat
 
   expected_edge_count <- 20
 
-  expect_equal(ecount(g), expected_edge_count)  
+  expect_equal(igraph::ecount(g), expected_edge_count)  
 }
 )
 

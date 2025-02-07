@@ -1,7 +1,3 @@
-library(dplyr)
-library(R6, quietly = TRUE)
-library(purrr, include.only = "map", quietly = TRUE)
-
 #' @export
 AgentBasedModel <- R6Class(classname="AgentBasedModel",
   public = list(
