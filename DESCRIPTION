@@ -15,11 +15,14 @@ Config/testthat/edition: 3
 Imports: 
     assertthat,
     dplyr,
+    evaluate,
     ggplot2,
     igraph,
     magrittr,
     netrankr,
+    pkgdown,
     purrr,
     R6,
     rlang,
     tibble
+URL: https://css4s.github.io/socmod/

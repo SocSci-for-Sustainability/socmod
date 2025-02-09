@@ -1,4 +1,5 @@
 # Set up empty stubs for default model subroutines.
+
 #' @export
 partner_selection_default = function(agent, model) { return (NULL) }
 
@@ -11,6 +12,16 @@ iterate_model_default     = function(model) {}
 #' @export
 stop_cond_default <- function(model) { return (FALSE) }
 
+#' Run an agent-based model for either a number of iterations (`max_its`) or 
+#' until some stop condition is met (e.g., fixation).
+#' @param model 
+#'
+#' @param max_its 
+#' @param partner_selection 
+#' @param interaction 
+#' @param iterate_model 
+#' @param stop_cond 
+#'
 #' @export
 run <- function(model, max_its = 1, 
                 partner_selection = partner_selection_default,

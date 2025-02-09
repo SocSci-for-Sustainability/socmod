@@ -50,7 +50,7 @@ test_that("ABM initialized by agents and network",
 })
 
 
-test_that("ABM initialized by network",
+test_that("ABM initialized by Florentine marriage network",
 {
   # Use Florentine network for fun, check it loaded as expected.
   florentine_m <- netrankr::florentine_m
@@ -89,4 +89,44 @@ test_that("ABM initialized by network",
   expect_true(m$get_agent("Albizzi")$neighbors$contains("Medici"))
 
   expect_false(m$get_agent("Acciaiuol")$neighbors$contains("Pazzi"))
+})
+
+
+test_that("ABM initialized by regular lattice",
+{
+
+  # Initialize the model with a regular lattice social network.
+  N <- 10
+  k <- 4
+  net <- regular_lattice(N, k)
+  m <- AgentBasedModel$new(network = net)
+  
+  # Check that all agents are present and doing Legacy.
+  agents <- m$agents
+  n_agents <- length(agents)
+  expect_equal(n_agents, N)
+  
+  n_doing_legacy <-
+    sum(
+      map_vec(
+        agents,
+        \(a) { ifelse(a$curr_behavior == "Legacy", 1, 0) }
+      )
+    )
+  
+  # Check that all agents initialized with legacy behavior.
+  expect_equal(n_doing_legacy, n_agents)
+  
+  # Spot check some neighbors are as expected.
+  expect_true(all(map_vec(c(2,3,9,10), \(ii) { m$agents[[1]]$neighbors$contains(ii) })))
+  expect_true(all(map_vec(c(3,4,10,1), \(ii) { m$agents[[2]]$neighbors$contains(ii) })))
+  expect_true(all(map_vec(c(1,2,4,5), \(ii) { m$get_agent(3)$neighbors$contains(ii) })))
+  expect_true(all(map_vec(c(2,3,5,6), \(ii) { m$get_agent(4)$neighbors$contains(ii) })))
+  expect_true(all(map_vec(c(3,4,6,7), \(ii) { m$get_agent(5)$neighbors$contains(ii) })))
+  expect_true(all(map_vec(c(4,5,7,8), \(ii) { m$get_agent(6)$neighbors$contains(ii) })))
+  expect_true(all(map_vec(c(5,6,8,9), \(ii) { m$agents[[7]]$neighbors$contains(ii) })))
+  expect_true(all(map_vec(c(6,7,9,10), \(ii) { m$get_agent(8)$neighbors$contains(ii) })))
+  expect_true(all(map_vec(c(7,8,10,1), \(ii) { m$agents[[9]]$neighbors$contains(ii) })))
+  expect_true(all(map_vec(c(8,9,1,2), \(ii) { m$get_agent(10)$neighbors$contains(ii) })))
+
 })

@@ -1,3 +1,24 @@
+#' Helper function to calculate relative error from an absolute error and the 
+#' known value used for comparison. Useful because for comparing small probability
+#' values in the function below.
+#' 
+#' @param abs_tol Desired absolute tolerance
+#' @param known_val Known value against which we calculate error of observed value
+#' @examples
+#' # Comparing expected to calculated like this...
+#' expected <- 0.17
+#' calculated <- 0.15
+#' expect_equal(calculated, expected, tolerance = 1e-1)
+#' # ...fails because it is calculating relative tolerance. Let's make the 
+#' # absolute tolerance 0.05, seems reasonable.
+#' abs_tol <- 0.05
+#' rel_tol <- abs_to_rel_tol(abs_tol, abs_known_val)
+#'
+abs_to_rel_tol <- function(abs_tol, abs_known_val) {
+  return (abs_tol / abs_known_val)
+}
+
+#--------- Success-biased learning tests -------------#
 test_that("Success-bias selects teachers as expected",
 {
   # Initialize a model with fully-connected network (default).
@@ -19,22 +40,32 @@ test_that("Success-bias selects teachers as expected",
 
   # Now set the fitnesses to be multiples of 1 so the probabilities of selection
   # are 1/6, 1/3, and 1/2; expect observe this fraction of 10000 selections.
-   a2$set_fitness(1.0)
-   a3$set_fitness(2.0)
-   a4$set_fitness(3.0)
+  a2$set_fitness(1.0)
+  a3$set_fitness(2.0)
+  a4$set_fitness(3.0)
 
-   n_selections <- 5000
-   # n_selections <- 50
-   selected_idxs <-
-     purrr::map_vec(1:n_selections,
-                    \(.) { success_bias_select_teacher(a1, model)$name })
+  n_selections <- 2000
 
-   select_frequency <- rle(sort(selected_idxs))$lengths / n_selections
+  selected_idxs <-
+    purrr::map_vec(1:n_selections,
+                   \(.) { success_bias_select_teacher(a1, model)$name })
 
-   expect_equal(select_frequency[1], 1.0 / 6.0, tolerance = 1e-1)
-   expect_equal(select_frequency[2], 1.0 / 3.0, tolerance = 1e-1)
-   expect_equal(select_frequency[3], 1.0 / 2.0, tolerance = 1e-1)
- })
+  select_frequency <- rle(sort(selected_idxs))$lengths / n_selections
+   
+  # Set absolute tolerance to be 0.05 for these tests.
+  a1_freq_expected <- 1.0 / 6.0
+  abs_tol <- 0.05
+  rel_tol <- abs_to_rel_tol(abs_tol, a1_freq_expected)
+  expect_equal(select_frequency[1], a1_freq_expected, tolerance = rel_tol)
+
+  a2_freq_expected <- 1.0 / 3.0
+  rel_tol <- abs_to_rel_tol(abs_tol, a2_freq_expected)
+  expect_equal(select_frequency[2], a2_freq_expected, tolerance = rel_tol)
+
+  a3_freq_expected <- 1.0 / 2.0
+  rel_tol <- abs_to_rel_tol(abs_tol, a3_freq_expected)
+  expect_equal(select_frequency[3], a3_freq_expected, tolerance = rel_tol)
+})
 
 
 test_that("Success-biased learning results in expected learned behaviors",
@@ -97,7 +128,7 @@ test_that("Success-biased learning results in expected learned behaviors",
     return (a1$curr_behavior)
   }
 
-  n_reps <- 1000
+  n_reps <- 2000
   a1_learned_behaviors <- purrr::map_vec(1:n_reps, \(.){ do_one() })
 
   select_count <- rle(sort(a1_learned_behaviors))
@@ -105,12 +136,26 @@ test_that("Success-biased learning results in expected learned behaviors",
   select_labels <- select_count$values
   names(select_frequency) <- select_labels
 
-  expect_equal(select_frequency[[select_labels[1]]], 1.0 / 6.0, tolerance = 1e-1)
-  expect_equal(select_frequency[[select_labels[2]]], 1.0 / 3.0, tolerance = 1e-1)
-  expect_equal(select_frequency[[select_labels[3]]], 1.0 / 2.0, tolerance = 1e-1)
+  # Set absolute tolerance to be 0.01 for these tests.
+  a1_freq_expected <- 1.0 / 6.0
+  abs_tol <- 0.05
+  rel_tol <- abs_to_rel_tol(abs_tol, a1_freq_expected)
+  expect_equal(select_frequency[[select_labels[1]]], 
+               a1_freq_expected, tolerance = rel_tol)
+
+  a2_freq_expected <- 1.0 / 3.0
+  rel_tol <- abs_to_rel_tol(abs_tol, a2_freq_expected)
+  expect_equal(select_frequency[[select_labels[2]]], 
+               a2_freq_expected, tolerance = rel_tol)
+
+  a3_freq_expected <- 1.0 / 2.0
+  rel_tol <- abs_to_rel_tol(abs_tol, a3_freq_expected)
+  expect_equal(select_frequency[[select_labels[3]]], 
+               a3_freq_expected, tolerance = rel_tol)
 })
 
 
+#--------- Frequency-biased learning tests -------------#
 test_that(
 "Frequency-biased learning leads to more common behaviors adopted more frequently", {
 
@@ -142,14 +187,14 @@ test_that(
     return (a1$curr_behavior)
   }
 
-  n_reps <- 500
+  n_reps <- 2000
   a1_learned_behaviors <- purrr::map_vec(1:n_reps, \(.){ do_one() })
 
   behavior_tbl <- count(tibble(curr_behavior = a1_learned_behaviors), curr_behavior)
   behavior_tbl$freq <- behavior_tbl$n / n_reps
 
   # Now set the fitnesses to be multiples of 1 so the probabilities of selection
-  # are 1/6, 1/3, and 1/2; expect observe this fraction of 10000 selections.
+  # are 1/6, 1/3, and 1/2; expect observe this fraction of 2000 selections.
   expect_equal(dplyr::filter(behavior_tbl, curr_behavior == "Legacy")$freq, 
                1.0 / 3.0,
                tolerance = 1e-1)

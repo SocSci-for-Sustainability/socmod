@@ -8,6 +8,25 @@ Agent attributes include information about previous, current, and next behaviors
 neighbors (an instance of the Neighbors class). Methods include
 exposure probability,
 }
+\section{Public fields}{
+\if{html}{\out{<div class="r6-fields">}}
+\describe{
+\item{\code{prev_behavior}}{Previous agent behavior.}
+
+\item{\code{curr_behavior}}{Current agent behavior.}
+
+\item{\code{next_behavior}}{Next behavior the agent could do, depending on iterate_model.}
+
+\item{\code{neighbors}}{Initial set of neighbors.}
+
+\item{\code{curr_fitness}}{Current agent fitness.}
+
+\item{\code{next_fitness}}{Next fitness of next behavior.}
+
+\item{\code{name}}{Agent's name.}
+}
+\if{html}{\out{</div>}}
+}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
@@ -42,6 +61,7 @@ Create a new Agent instance.
 }
 \subsection{Returns}{
 A new \code{Agent} object.
+Add agents to this agent's \code{neighbor} field
 }
 }
 \if{html}{\out{<hr>}}
@@ -52,6 +72,17 @@ A new \code{Agent} object.
 \if{html}{\out{<div class="r">}}\preformatted{Agent$add_neighbors(new_neighbors)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{new_neighbors}}{List of Agents to add as neighbors.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+self (Agent)
+Calculate the exposure probability for this agent.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Agent-exposure_prob"></a>}}
@@ -61,6 +92,12 @@ A new \code{Agent} object.
 \if{html}{\out{<div class="r">}}\preformatted{Agent$exposure_prob()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+Float ≥ 0 and ≤ 1 representing the probability of a non-trivial
+exposure to the adaptive behavior, where \emph{non-trivial} exposure means the learner
+is doing the legacy behavior and selects an agent doing the adaptive behavior.
+Set the agent's current fitness value.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Agent-set_fitness"></a>}}
@@ -70,6 +107,16 @@ A new \code{Agent} object.
 \if{html}{\out{<div class="r">}}\preformatted{Agent$set_fitness(fitness)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{fitness}}{The fitness to assign.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+self
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Agent-clone"></a>}}

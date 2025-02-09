@@ -1,0 +1,34 @@
+url: ~
+template:
+  bootstrap: 5
+
+reference:
+- title: "The `AgentBasedModel` class, model runs with `run`, and partner selection and interaction functions"
+  desc: >
+    Create and run agent-based models focused on the spread of sustainable
+    behaviors in socmod.
+  contents:
+    - AgentBasedModel
+    - run
+    - starts_with("success_bias")
+    - starts_with("frequency_bias")
+    - iterate_learning_model
+
+- title: "Agents and their neighbors"
+  desc: >
+    Agents in the model are represented by a number of attributes, with select
+    class methods to track lists of their neighbors.
+  contents:
+    - Agent
+    - Neighbors
+     
+- title: "Utilities for networks"
+  desc: >
+    Some basic utilities for creating networks, including a growing suite of
+    network construction routines.
+  contents:
+    - regular_lattice
+    - G_NM
+    - add_unique_edge
+    - get_all_possible_edges
+    - not_adjacent

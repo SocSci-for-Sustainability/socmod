@@ -1,18 +1,47 @@
+#' `socmod` implementation of an agent-based model 
+#' 
+#' @description
+#' This class encapsulates the model's agents, the network that structures
+#' their interactions, static or dynamic model parameters, model
+#' state, and model outputs. 
+#' 
 #' @export
 AgentBasedModel <- R6Class(classname="AgentBasedModel",
   public = list(
-    agents = c(), 
+
+    #' @field agents Named list of agents 
+    agents = list(), 
+
+    #' @field step Time step integer index
     step = 0,
+
+    #' @field network Social network that structures agent interactions
     network = NULL,
+
+    #' @field params Model parameters for use in partner selection, 
+    #' interaction functions, and 
     params = list(),
+
+    #' @field output Model output, which is either initiated or appended to 
+    #' depending on if the model has been run yet.
     output = NULL,
-    add_agents = function(agents_to_add) {
-      self$agents <- unlist(c(self$agents, agents_to_add))
-      invisible(self)
-    },                    
-    get_agent = function(name) {
-      invisible (self$agents[[name]])
-    },
+
+    
+    #' Create a new agent-based model.
+    #' 
+    #' @description
+    #' Agent-based models may be initialized one of three ways: (1) 
+    #' by providing the agents and the social network that structures their
+    #' interaction; (2) providing only the social network; or (3) provide
+    #' the number of agents only, which will create and add them to a 
+    #' complete graph.
+    #' 
+    #' @param agents List of agents in agent-based model.
+    #' @param network igraph Graph instance representing the ABM social network
+    #' @param n_agents Number of agents.]
+    #' @param ... Additional kwargs that become entries in the AgentBasedModel$params field
+    #' 
+    #' @return self New agent-based model initialized as specified.
     initialize = 
       function(agents = NULL, network = NULL, n_agents = NULL, ...) {
 
@@ -34,31 +63,38 @@ AgentBasedModel <- R6Class(classname="AgentBasedModel",
           }
 
           self$agents <- agents
+
         } else if (!is.null(network)) {
         # Now dealing with the case where `agents` is null, but network not.
-            self$network <- network
             
+            if (is.null(igraph::V(network)$name)) {
+              igraph::V(network)$name <- seq(1, length(igraph::V(network)))
+            }
+            
+            self$network <- network
             # Create new agents defaulting to Legacy behavior on init.
-            self$add_agents( 
+            self$add_agents(
               purrr::map(
                 V(network), \(n) { 
                   Agent$new("Legacy", name=n$name)
                 }
               )
             )
-          # Neighbors$new(neighbors(network, n))
-          names(self$agents) <- V(network)$name
+          
+          names <- V(network)$name
+          
+          if (is.null(names)) {
+            names(self$agents) <- 1:length(self$agents)
+          } else {
+            names(self$agents) <- names  
+          }
+          
           for (agent in self$agents) {
             net_neighbors <- neighbors(network, agent$name)
-            agent_neighbors <- purrr::map(net_neighbors, \(n) { self$get_agent(n$name) })
+            agent_neighbors <- purrr::map(net_neighbors, 
+                                          \(n) { self$get_agent(n$name) })
             agent$add_neighbors(agent_neighbors)
           }
-            
-            # map(self$agents, \(a) { a$add_neighbors()
-
-            # Make agents into named list so graph names can look up agents.
-            
-            
 
         # Finally deal with the case where only number of agents is provided. 
         }  else if (!is.null(n_agents)) {
@@ -77,7 +113,7 @@ AgentBasedModel <- R6Class(classname="AgentBasedModel",
           # After all agents added to the model, set network neighbor agents.
           for (agent in self$agents) { 
             agent$add_neighbors(
-              purrr::map(neighbors(self$network, agent$name), 
+              purrr::map(igraph::neighbors(self$network, agent$name), 
                   \(n) { self$get_agent(n) })
             )
           }
@@ -87,6 +123,22 @@ AgentBasedModel <- R6Class(classname="AgentBasedModel",
         self$params = list(...)
 
         invisible(self)
-      }
+      },
+
+    #' Add agents to the model.
+    #' 
+    #' @param agents_to_add Insert a list of new agents into list of existing agents.
+    add_agents = function(agents_to_add) {
+      self$agents <- unlist(c(self$agents, agents_to_add))
+      invisible(self)
+    },
+
+    #' Get an agent from the model by name.
+    #' 
+    #' @param name Name of agent, usually an integer or string
+    get_agent = function(name) {
+      invisible (self$agents[[name]])
+    }
+
   )
 )

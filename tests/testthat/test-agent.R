@@ -3,7 +3,8 @@ test_that("Exposure probability works as expected",
   # Use Florentine network for fun, check it loaded as expected.
   florentine_m <- netrankr::florentine_m
   florentine_m <-
-    delete_vertices(florentine_m, which(igraph::degree(florentine_m) == 0))
+    igraph::delete_vertices(florentine_m, 
+                            which(igraph::degree(florentine_m) == 0))
   fl_verts <- igraph::V(florentine_m)
   n_verts <- length(fl_verts)
   expect_equal(n_verts, 15)
@@ -13,7 +14,7 @@ test_that("Exposure probability works as expected",
   alb <- m$get_agent("Albizzi")
   
   alb$curr_behavior <- "Adaptive"
-
+  
   gin <- m$get_agent("Ginori")
   gua <- m$get_agent("Guadagni")
   med <- m$get_agent("Medici")
