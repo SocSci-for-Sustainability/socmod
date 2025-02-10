@@ -19,7 +19,7 @@
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Models of Social Behavior in R">
 <meta name="description" content="Provides a conceptual framework with software tools for creating computational models of social behavior for decision making.">
 <meta property="og:description" content="Provides a conceptual framework with software tools for creating computational models of social behavior for decision making.">
-<meta property="og:image" content="/logo.png">
+<meta property="og:image" content="https://css4s.github.io/socmod/logo.png">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -51,9 +51,7 @@
   </div>
 </nav><div class="container template-home">
 <div class="row">
-  <main id="main" class="col-md-9"><p>true</p>
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-<div class="section level1">
+  <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header">
 <img src="logo.png" class="logo" alt=""><h1 id="socmod">socmod<a class="anchor" aria-label="anchor" href="#socmod"></a>
 </h1>
@@ -89,7 +87,7 @@
 A simple network nieghborhood of individual/agent <span class="math inline"><em>i</em></span>
 </figcaption></figure><p>We can initialize these agents and their network as follows. In the next code block we first initialize four agents named “i”, “n_i1”, “n_i2”, and “n_i3” to match the illustration of focal/learner agent <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math> and its three neighbors (each one is an <em>instance</em> of the <code><a href="reference/Agent.html">socmod::Agent</a></code> class). Then we create the social network from the illustration using <code>igraph</code>. Finally, we initialize a new <code><a href="reference/AgentBasedModel.html">socmod::AgentBasedModel</a></code> using the helper function <code>make_example_abm</code>. In the next subsection we then use this helper function to initialize new models that will be run with frequency- and success-biased adaptive learning strategies, using learning functions provided with <code>socmod</code>. After that we show how to define non-adaptive contagion learning functions, adapted from compartmental epidemiological modeling.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://css4s.github.io/socmod/" class="external-link">socmod</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://css4s.github.io/socmod/">socmod</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Example ABM builder with four agents as pictured above. Can pass arbitrary</span></span>
 <span><span class="co"># named parameters in ... that will be passed to AgentBasedModel$new as params.</span></span>
@@ -165,7 +163,7 @@ A simple network nieghborhood of individual/agent <span class="math inline"><em>
 <span></span>
 <span><span class="va">success_rate</span> <span class="op">&lt;-</span> <span class="va">n_success</span> <span class="op">/</span> <span class="va">n_trials</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Success rate:"</span>, <span class="va">success_rate</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "Success rate: 0.24"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "Success rate: 0.27"</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="success-biased-adaptive-learning">Success-biased adaptive learning<a class="anchor" aria-label="anchor" href="#success-biased-adaptive-learning"></a>
@@ -196,7 +194,7 @@ A simple network nieghborhood of individual/agent <span class="math inline"><em>
 <span></span>
 <span><span class="va">success_rate</span> <span class="op">&lt;-</span> <span class="va">n_success</span> <span class="op">/</span> <span class="va">n_trials</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Success rate:"</span>, <span class="va">success_rate</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "Success rate: 0.65"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "Success rate: 0.68"</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
@@ -255,7 +253,6 @@ A simple network nieghborhood of individual/agent <span class="math inline"><em>
 <p>Technically, <code>socmod</code> uses object-oriented programming, provided by <a href="https://r6.r-lib.org/" class="external-link"><code>R6</code></a>, and functional-style agent and model behavior specification inspired by <a href="https://juliadynamics.github.io/Agents.jl/stable/" class="external-link">Agents.jl</a>, which I myself have enjoyed using. But, I still had to do my plotting in R, and more beginning students across disciplines will tend to know R than Julia. R also seems to have a great community with the <code>r-lib</code> project that seems to be bringing a continuity to scientific programming that I have not seen in any other programming language.</p>
 </div>
 </div>
-
   </main><aside class="col-md-3"><div class="license">
 <h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
