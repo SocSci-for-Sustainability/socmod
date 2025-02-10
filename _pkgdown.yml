@@ -3,16 +3,28 @@ template:
   bootstrap: 5
 
 reference:
-- title: "The `AgentBasedModel` class, model runs with `run`, and partner selection and interaction functions"
+- title: "The `AgentBasedModel` class to represent the agents and their social network"
   desc: >
-    Create and run agent-based models focused on the spread of sustainable
-    behaviors in socmod.
+    Create and run agent-based models of social behavior in socmod.
   contents:
     - AgentBasedModel
+
+- title: "Running models"
+  desc: >
+    The `run()` function uses the specified `partner_selection`, `interaction`, 
+    and `iterate_model` functions to specify these dynamics and iterate the
+    `model` (an instance of `socmod::AgentBasedModel`).
+  contents:
     - run
+
+- title: "Learning (strategy) functions"
+  desc: >
+    Functions to pass to run for model iteration in a learning model, 
+    and for either success-biased or frequency-biased adaptive learning.
+  contents:
+    - iterate_learning_model
     - starts_with("success_bias")
     - starts_with("frequency_bias")
-    - iterate_learning_model
 
 - title: "Agents and their neighbors"
   desc: >

@@ -25,7 +25,6 @@ AgentBasedModel <- R6Class(classname="AgentBasedModel",
     #' @field output Model output, which is either initiated or appended to 
     #' depending on if the model has been run yet.
     output = NULL,
-
     
     #' Create a new agent-based model.
     #' 

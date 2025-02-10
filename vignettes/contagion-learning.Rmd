@@ -1,0 +1,69 @@
+---
+title: "contagion-learning"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{contagion-learning}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(socmod)
+```
+
+### Example: agent-based model of contagion learning among the Florentine oligarchy
+
+Matthew Jackson begins his (2008) textbook, [*Social and Economic
+Networks*](https://web.stanford.edu/~jacksonm/books.html#book)*,* by
+reviewing the rise of the Medici family as the dominant oligarchs of the
+oligarchy of Florence in the 1400s. In short, the family patriarch
+managed to arrange marriages such that the Medicis became not just the
+best-connected among the oligarchy, but also attained the greatest
+*betweenness centrality*. This means that if one family wanted to
+influence another, the Medicis were the most likely to be an effective
+intermediary.
+
+#### Initialize agents and social network
+
+We first load the [Florentine Families intermarriage network data from the
+`netrankr`
+package](https://cran.r-project.org/web/packages/netrankr/vignettes/use_case.html)
+to specify the agents and their social network for our agent-based
+model. 
+
+```{r example}
+library(socmod)
+
+# igraph should be installed as dependency of socmod.
+library(igraph, quietly = T)
+# Ensure installed via install.packages("netrankr"); provides the network data.
+library(netrankr)
+
+# Load Florentine marriage network.
+flornet <- delete_vertices(florentine_m, which(degree(florentine_m) == 0))
+
+# Initialize new agent-based model with Florentine family network,
+# then do some spot checks of neighbors; compare with network below.
+flor_abm <- AgentBasedModel$new(network = flornet)
+print(
+  paste( "Num. neighbors of Medici (should be 6): ", 
+         flor_abm$get_agent("Medici")$neighbors$n   )
+)
+
+flor_abm$get_agent("Barbadori")$neighbors$agents  # List of two Agent objects
+plot(flor_abm$network)
+```
+
+
+#### Set initial conditions 
+
+Next we can set the number of agents doing the *adaptive* behavior, denoted $A$.
+This behavior is learned through contagion if an agent is doing the *legacy*
+behavior $L$. The learning procedure is defined later. For now 

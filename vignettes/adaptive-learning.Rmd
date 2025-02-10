@@ -1,0 +1,50 @@
+---
+title: "Adaptive learning in agent-based models"
+output: rmarkdown::html_vignette
+bibliography: ../socmod.bib
+vignette: >
+  %\VignetteIndexEntry{adaptive-learning}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+
+## Introduction
+
+Human cognitive abilities enable us to manage risk in changing environments through cultural adaptation. Cultural adaptation enables the rapid development, modification, combination, and diffusion of beneficial behaviors. These cognitive abilities evolved as *genetic* adaptations about two million years ago. Human capacity for adaptive learning that underlies cultural change rests on the ability to integrate information coming from our social partners, those with whom we interact, and personal experience of whether our [@Witt2024].
+
+There are two simple adaptive learning strategies currently implemented in
+[R/learning.R](R/learning.R): success-biased partner selection and frequency-biased
+behavior selection. These are two generalizations of adaptive social learning strategies [@Kendal2018], 
+and the versions here will be highly simplified to focus on key distinguishing
+features and mechanisms of varieties of social learning.
+
+### Setting up agents and social network for performing comparison
+
+Here we create a function to initialize an agent-based model with a complete 
+network 
+
+### Success-biased partner selection
+
+
+```{r setup}
+library(socmod)
+
+
+```
+
+
+### Frequency-biased partner selection
+
+
+
+
+## References

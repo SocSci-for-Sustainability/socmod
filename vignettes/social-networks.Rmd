@@ -1,0 +1,24 @@
+---
+title: "social-networks"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{social-networks}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(socmod)
+```
+
+```{r}
+gnm_net <- G_NM(10, 10)
+plot(gnm_net)
+```
