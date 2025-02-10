@@ -28,11 +28,13 @@ Agent <- R6Class(classname="Agent", public = list(
   #' @field neighbors Initial set of neighbors.
   neighbors = c(),
   #' @field curr_fitness Current agent fitness.
+  prev_fitness = 0.0,
+  #' @field curr_fitness Current agent fitness.
   curr_fitness = 0.0,
   #' @field next_fitness Next fitness of next behavior.
   next_fitness = 0.0,
   #' @field name Agent's name.
-  name = "",
+  name = NULL,
 
   #' @description
   #' Create a new Agent instance. 
@@ -42,11 +44,17 @@ Agent <- R6Class(classname="Agent", public = list(
   #' @param neighbors Initialize neighbors; typically done in ABM initialization.
   #' @return A new `Agent` object.
   initialize = 
-    function(behavior = "", fitness = 0.0, name = "", neighbors = c()) {
+    function(behavior = "", fitness = 0.0, name = NULL, neighbors = c()) {
       
       self$prev_behavior <- behavior
       self$curr_behavior <- behavior
       self$next_behavior <- behavior
+      # print(fitness)
+      self$prev_fitness <- fitness
+      self$curr_fitness <- fitness
+      self$next_fitness <- fitness
+      
+      # print(self$curr_fitness)
       
       self$name <- name
       self$add_neighbors(neighbors)  

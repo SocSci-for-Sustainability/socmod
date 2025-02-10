@@ -102,7 +102,7 @@ success_bias_select_teacher <- function(learner, model) {
   neighbor_fitnesses <- purrr::map_vec(neighbor_agents, \(n) { n$curr_fitness })
 
   total_fitness <- sum(neighbor_fitnesses)
-
+  
   neighbor_probs <- purrr::map(neighbor_fitnesses, \(f) { f / total_fitness })
 
   return (sample(neighbor_agents, 1, prob = neighbor_probs)[[1]])

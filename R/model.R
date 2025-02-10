@@ -11,6 +11,9 @@ AgentBasedModel <- R6Class(classname="AgentBasedModel",
 
     #' @field agents Named list of agents 
     agents = list(), 
+    
+    #' @field n_agents Number of agents
+    n_agents = 0,
 
     #' @field step Time step integer index
     step = 0,
@@ -55,16 +58,37 @@ AgentBasedModel <- R6Class(classname="AgentBasedModel",
             self$network <- network
           }
           
-          names(agents) <- map_vec(agents, \(a) { a$name })
-
-          for (agent in agents) {
+          self$agents <- agents
+          self$n_agents <- length(agents)
+          
+          names(self$agents) <- purrr::map_vec(1:self$n_agents, \(a_idx) { 
+            agent <- agents[[a_idx]]
             
-            agent$add_neighbors(
-              igraph::neighbors(self$network, agent$name)
-            )
+            if (is.null(agent$name)) {
+              agent$name <- a_idx
+              
+              return (a_idx)
+            } else {
+              return (agent$name)
+            }
+          })
+          
+          a_idx <- 1
+          if (is.null(V(network)$name)) {
+            igraph::V(network)$name <- names(self$agents)
+          }
+          for (agent in self$agents) {
+            
+            net_neighbors <- neighbors(network, agent$name)
+            
+            agent_neighbors <- purrr::map(net_neighbors, 
+                                          \(n) { self$get_agent(n$name) })
+            
+            agent$add_neighbors(agent_neighbors)
+            
+            a_idx <- a_idx + 1
           }
 
-          self$agents <- agents
 
         } else if (!is.null(network)) {
         # Now dealing with the case where `agents` is null, but network not.
@@ -139,7 +163,7 @@ AgentBasedModel <- R6Class(classname="AgentBasedModel",
     #' 
     #' @param name Name of agent, usually an integer or string
     get_agent = function(name) {
-      invisible (self$agents[[name]])
+      return (self$agents[[name]])
     }
 
   )
