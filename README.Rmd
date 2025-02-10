@@ -4,7 +4,6 @@ editor_options:
   markdown: 
     wrap: 72
 bibliography: socmod.bib
-toc: true
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
