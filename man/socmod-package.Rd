@@ -4,9 +4,11 @@
 \name{socmod-package}
 \alias{socmod}
 \alias{socmod-package}
-\title{socmod: What the Package Does (One Line, Title Case)}
+\title{socmod: Models of Social Behavior in R}
 \description{
-What the package does (one paragraph).
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+
+Provides a conceptual framework with software tools for creating computational models of social behavior for decision making.
 }
 \seealso{
 Useful links:
@@ -16,7 +18,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: First Last \email{first.last@example.com} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+\strong{Maintainer}: Matt Turner \email{maturner01@gmail.com} (\href{https://orcid.org/0000-0001-7421-4552}{ORCID})
 
 }
 \keyword{internal}

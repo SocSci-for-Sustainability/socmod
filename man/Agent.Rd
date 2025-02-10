@@ -5,8 +5,8 @@
 \title{Agent for use with AgentBasedModel instances}
 \description{
 Agent attributes include information about previous, current, and next behaviors,
-neighbors (an instance of the Neighbors class). Methods include
-exposure probability,
+neighbors (an instance of the Neighbors class). Use class methods
+to calculate exposure probability, add neighbors, or set agent fitness.
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

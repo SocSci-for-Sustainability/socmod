@@ -14,8 +14,8 @@
 #' 
 #' @description
 #' Agent attributes include information about previous, current, and next behaviors, 
-#' neighbors (an instance of the Neighbors class). Methods include 
-#' exposure probability,
+#' neighbors (an instance of the Neighbors class). Use class methods 
+#' to calculate exposure probability, add neighbors, or set agent fitness.
 #' @export
 Agent <- R6Class(classname="Agent", public = list(
   

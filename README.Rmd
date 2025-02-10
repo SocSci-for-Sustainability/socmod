@@ -80,7 +80,33 @@ We can initialize these agents and their network as follows. In the next code bl
 ```{r}
 library(socmod)
 
+n_agents <- 4
 
+agent_fitness <- c(1, 1, 1, 2)
+agent_behaviors <- c("Legacy", "Legacy", "Legacy", "Adaptive")
+agent_names <- c("i", "n_i1", "n_i2", "n_i3")
+
+agents <- purrr::map(
+  1:n_agents, \(a_idx) { 
+    Agent$new(behavior=agent_behaviors[a_idx], 
+              fitness=agent_fitness[a_idx], 
+              name=agent_names[a_idx]) 
+  }
+)
+
+# Initialize network.
+socnet <- igraph::make_empty_graph(n_agents, directed = FALSE)
+# Set the vertex names.
+# igraph::V(net)$name <- agent_names
+# print(V(net)[["n_i1"]])
+# Edges can be added like so where every two names specify an edge.
+socnet <- igraph::add_edges(socnet, c(1, 2, 1, 3, 1, 4, 3, 4))
+# socnet <- igraph::add_edges(socnet, c("i", "n_i1", "i", "n_i2", "i", "n_i3", "n_i2", "n_i3"))
+
+# Create the agent-based model and plot the model's network.
+abm <- AgentBasedModel$new(agents = agents, network = socnet)
+print(abm$get_agent("i"))
+plot(abm$network)
 ```
 
 ## More information and the philosophy of socmod

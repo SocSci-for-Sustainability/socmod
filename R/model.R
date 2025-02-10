@@ -52,12 +52,15 @@ AgentBasedModel <- R6Class(classname="AgentBasedModel",
           if (is.null(network)) {
             self$network <- igraph::make_full_graph(length(agents))
           } else {
-            self$network <- network    
+            self$network <- network
           }
+          
+          names(agents) <- map_vec(agents, \(a) { a$name })
 
-          for (agent_idx in 1:length(agents)) {
-            agents[[agent_idx]]$add_neighbors(
-              igraph::neighbors(self$network, agent_idx)
+          for (agent in agents) {
+            
+            agent$add_neighbors(
+              igraph::neighbors(self$network, agent$name)
             )
           }
 
