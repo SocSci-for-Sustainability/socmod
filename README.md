@@ -186,7 +186,7 @@ n_success <- sum(purrr::map_vec(1:n_trials, \(.) {one_trial_success()}));
 
 success_rate <- n_success / n_trials
 print(paste("Success rate:", success_rate))
-#> [1] "Success rate: 0.27"
+#> [1] "Success rate: 0.22"
 ```
 
 #### Success-biased adaptive learning
@@ -228,7 +228,7 @@ n_success <- sum(purrr::map_vec(1:n_trials, \(.) {one_trial_success()}));
 
 success_rate <- n_success / n_trials
 print(paste("Success rate:", success_rate))
-#> [1] "Success rate: 0.68"
+#> [1] "Success rate: 0.67"
 ```
 
 ### Model dynamics with non-adaptive contagion learning

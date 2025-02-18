@@ -108,6 +108,7 @@ compartmental epidemiological modeling.
 
 ```{r}
 #| echo: true
+
 library(socmod)
 
 # Example ABM builder with four agents as pictured above. Can pass arbitrary
@@ -168,6 +169,7 @@ the Adaptive behavior, and many ending with $A(t=50) = 0$, fixating on
 the Legacy behavior.
 
 ```{r}
+#| fig-width: 3
 library(ggplot2)
 abm <- make_example_abm()
 
@@ -210,6 +212,8 @@ exercise.
 Here is how one can run a model with success-biased learning:
 
 ```{r}
+#| fig-width: 3
+#| 
 library(ggplot2)
 abm <- make_example_abm()
 
