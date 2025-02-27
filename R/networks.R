@@ -46,7 +46,6 @@ make_homophily_network <- function(group_sizes = c(3, 7), mean_degree = 6,
     a_idx <- final_a_idx + 1
   }
   
-  
   # The number of edges per group is the group size times user-specified mean degree.
   edges_per_group <- (group_sizes * mean_degree)
   
@@ -136,11 +135,9 @@ make_homophily_network <- function(group_sizes = c(3, 7), mean_degree = 6,
         }
         
       }
-      # 
-      # print("Stopping now with network with some between edges missing for the group.")
-      # print("Could fix later if it's a big problem.")
       
       edges_remain <- FALSE
+    
     } else {
       # If more than one group needs between edges, sample and add new edge.
       groups_for_adding <- sample(group_names, 2, prob = edges_between_per_group)
