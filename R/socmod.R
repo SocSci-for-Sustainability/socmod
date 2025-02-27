@@ -1,11 +1,11 @@
 #' @keywords internal
-#' @import rlang 
 #' @import R6
 #' @import ggplot2
 #' @import ggnetwork
 #' @import assertthat
 #' @importFrom magrittr %>%
 #' @importFrom stats runif
+#' @importFrom rlang on_load local_use_cli new_environment
 #' @importFrom dplyr count slice_max bind_rows 
 #' @importFrom purrr map map_vec
 #' @importFrom tibble tibble
