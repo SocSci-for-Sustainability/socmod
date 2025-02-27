@@ -198,10 +198,10 @@ ggnetplot <- function(net, ...) {
 #' @export
 #'
 #' @examples
-plot_homophilynet <- function(net) {
+plot_homophilynet <- function(net, node_size = 3) {
   ggnetplot(net) + 
     geom_edges(color = "grey") + 
-    geom_nodes(aes(color = group), size = 3) + 
+    geom_nodes(aes(color = group), size = node_size) + 
     theme_blank()
 }
 
