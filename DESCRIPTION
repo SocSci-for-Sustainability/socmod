@@ -19,6 +19,7 @@ Imports:
     dplyr,
     evaluate,
     ggplot2,
+    ggnetwork,
     igraph,
     magrittr,
     netrankr,

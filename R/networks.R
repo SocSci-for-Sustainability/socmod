@@ -46,15 +46,14 @@ make_homophily_network <- function(group_sizes = c(3, 7), mean_degree = 6,
     a_idx <- final_a_idx + 1
   }
   
-  print(group_sizes)
   
   # The number of edges per group is the group size times user-specified mean degree.
   edges_per_group <- (group_sizes * mean_degree)
-  print(edges_per_group)
+  
   # Scale by homophily to get edges per group, divided by two since each edge
   # adds additional degree per connected node and rounded for a whole number.
   edges_within_per_group <- round(edges_per_group * ((1 + homophily)/2) * 0.5)
-  print(edges_within_per_group)
+
   # The number of between-group edges starting from each group 
   edges_between_per_group <- edges_per_group - edges_within_per_group
   
@@ -64,11 +63,11 @@ make_homophily_network <- function(group_sizes = c(3, 7), mean_degree = 6,
   for (g_idx in 1:n_groups) {
     
     n_edges <- edges_within_per_group[g_idx]
-    # print(n_edges)
+    
     in_vertices <- V(net)[V(net)$group == group_names[g_idx]]
-    # print(in_vertices)
+    
     for (e_idx in 1:n_edges) {
-      # print(e_idx)
+    
       # Draw new vertices and add to graph if they are not already connected.
       edge_exists <- TRUE 
       while (edge_exists) {
