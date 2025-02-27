@@ -172,6 +172,37 @@ get_all_possible_edges <- function(N, directed = FALSE) {
 }
 
 
+#' Command that operates like ggplot
+#'
+#' @param net Network to plot
+#' @param ... Additional key-value aesthetics to pass to aes() in ggplot call
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+ggnetplot <- function(net, ...) {
+  
+  return(
+    ggplot(ggnetwork(net, layout = layout_in_circle(net)), 
+           aes(x=x, y=y, xend=xend, yend=yend, ...))
+  )
+}
 
+
+#' Plot homophily network where groups color nodes.
+#'
+#' @param net 
+#'
+#' @returns
+#' @export
+#'
+#' @examples
+plot_homophilynet <- function(net) {
+  ggnetplot(net) + 
+    geom_edges(color = "grey") + 
+    geom_nodes(aes(color = group), size = 3) + 
+    theme_blank()
+}
 
 

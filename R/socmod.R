@@ -1,12 +1,14 @@
 #' @keywords internal
 #' @import rlang 
 #' @import R6
+#' @import ggplot2
+#' @import ggnetwork
+#' @import assertthat
 #' @importFrom magrittr %>%
 #' @importFrom stats runif
 #' @importFrom dplyr count slice_max bind_rows 
 #' @importFrom purrr map map_vec
 #' @importFrom tibble tibble
-#' @importFrom assertthat assert_that
 #' @importFrom igraph make_empty_graph add_edges delete_vertices degree ecount V neighbors
 
 #' @importFrom R6 R6Class
