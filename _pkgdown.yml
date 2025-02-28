@@ -23,10 +23,13 @@ reference:
   contents:
   - Agent
   - Neighbors
-- title: Utilities for networks
+- title: Networks
   desc: |
-    Some basic utilities for creating networks, including a growing suite of network construction routines.
+    Create networks, including a growing suite of network construction routines.
   contents:
+  - make_homophily_network
+  - plot_homophilynet
+  - ggnetplot  
   - regular_lattice
   - G_NM
   - add_unique_edge

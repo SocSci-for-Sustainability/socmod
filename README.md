@@ -73,9 +73,9 @@ yields a payoff of 1. This matters only for the success-biased social
 learning strategy, not for the frequency-biased strategy or unbiased
 contagion learning.
 
-<figure id="fig-example">
+<figure>
 <img src="man/figures/small_example_network.png" data-fig-align="center"
-width="300" alt="A simple network nieghborhood of individual/agent i" />
+width="350" alt="A simple network nieghborhood of individual/agent i" />
 <figcaption aria-hidden="true">A simple network nieghborhood of
 individual/agent <span
 class="math inline"><em>i</em></span></figcaption>
@@ -96,6 +96,16 @@ compartmental epidemiological modeling.
 
 ``` r
 library(socmod)
+library(igraph)
+#> 
+#> Attaching package: 'igraph'
+#> The following objects are masked from 'package:stats':
+#> 
+#>     decompose, spectrum
+#> The following object is masked from 'package:base':
+#> 
+#>     union
+
 
 # Example ABM builder with four agents as pictured above. Can pass arbitrary
 # named parameters in ... that will be passed to AgentBasedModel$new as params.
@@ -136,10 +146,19 @@ make_example_abm <- function(...) {
 }
 
 abm <- make_example_abm()
-plot(abm$network)
+
+library(ggnetwork)
+#> Loading required package: ggplot2
+library(igraph)
+
+ggnetplot(abm$network) + 
+      geom_edges(linewidth=0.1) + 
+      geom_nodes(color = "#008566", size=3) + 
+      geom_nodelabel_repel(aes(label = name), size = 1.5) + 
+      theme_blank()
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="50%" style="display: block; margin: auto;" />
 
 ### Model dynamics with different adaptive social learning strategies
 
@@ -165,13 +184,13 @@ result <- run(abm, 50, frequency_bias_select_teacher, frequency_bias_interact, i
 ggplot(result$output, aes(x=t, y=A)) + geom_line() + theme_classic()
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="50%" style="display: block; margin: auto;" />
 
 We can check how many end in $A$ or $L$ being fixated like so, where
 fixation on $A$ counts as adaptation “success”:
 
 ``` r
-n_trials <- 100
+n_trials <- 10
 one_trial_success <- function(n_steps = 50) {
   abm <- make_example_abm()
   A_T <- run(
@@ -186,7 +205,7 @@ n_success <- sum(purrr::map_vec(1:n_trials, \(.) {one_trial_success()}));
 
 success_rate <- n_success / n_trials
 print(paste("Success rate:", success_rate))
-#> [1] "Success rate: 0.22"
+#> [1] "Success rate: 0.3"
 ```
 
 #### Success-biased adaptive learning
@@ -202,6 +221,7 @@ exercise.
 Here is how one can run a model with success-biased learning:
 
 ``` r
+
 library(ggplot2)
 abm <- make_example_abm()
 
@@ -210,10 +230,10 @@ result <- run(abm, 50, success_bias_select_teacher, success_bias_interact, itera
 ggplot(result$output, aes(x=t, y=A)) + geom_line() + theme_classic()
 ```
 
-<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="50%" style="display: block; margin: auto;" />
 
 ``` r
-n_trials <- 100
+n_trials <- 10
 one_trial_success <- function(n_steps = 50) {
   abm <- make_example_abm()
   A_T <- run(
@@ -228,7 +248,7 @@ n_success <- sum(purrr::map_vec(1:n_trials, \(.) {one_trial_success()}));
 
 success_rate <- n_success / n_trials
 print(paste("Success rate:", success_rate))
-#> [1] "Success rate: 0.67"
+#> [1] "Success rate: 0.3"
 ```
 
 ### Model dynamics with non-adaptive contagion learning
@@ -289,7 +309,7 @@ result <- run(abm, 100, contagion_partner_selection, contagion_interaction,
 ggplot(result$output, aes(x=t, y=A)) + geom_line() + theme_classic()
 ```
 
-<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-10-1.png" width="50%" style="display: block; margin: auto;" />
 
 ## More information and the philosophy of socmod
 

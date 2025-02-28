@@ -13,8 +13,10 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  out.width = "50%",
+  dpi=300,fig.width=2,fig.height=1.5,fig.align="center"
 )
+# knitr::opts_chunk$set(dpi=300,fig.width=2,fig.height=1.5,fig.align="center")
 ```
 
 # socmod
@@ -90,7 +92,7 @@ learning strategy, not for the frequency-biased strategy or unbiased
 contagion learning.
 
 ![A simple network nieghborhood of individual/agent
-$i$](man/figures/small_example_network.png){#fig-example width="300"
+$i$](man/figures/small_example_network.png){width="350"
 fig-align="center"}
 
 We can initialize these agents and their network as follows. In the next
@@ -106,10 +108,12 @@ learning functions provided with `socmod`. After that we show how to
 define non-adaptive contagion learning functions, adapted from
 compartmental epidemiological modeling.
 
-```{r}
-#| echo: true
 
+```{r fig.height=1.5}
+#| echo: true
 library(socmod)
+library(igraph)
+
 
 # Example ABM builder with four agents as pictured above. Can pass arbitrary
 # named parameters in ... that will be passed to AgentBasedModel$new as params.
@@ -150,7 +154,15 @@ make_example_abm <- function(...) {
 }
 
 abm <- make_example_abm()
-plot(abm$network)
+
+library(ggnetwork)
+library(igraph)
+
+ggnetplot(abm$network) + 
+      geom_edges(linewidth=0.1) + 
+      geom_nodes(color = "#008566", size=3) + 
+      geom_nodelabel_repel(aes(label = name), size = 1.5) + 
+      theme_blank()
 ```
 
 ### Model dynamics with different adaptive social learning strategies
@@ -168,8 +180,7 @@ this setup, with many model runs ending with $A(t=50) = 4$, fixating on
 the Adaptive behavior, and many ending with $A(t=50) = 0$, fixating on
 the Legacy behavior.
 
-```{r}
-#| fig-width: 3
+```{r fig.align="center", fig.width =2}
 library(ggplot2)
 abm <- make_example_abm()
 
@@ -182,7 +193,7 @@ We can check how many end in $A$ or $L$ being fixated like so, where
 fixation on $A$ counts as adaptation "success":
 
 ```{r}
-n_trials <- 100
+n_trials <- 10
 one_trial_success <- function(n_steps = 50) {
   abm <- make_example_abm()
   A_T <- run(
@@ -212,8 +223,7 @@ exercise.
 Here is how one can run a model with success-biased learning:
 
 ```{r}
-#| fig-width: 3
-#| 
+
 library(ggplot2)
 abm <- make_example_abm()
 
@@ -223,7 +233,7 @@ ggplot(result$output, aes(x=t, y=A)) + geom_line() + theme_classic()
 ```
 
 ```{r}
-n_trials <- 100
+n_trials <- 10
 one_trial_success <- function(n_steps = 50) {
   abm <- make_example_abm()
   A_T <- run(

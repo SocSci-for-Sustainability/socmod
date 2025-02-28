@@ -13,6 +13,8 @@ state, and model outputs.
 \describe{
 \item{\code{agents}}{Named list of agents}
 
+\item{\code{n_agents}}{Number of agents}
+
 \item{\code{step}}{Time step integer index}
 
 \item{\code{network}}{Social network that structures agent interactions}

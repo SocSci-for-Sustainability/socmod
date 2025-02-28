@@ -10,9 +10,18 @@
 #' @param mean_degree Desired mean degree
 #' @param homophily Singleton or vector; if vector must be length of group_sizes
 #' @param group_names Optional parameter to specify group names
+#' @param add_to_complete Boolean to specify whether to complete the network if there's only one group left needing out-edges
+#' @examples
+#' # Two groups size 5 and 10.
+#' hnet_2grp <- make_homophily_network(c(5, 10), mean_degree = 3, homophily = 0.5)
+#' plot_homophilynet(hnet_2grp)
+#' 
+#' # Five groups all size 5 with out-group preference (neg. homophily).
+#' hnet_5grp <- make_homophily_network(rep(5, 5), mean_degree = 2, homophily = -0.5)
+#' plot_homophilynet(hnet_5grp)
 #' @return igraph Graph
 #' @export
-make_homophily_network <- function(group_sizes = c(3, 7), mean_degree = 6,
+make_homophily_network <- function(group_sizes = c(3, 7), mean_degree = 2,
                                    homophily = c(0.0), group_names = NULL,
                                    add_to_complete = FALSE) {
   

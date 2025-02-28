@@ -175,18 +175,33 @@ get_all_possible_edges <- function(N, directed = FALSE) {
 #' Command that operates like ggplot
 #'
 #' @param net Network to plot
+#' @param layout Optional igraph-style plotting layout 
 #' @param ... Additional key-value aesthetics to pass to aes() in ggplot call
 #'
 #' @returns
 #' @export
 #'
 #' @examples
-ggnetplot <- function(net, ...) {
+#' library(ggnetwork)
+#' socnet <- igraph::make_graph(~ 1-2:3:4,2:4)
+#' V(socnet)$name <- c("Mateus", "Marcos", "Lucas", "João")
+#' ggnetplot(socnet) + 
+#'   geom_edges(linewidth=0.1) + 
+#'   geom_nodes(color = "#008566", size=3) + 
+#'   geom_nodelabel_repel(aes(label = name), size = 1.5) + 
+#'   theme_blank()
+ggnetplot <- function(net, layout = NULL, ...) {
   
-  return(
-    ggplot(ggnetwork(net, layout = layout_in_circle(net)), 
-           aes(x=x, y=y, xend=xend, yend=yend, ...))
-  )
+  if (is.null(layout)) {
+    
+    ret <- ggplot(ggnetwork(net), aes(x=x, y=y, xend=xend, yend=yend, ...))
+  
+  } else {
+    
+    ret <- ggplot(ggnetwork(net, layout = layout), aes(x=x, y=y, xend=xend, yend=yend, ...))
+  }
+  
+  return (ret)
 }
 
 
