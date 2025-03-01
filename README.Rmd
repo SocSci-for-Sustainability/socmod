@@ -109,7 +109,7 @@ define non-adaptive contagion learning functions, adapted from
 compartmental epidemiological modeling.
 
 
-```{r fig.height=1.5}
+```{r fig.height=1.75}
 #| echo: true
 library(socmod)
 library(igraph)
@@ -160,8 +160,8 @@ library(igraph)
 
 ggnetplot(abm$network) + 
       geom_edges(linewidth=0.1) + 
-      geom_nodes(color = "#008566", size=3) + 
-      geom_nodelabel_repel(aes(label = name), size = 1.5) + 
+      geom_nodes(color = "#008566", size=4) + 
+      geom_nodelabel_repel(aes(label = name), size = 2) + 
       theme_blank()
 ```
 
@@ -186,7 +186,11 @@ abm <- make_example_abm()
 
 result <- run(abm, 50, frequency_bias_select_teacher, frequency_bias_interact, iterate_learning_model)
 
-ggplot(result$output, aes(x=t, y=A)) + geom_line() + theme_classic()
+ggplot(result$output, aes(x=t, y=A)) + 
+  geom_line() + 
+  xlab("Time step") +
+  ylab("# Adaptive") +
+  theme_classic()
 ```
 
 We can check how many end in $A$ or $L$ being fixated like so, where
@@ -229,7 +233,11 @@ abm <- make_example_abm()
 
 result <- run(abm, 50, success_bias_select_teacher, success_bias_interact, iterate_learning_model)
 
-ggplot(result$output, aes(x=t, y=A)) + geom_line() + theme_classic()
+ggplot(result$output, aes(x=t, y=A)) + 
+  geom_line() + 
+  xlab("Time step") +
+  ylab("# Adaptive") +
+  theme_classic()
 ```
 
 ```{r}
@@ -305,8 +313,112 @@ abm <- make_example_abm(adopt_rate = 0.2, drop_rate = 0.02)
 result <- run(abm, 100, contagion_partner_selection, contagion_interaction,
               contagion_model_step)
 
-ggplot(result$output, aes(x=t, y=A)) + geom_line() + theme_classic()
+ggplot(result$output, aes(x=t, y=A)) + 
+  geom_line() + 
+  xlab("Time step") +
+  ylab("# Adaptive") +
+  theme_classic()
 ```
+
+
+### Social networks
+
+`socmod` provides social network tools to create and analyze custom instances of `igraph::Graph`. See examples below. Create and pass these to the agent-based
+models constructor to create ABMs with specified network structures, e.g., 
+```{r}
+sw_net <- socmod::make_small_world(N = 10, k = 4, p=0.1)
+sw_abm <- AgentBasedModel$new(network = sw_net)
+```
+
+We can build models with real-world social networks, as well, e.g.,
+Florentine oligarchs,
+
+```{r, out.width="60%"}
+library(netrankr)
+ 
+# Remove the oligarch with no friends.
+oligarchs <- delete_vertices(florentine_m, which(degree(florentine_m) == 0))
+
+# Initialize a new ABM with this network.
+abm <- AgentBasedModel$new(network = oligarchs)
+
+# Print the name of the Medici's network neighbors.
+print(abm$get_agent("Medici")$neighbors$map(\(a) { a$name }))
+# Plot the network.
+ggnetplot(abm$network, layout = layout_with_fr(abm$network)) + 
+  geom_edges(linewidth=0.1, color="darkgray") + 
+  geom_nodes(color = "#008566", size=2) + 
+  geom_nodelabel_repel(aes(label = name), size = 1.25, lineheight = 1.25) + 
+  theme_blank()
+```
+
+#### Regular lattice
+
+```{r, fig.height = 1, fig.width = 1, dpi=400}
+latnet <- make_regular_lattice(N = 10, k = 4)
+ggnetplot(latnet, layout = 0.6*layout_in_circle(latnet)) + 
+      geom_edges(linewidth=0.1, color="darkgray") + 
+      geom_nodes(color = "#008566", size=1) + 
+      theme_blank()
+```
+
+#### Random networks
+
+**Erdős–Rényi $G(N,M)$**
+
+```{r, fig.height = 1, fig.width = 1, dpi=400}
+gnm_net <- G_NM(20, 30)
+ggnetplot(gnm_net) + 
+      geom_edges(linewidth=0.1, color= "darkgray") + 
+      geom_nodes(color = "#008566", size=.75) + 
+      theme_blank()
+```
+
+**Small-world networks**
+
+```{r, fig.height = 1, fig.width = 1, dpi=400}
+sw_net <- make_small_world(N = 10, k = 4, p=0.1)
+ggnetplot(sw_net, layout = 0.6*layout_in_circle(sw_net)) + 
+      geom_edges(linewidth=0.1, color="darkgray") + 
+      geom_nodes(color = "#008566", size=1) + 
+      theme_blank()
+```
+
+
+**Preferential attachment networks**
+
+```{r, fig.height = 1.5, fig.width = 2, out.width="70%", dpi=400}
+pa_net <- make_preferential_attachment(N = 100)
+ggnetplot(pa_net, layout = 0.6*layout_with_fr(pa_net)) + 
+      geom_edges(linewidth=0.1, color="darkgray") + 
+      geom_nodes(color = "#008566", size=0.5) + 
+      theme_blank()
+```
+
+#### Homophily networks
+
+```{r, fig.height = 2.25, fig.width = 3, out.width="65%", dpi=300}
+# Two groups size 5 and 10.
+hnet_2grp <- make_homophily_network(c(5, 10), mean_degree = 3, homophily = 0.5)
+ggnetplot(hnet_2grp, layout = 0.6*layout_in_circle(hnet_2grp)) +
+  geom_edges(linewidth = 0.25, color="darkgray") +
+  geom_nodes(aes(color = group), size = 3) +
+  theme_blank(base_size=12)
+```
+ 
+ 
+```{r, fig.height = 2.25, fig.width = 3, out.width="65%", dpi=300}
+library(ggsci)
+# Five groups all size 5 with out-group preference (neg. homophily).
+hnet_5grp <- make_homophily_network(rep(5, 5), mean_degree = 2, homophily = -0.5)
+ggnetplot(hnet_5grp, layout = 0.6*layout_in_circle(hnet_5grp)) +
+  geom_edges(linewidth = 0.25, color="darkgray") +
+  geom_nodes(aes(color = group), size = 2) +
+  ggsci::scale_color_aaas() +
+  theme_blank(base_size=12)
+```
+
+
 
 ## More information and the philosophy of socmod
 

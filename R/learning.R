@@ -3,7 +3,7 @@
 #' and fitness.
 #'
 #' @examples
-#' net <- regular_lattice(10, 4)
+#' net <- make_regular_lattice(10, 4)
 #' model <- AgentBasedModel$new(network = net)
 #' output <- run(model, 10, interact = frequency_bias_interact, 
 #'               iterate_model = iterate_learning_model)
@@ -40,7 +40,7 @@ frequency_bias_select_teacher <- function(agent, model) { return (NULL) }
 #' @param model Model variable will be the agent-based model.
 #'
 #' @examples
-#' net <- regular_lattice(10, 4)
+#' net <- make_regular_lattice(10, 4)
 #' model <- AgentBasedModel$new(network = net)
 #' output <- run(model, 10, interact = frequency_bias_interact)
 #' @return NULL 
@@ -83,7 +83,7 @@ frequency_bias_interact <- function(learner, ., model) {
 #' @param model Agent-based model being run with this specification.
 #' @return Agent selected from neighbors as teacher.
 #' @examples 
-#' net <- regular_lattice(10, 4)
+#' net <- make_regular_lattice(10, 4)
 #' model <- AgentBasedModel$new(network = net)
 #' for (agent in model$agents) {
 #'   # Agents need non-zero fitness for success bias to work
@@ -114,7 +114,7 @@ success_bias_select_teacher <- function(learner, model) {
 #' behavior and fitness.
 #' 
 #' @examples 
-#' net <- regular_lattice(10, 4)
+#' net <- make_regular_lattice(10, 4)
 #' model <- AgentBasedModel$new(network = net)
 #' for (agent in model$agents) {
 #'   # Agents need non-zero fitness for success bias to work

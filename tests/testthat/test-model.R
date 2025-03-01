@@ -26,7 +26,7 @@ test_that("ABM initialized by agents and network",
   agents <- map(behaviors, \(b) { Agent$new(b) })
 
   model <- AgentBasedModel$new(agents = agents,
-                               network = regular_lattice(N, 4),
+                               network = make_regular_lattice(N, 4),
                                switch_prob = 0.1)
 
   n_legacy <- sum(map_vec(
@@ -98,7 +98,7 @@ test_that("ABM initialized by regular lattice",
   # Initialize the model with a regular lattice social network.
   N <- 10
   k <- 4
-  net <- regular_lattice(N, k)
+  net <- make_regular_lattice(N, k)
   m <- AgentBasedModel$new(network = net)
   
   # Check that all agents are present and doing Legacy.

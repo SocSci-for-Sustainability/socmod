@@ -19,11 +19,11 @@ to calculate exposure probability, add neighbors, or set agent fitness.
 
 \item{\code{neighbors}}{Initial set of neighbors.}
 
-\item{\code{curr_fitness}}{Current agent fitness.}
+\item{\code{prev_fitness}}{Previous agent fitness.}
 
 \item{\code{curr_fitness}}{Current agent fitness.}
 
-\item{\code{next_fitness}}{Next fitness of next behavior.}
+\item{\code{next_fitness}}{Next fitness.}
 
 \item{\code{name}}{Agent's name.}
 }

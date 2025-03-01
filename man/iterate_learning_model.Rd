@@ -17,7 +17,7 @@ behavior and fitness to be whatever was identified as the next behavior
 and fitness.
 }
 \examples{
-net <- regular_lattice(10, 4)
+net <- make_regular_lattice(10, 4)
 model <- AgentBasedModel$new(network = net)
 output <- run(model, 10, interact = frequency_bias_interact, 
               iterate_model = iterate_learning_model)

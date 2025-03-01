@@ -27,11 +27,11 @@ Agent <- R6Class(classname="Agent", public = list(
   next_behavior = "",
   #' @field neighbors Initial set of neighbors.
   neighbors = c(),
-  #' @field curr_fitness Current agent fitness.
+  #' @field prev_fitness Previous agent fitness.
   prev_fitness = 0.0,
   #' @field curr_fitness Current agent fitness.
   curr_fitness = 0.0,
-  #' @field next_fitness Next fitness of next behavior.
+  #' @field next_fitness Next fitness.
   next_fitness = 0.0,
   #' @field name Agent's name.
   name = NULL,

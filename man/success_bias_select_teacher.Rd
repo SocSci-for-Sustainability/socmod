@@ -20,7 +20,7 @@ one of the agent's neighbors is proportional to their fitness relative to
 other neighbors.
 }
 \examples{
-net <- regular_lattice(10, 4)
+net <- make_regular_lattice(10, 4)
 model <- AgentBasedModel$new(network = net)
 for (agent in model$agents) {
   # Agents need non-zero fitness for success bias to work

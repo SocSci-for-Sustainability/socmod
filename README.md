@@ -153,8 +153,8 @@ library(igraph)
 
 ggnetplot(abm$network) + 
       geom_edges(linewidth=0.1) + 
-      geom_nodes(color = "#008566", size=3) + 
-      geom_nodelabel_repel(aes(label = name), size = 1.5) + 
+      geom_nodes(color = "#008566", size=4) + 
+      geom_nodelabel_repel(aes(label = name), size = 2) + 
       theme_blank()
 ```
 
@@ -181,7 +181,11 @@ abm <- make_example_abm()
 
 result <- run(abm, 50, frequency_bias_select_teacher, frequency_bias_interact, iterate_learning_model)
 
-ggplot(result$output, aes(x=t, y=A)) + geom_line() + theme_classic()
+ggplot(result$output, aes(x=t, y=A)) + 
+  geom_line() + 
+  xlab("Time step") +
+  ylab("# Adaptive") +
+  theme_classic()
 ```
 
 <img src="man/figures/README-unnamed-chunk-5-1.png" width="50%" style="display: block; margin: auto;" />
@@ -205,7 +209,7 @@ n_success <- sum(purrr::map_vec(1:n_trials, \(.) {one_trial_success()}));
 
 success_rate <- n_success / n_trials
 print(paste("Success rate:", success_rate))
-#> [1] "Success rate: 0.3"
+#> [1] "Success rate: 0.2"
 ```
 
 #### Success-biased adaptive learning
@@ -227,7 +231,11 @@ abm <- make_example_abm()
 
 result <- run(abm, 50, success_bias_select_teacher, success_bias_interact, iterate_learning_model)
 
-ggplot(result$output, aes(x=t, y=A)) + geom_line() + theme_classic()
+ggplot(result$output, aes(x=t, y=A)) + 
+  geom_line() + 
+  xlab("Time step") +
+  ylab("# Adaptive") +
+  theme_classic()
 ```
 
 <img src="man/figures/README-unnamed-chunk-7-1.png" width="50%" style="display: block; margin: auto;" />
@@ -248,7 +256,7 @@ n_success <- sum(purrr::map_vec(1:n_trials, \(.) {one_trial_success()}));
 
 success_rate <- n_success / n_trials
 print(paste("Success rate:", success_rate))
-#> [1] "Success rate: 0.3"
+#> [1] "Success rate: 0.6"
 ```
 
 ### Model dynamics with non-adaptive contagion learning
@@ -306,10 +314,145 @@ abm <- make_example_abm(adopt_rate = 0.2, drop_rate = 0.02)
 result <- run(abm, 100, contagion_partner_selection, contagion_interaction,
               contagion_model_step)
 
-ggplot(result$output, aes(x=t, y=A)) + geom_line() + theme_classic()
+ggplot(result$output, aes(x=t, y=A)) + 
+  geom_line() + 
+  xlab("Time step") +
+  ylab("# Adaptive") +
+  theme_classic()
 ```
 
 <img src="man/figures/README-unnamed-chunk-10-1.png" width="50%" style="display: block; margin: auto;" />
+
+### Social networks
+
+`socmod` provides social network tools to create and analyze custom
+instances of `igraph::Graph`. See examples below. Create and pass these
+to the agent-based models constructor to create ABMs with specified
+network structures, e.g.,
+
+``` r
+sw_net <- socmod::make_small_world(N = 10, k = 4, p=0.1)
+sw_abm <- AgentBasedModel$new(network = sw_net)
+```
+
+We can build models with real-world social networks, as well, e.g.,
+Florentine oligarchs,
+
+``` r
+library(netrankr)
+ 
+# Remove the oligarch with no friends.
+oligarchs <- delete_vertices(florentine_m, which(degree(florentine_m) == 0))
+
+# Initialize a new ABM with this network.
+abm <- AgentBasedModel$new(network = oligarchs)
+
+# Print the name of the Medici's network neighbors.
+print(abm$get_agent("Medici")$neighbors$map(\(a) { a$name }))
+#> $Acciaiuol
+#> [1] "Acciaiuol"
+#> 
+#> $Albizzi
+#> [1] "Albizzi"
+#> 
+#> $Barbadori
+#> [1] "Barbadori"
+#> 
+#> $Ridolfi
+#> [1] "Ridolfi"
+#> 
+#> $Salviati
+#> [1] "Salviati"
+#> 
+#> $Tornabuon
+#> [1] "Tornabuon"
+# Plot the network.
+ggnetplot(abm$network, layout = layout_with_fr(abm$network)) + 
+  geom_edges(linewidth=0.1, color="darkgray") + 
+  geom_nodes(color = "#008566", size=2) + 
+  geom_nodelabel_repel(aes(label = name), size = 1.25, lineheight = 1.25) + 
+  theme_blank()
+```
+
+<img src="man/figures/README-unnamed-chunk-12-1.png" width="60%" style="display: block; margin: auto;" />
+
+#### Regular lattice
+
+``` r
+latnet <- make_regular_lattice(N = 10, k = 4)
+ggnetplot(latnet, layout = 0.6*layout_in_circle(latnet)) + 
+      geom_edges(linewidth=0.1, color="darkgray") + 
+      geom_nodes(color = "#008566", size=1) + 
+      theme_blank()
+```
+
+<img src="man/figures/README-unnamed-chunk-13-1.png" width="50%" style="display: block; margin: auto;" />
+
+#### Random networks
+
+**Erdős–Rényi $G(N,M)$**
+
+``` r
+gnm_net <- G_NM(20, 30)
+ggnetplot(gnm_net) + 
+      geom_edges(linewidth=0.1, color= "darkgray") + 
+      geom_nodes(color = "#008566", size=.75) + 
+      theme_blank()
+#> Warning in format_fortify(model = model, nodes = nodes, weights = "none", :
+#> duplicated edges detected
+```
+
+<img src="man/figures/README-unnamed-chunk-14-1.png" width="50%" style="display: block; margin: auto;" />
+
+**Small-world networks**
+
+``` r
+sw_net <- make_small_world(N = 10, k = 4, p=0.1)
+ggnetplot(sw_net, layout = 0.6*layout_in_circle(sw_net)) + 
+      geom_edges(linewidth=0.1, color="darkgray") + 
+      geom_nodes(color = "#008566", size=1) + 
+      theme_blank()
+```
+
+<img src="man/figures/README-unnamed-chunk-15-1.png" width="50%" style="display: block; margin: auto;" />
+
+**Preferential attachment networks**
+
+``` r
+pa_net <- make_preferential_attachment(N = 100)
+ggnetplot(pa_net, layout = 0.6*layout_with_fr(pa_net)) + 
+      geom_edges(linewidth=0.1, color="darkgray") + 
+      geom_nodes(color = "#008566", size=0.5) + 
+      theme_blank()
+```
+
+<img src="man/figures/README-unnamed-chunk-16-1.png" width="70%" style="display: block; margin: auto;" />
+
+#### Homophily networks
+
+``` r
+# Two groups size 5 and 10.
+hnet_2grp <- make_homophily_network(c(5, 10), mean_degree = 3, homophily = 0.5)
+ggnetplot(hnet_2grp, layout = 0.6*layout_in_circle(hnet_2grp)) +
+  geom_edges(linewidth = 0.25, color="darkgray") +
+  geom_nodes(aes(color = group), size = 3) +
+  theme_blank(base_size=12)
+```
+
+<img src="man/figures/README-unnamed-chunk-17-1.png" width="65%" style="display: block; margin: auto;" />
+
+``` r
+library(ggsci)
+# Five groups all size 5 with out-group preference (neg. homophily).
+hnet_5grp <- make_homophily_network(rep(5, 5), mean_degree = 2, homophily = -0.5)
+ggnetplot(hnet_5grp, layout = 0.6*layout_in_circle(hnet_5grp)) +
+  geom_edges(linewidth = 0.25, color="darkgray") +
+  geom_nodes(aes(color = group), size = 2) +
+  ggsci::scale_color_aaas() +
+  theme_blank(base_size=12)
+```
+
+<img src="man/figures/README-unnamed-chunk-18-1.png" width="65%" style="display: block; margin: auto;" />
 
 ## More information and the philosophy of socmod
 

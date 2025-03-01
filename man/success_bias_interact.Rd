@@ -14,7 +14,7 @@ that sets the learner's next behavior and fitness to be the teacher's current
 behavior and fitness.
 }
 \examples{
-net <- regular_lattice(10, 4)
+net <- make_regular_lattice(10, 4)
 model <- AgentBasedModel$new(network = net)
 for (agent in model$agents) {
   # Agents need non-zero fitness for success bias to work

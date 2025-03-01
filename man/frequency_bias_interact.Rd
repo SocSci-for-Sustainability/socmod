@@ -17,7 +17,7 @@ frequency_bias_interact(learner, ., model)
 Interaction function for frequency-biased adaptive learning.
 }
 \examples{
-net <- regular_lattice(10, 4)
+net <- make_regular_lattice(10, 4)
 model <- AgentBasedModel$new(network = net)
 output <- run(model, 10, interact = frequency_bias_interact)
 }

@@ -7,9 +7,9 @@
 #' @importFrom stats runif
 #' @importFrom rlang on_load local_use_cli new_environment
 #' @importFrom dplyr count slice_max bind_rows 
-#' @importFrom purrr map map_vec
+#' @importFrom purrr map map_vec map_dfr
 #' @importFrom tibble tibble
-#' @importFrom igraph make_empty_graph add_edges delete_vertices degree ecount V neighbors
+#' @importFrom igraph make_empty_graph add_edges delete_vertices degree ecount V neighbors are_adjacent
 
 #' @importFrom R6 R6Class
 "_PACKAGE"
