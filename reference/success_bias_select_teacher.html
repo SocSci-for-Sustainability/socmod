@@ -11,7 +11,7 @@ other neighbors."><meta property="og:image" content="https://css4s.github.io/soc
 
     <a class="navbar-brand me-2" href="../index.html">socmod</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,7 +64,7 @@ other neighbors.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">net</span> <span class="op">&lt;-</span> <span class="fu"><a href="regular_lattice.html">regular_lattice</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">4</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">net</span> <span class="op">&lt;-</span> <span class="fu"><a href="make_regular_lattice.html">make_regular_lattice</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">4</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="va"><a href="AgentBasedModel.html">AgentBasedModel</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>network <span class="op">=</span> <span class="va">net</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="kw">for</span> <span class="op">(</span><span class="va">agent</span> <span class="kw">in</span> <span class="va">model</span><span class="op">$</span><span class="va">agents</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="co"># Agents need non-zero fitness for success bias to work</span></span></span>

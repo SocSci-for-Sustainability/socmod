@@ -12,10 +12,15 @@
 <url><loc>https://css4s.github.io/socmod/reference/frequency_bias_interact.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/frequency_bias_select_teacher.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/get_all_possible_edges.html</loc></url>
+<url><loc>https://css4s.github.io/socmod/reference/ggnetplot.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/index.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/iterate_learning_model.html</loc></url>
+<url><loc>https://css4s.github.io/socmod/reference/make_homophily_network.html</loc></url>
+<url><loc>https://css4s.github.io/socmod/reference/make_preferential_attachment.html</loc></url>
+<url><loc>https://css4s.github.io/socmod/reference/make_regular_lattice.html</loc></url>
+<url><loc>https://css4s.github.io/socmod/reference/make_small_world.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/not_adjacent.html</loc></url>
-<url><loc>https://css4s.github.io/socmod/reference/regular_lattice.html</loc></url>
+<url><loc>https://css4s.github.io/socmod/reference/plot_homophilynet.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/run.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/socmod-package.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/success_bias_interact.html</loc></url>
