@@ -75,6 +75,10 @@ to calculate exposure probability, add neighbors, or set agent fitness.</p>
 <dd><p>Agent's name.</p></dd>
 
 
+<dt><code>group</code></dt>
+<dd><p>Agent's group.</p></dd>
+
+
 </dl><p></p></div>
     </div>
     <div class="section level2">
@@ -92,7 +96,13 @@ to calculate exposure probability, add neighbors, or set agent fitness.</p>
 <h3 id="method-new-">Method <code><a href="https://rdrr.io/r/methods/new.html" class="external-link">new()</a></code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
 <p>Create a new Agent instance.</p><div class="section">
 <h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/Agent.html">Agent</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>behavior <span class="op">=</span> <span class="st">""</span>, fitness <span class="op">=</span> <span class="fl">0</span>, name <span class="op">=</span> <span class="cn">NULL</span>, neighbors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/Agent.html">Agent</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
+<span>  behavior <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  fitness <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  name <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  neighbors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  group <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
