@@ -26,6 +26,8 @@ to calculate exposure probability, add neighbors, or set agent fitness.
 \item{\code{next_fitness}}{Next fitness.}
 
 \item{\code{name}}{Agent's name.}
+
+\item{\code{group}}{Agent's group.}
 }
 \if{html}{\out{</div>}}
 }
@@ -45,7 +47,13 @@ to calculate exposure probability, add neighbors, or set agent fitness.
 \subsection{Method \code{new()}}{
 Create a new Agent instance.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Agent$new(behavior = "", fitness = 0, name = NULL, neighbors = c())}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Agent$new(
+  behavior = "",
+  fitness = 0,
+  name = NULL,
+  neighbors = c(),
+  group = NULL
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

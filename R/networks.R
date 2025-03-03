@@ -323,7 +323,7 @@ make_homophily_network <- function(group_sizes = c(3, 7), mean_degree = 2,
   
   assert_that(mean_degree < N, msg = "Mean degree can be at most N - 1")
   
-  assert_that((-1 <= homophily) && (homophily <= 1), 
+  assert_that(all(-1 <= homophily) && all(homophily <= 1), 
               msg = "Homophily must be between -1 and 1")
   
   net <- make_empty_graph(N, directed = FALSE)
