@@ -8,10 +8,10 @@ AgentBasedModel <- R6::R6Class(
   public = list(
     agents = NULL,
     network = NULL,
-    
+    output = NULL,
     initialize = function(n_agents = NULL, graph = NULL) {
       if (!is.null(n_agents)) {
-        graph <- igraph::make_empty_graph(n_agents, directed = FALSE)
+        graph <- igraph::make_full_graph(n_agents, directed = FALSE)
       } else if (is.null(graph)) {
         stop("Must provide either n_agents or graph")
       }
@@ -24,25 +24,22 @@ AgentBasedModel <- R6::R6Class(
       self$network <- graph
       
       # Create agents
-      self$agents <- purrr::map(igraph::V(graph), \(v) {
-        Agent$new(id = as.integer(v),
-                  graph = graph,
-                  name = v$name)
+      self$agents <- purrr::map(seq_along(igraph::V(graph)), \(i) {
+        v <- igraph::V(graph)[i]
+        Agent$new(id = i, graph = graph, name = v$name)
       })
       
-      # Sync agent names back to graph if needed
+      # Sync agent names back to graph
       for (i in seq_along(self$agents)) {
         agent <- self$agents[[i]]
-        if (is.null(agent$name)) {
-          agent$name <- paste0("a", i)
-        }
         igraph::V(graph)$name[i] <- agent$name
       }
       
       # Assign neighbors
       for (agent in self$agents) {
-        neighbor_ids <- igraph::neighbors(graph, agent$id)
-        neighbors <- lapply(neighbor_ids, \(v) self$agents[[as.integer(v)]])
+        neighbor_vertices <- igraph::neighbors(graph, agent$id)
+        neighbor_ids <- as.integer(neighbor_vertices)
+        neighbors <- lapply(neighbor_ids, \(idx) self$agents[[idx]])
         do.call(agent$add_neighbors, neighbors)
       }
     },

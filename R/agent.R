@@ -73,7 +73,8 @@ Agent <- R6::R6Class(
     #' Set the next behavior
     #' @param value A string behavior type
     set_next_behavior = function(value) {
-      igraph::vertex_attr(self$graph, "behavior_next", index = self$id) <<- value
+      igraph::set_vertex_attr(self$graph, name = "behavior_next", 
+                              index = self$id, value = value)
     },
     
     #' @description
@@ -93,7 +94,8 @@ Agent <- R6::R6Class(
     #' Set the current fitness
     #' @param value A numeric fitness score
     set_fitness = function(value) {
-      self$set_attr("fitness_current", value)
+      self$set_vertex_attr(self$graph, name = "fitness_current", 
+                           index = self$id, value = value)
     },
     
     #' @description
@@ -107,7 +109,8 @@ Agent <- R6::R6Class(
     #' Set the next fitness value
     #' @param value A numeric fitness score
     set_next_fitness = function(value) {
-      igraph::vertex_attr(self$graph, "fitness_next", index = self$id) <<- value
+      igraph::set_vertex_attr(self$graph, name = "fitness_next", 
+                              index = self$id, value = value)
     },
     
     #' @description
@@ -129,7 +132,7 @@ Agent <- R6::R6Class(
     #' @param name Name of the attribute
     #' @param value Value to assign
     set_attr = function(name, value) {
-      igraph::vertex_attr(self$graph, name, index = self$id) <<- value
+      igraph::set_vertex_attr(self$graph, name, index = self$id, value)
     },
     
     #' @description

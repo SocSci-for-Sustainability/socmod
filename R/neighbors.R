@@ -56,25 +56,41 @@ Neighbors <- R6::R6Class(
     #' @param n Number of neighbors to sample
     #' @param replace Logical: sample with replacement?
     #' @param weights Either a numeric vector or a function returning weights for each agent
-    #' @return A Neighbors object containing the sampled agents
+    #' @return A Neighbors object or a single Agent depending on `n`
     #' @examples
     #' nbrs$sample(2)
     #' nbrs$sample(weights = \(a) a$get_fitness())
     sample = function(n = 1, replace = FALSE, weights = NULL) {
       if (is.function(weights)) {
-        prob <- vapply(self$agents, weights, numeric(1))
+        prob <- vapply(self$agents, \(a) {
+          val <- weights(a)
+          if (is.numeric(val) && length(val) == 1 && !is.na(val)) val else 0
+        }, numeric(1))
       } else {
         prob <- weights
       }
       
-      sampled <- base::sample(self$agents, size = n, replace = replace, prob = prob)
+      # Only keep neighbors with positive probability
+      valid_idxs <- which(prob > 0)
+      
+      if (length(valid_idxs) < n) {
+        stop("Too few neighbors with positive weights to sample from.")
+      }
+      
+      sampled <- base::sample(
+        self$agents[valid_idxs],
+        size = n,
+        replace = replace,
+        prob = prob[valid_idxs]
+      )
       
       if (n == 1) {
-        return(sampled[[1]])  # Return Agent
+        return(sampled[[1]])
       } else {
-        return(Neighbors$new(sampled))  # Return Neighbors
+        return(Neighbors$new(sampled))
       }
-    },
+    }
+    ,
     
     #' @description
     #' Add one or more agents to the neighbors list
