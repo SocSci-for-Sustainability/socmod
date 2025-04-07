@@ -28,7 +28,6 @@ Neighbors <- R6::R6Class(
     #' @examples
     #' nbrs$get(1)
     #' nbrs$get("a2")
-    #' @export
     get = function(key) {
       if (is.numeric(key)) {
         return(self$agents[[key]])
@@ -61,20 +60,20 @@ Neighbors <- R6::R6Class(
     #' @examples
     #' nbrs$sample(2)
     #' nbrs$sample(weights = \(a) a$get_fitness())
-    sample = function(n = 1,
-                      replace = FALSE,
-                      weights = NULL) {
+    sample = function(n = 1, replace = FALSE, weights = NULL) {
       if (is.function(weights)) {
         prob <- vapply(self$agents, weights, numeric(1))
       } else {
         prob <- weights
       }
-      Neighbors$new(base::sample(
-        self$agents,
-        size = n,
-        replace = replace,
-        prob = prob
-      ))
+      
+      sampled <- base::sample(self$agents, size = n, replace = replace, prob = prob)
+      
+      if (n == 1) {
+        return(sampled[[1]])  # Return Agent
+      } else {
+        return(Neighbors$new(sampled))  # Return Neighbors
+      }
     },
     
     #' Add one or more agents to the neighbors list
