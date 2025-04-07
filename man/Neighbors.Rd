@@ -4,27 +4,21 @@
 \alias{Neighbors}
 \title{Neighbors class}
 \description{
+Neighbors class
+
+Neighbors class
+}
+\details{
 A container for an agent's neighbors, with utilities for iteration, filtering,
 sampling, and modification.
 }
 \examples{
 
 ## ------------------------------------------------
-## Method `Neighbors$get`
-## ------------------------------------------------
-
-nbrs$get(1)
-nbrs$get("a2")
-Filter neighbors using a predicate function
-
-
-## ------------------------------------------------
 ## Method `Neighbors$filter`
 ## ------------------------------------------------
 
 nbrs$filter(\(a) a$get_fitness() > 1)
-Sample one or more neighbors
-
 
 ## ------------------------------------------------
 ## Method `Neighbors$sample`
@@ -32,16 +26,12 @@ Sample one or more neighbors
 
 nbrs$sample(2)
 nbrs$sample(weights = \(a) a$get_fitness())
-Add one or more agents to the neighbors list
-
 
 ## ------------------------------------------------
 ## Method `Neighbors$add`
 ## ------------------------------------------------
 
 nbrs$add(agent1, agent2)
-Remove one or more agents from the neighbors list
-
 
 ## ------------------------------------------------
 ## Method `Neighbors$remove`
@@ -94,6 +84,7 @@ nbrs$remove(agent2)
 \if{html}{\out{<a id="method-Neighbors-get"></a>}}
 \if{latex}{\out{\hypertarget{method-Neighbors-get}{}}}
 \subsection{Method \code{get()}}{
+Get a neighbor by index or name
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Neighbors$get(key)}\if{html}{\out{</div>}}
 }
@@ -108,22 +99,12 @@ nbrs$remove(agent2)
 \subsection{Returns}{
 An Agent instance
 }
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{nbrs$get(1)
-nbrs$get("a2")
-Filter neighbors using a predicate function
-
-}
-\if{html}{\out{</div>}}
-
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Neighbors-filter"></a>}}
 \if{latex}{\out{\hypertarget{method-Neighbors-filter}{}}}
 \subsection{Method \code{filter()}}{
+Filter neighbors using a predicate function
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Neighbors$filter(predicate)}\if{html}{\out{</div>}}
 }
@@ -141,8 +122,6 @@ A new Neighbors object containing only the filtered agents
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{nbrs$filter(\(a) a$get_fitness() > 1)
-Sample one or more neighbors
-
 }
 \if{html}{\out{</div>}}
 
@@ -153,6 +132,7 @@ Sample one or more neighbors
 \if{html}{\out{<a id="method-Neighbors-sample"></a>}}
 \if{latex}{\out{\hypertarget{method-Neighbors-sample}{}}}
 \subsection{Method \code{sample()}}{
+Sample one or more neighbors
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Neighbors$sample(n = 1, replace = FALSE, weights = NULL)}\if{html}{\out{</div>}}
 }
@@ -175,8 +155,6 @@ A Neighbors object containing the sampled agents
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{nbrs$sample(2)
 nbrs$sample(weights = \(a) a$get_fitness())
-Add one or more agents to the neighbors list
-
 }
 \if{html}{\out{</div>}}
 
@@ -187,6 +165,7 @@ Add one or more agents to the neighbors list
 \if{html}{\out{<a id="method-Neighbors-add"></a>}}
 \if{latex}{\out{\hypertarget{method-Neighbors-add}{}}}
 \subsection{Method \code{add()}}{
+Add one or more agents to the neighbors list
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Neighbors$add(...)}\if{html}{\out{</div>}}
 }
@@ -201,8 +180,6 @@ Add one or more agents to the neighbors list
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
 \preformatted{nbrs$add(agent1, agent2)
-Remove one or more agents from the neighbors list
-
 }
 \if{html}{\out{</div>}}
 
@@ -213,6 +190,7 @@ Remove one or more agents from the neighbors list
 \if{html}{\out{<a id="method-Neighbors-remove"></a>}}
 \if{latex}{\out{\hypertarget{method-Neighbors-remove}{}}}
 \subsection{Method \code{remove()}}{
+Remove one or more agents from the neighbors list
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Neighbors$remove(...)}\if{html}{\out{</div>}}
 }

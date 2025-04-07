@@ -28,7 +28,7 @@ test_that("Neighbors$get() works by index and by name", {
   a2 <- model$get_agent("a2")
   neighbors <- a2$neighbors
   
-  expect_s3_class(neighbors$get(1), "R6")
+  expect_true(inherits(neighbors$get(1), "R6"))
   expect_equal(neighbors$get("a1")$get_name(), "a1")
   
   expect_error(neighbors$get("nonexistent"), "No neighbor found with that name")

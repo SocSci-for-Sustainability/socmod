@@ -4,11 +4,15 @@
 \alias{Agent}
 \title{Agent class for socmod}
 \description{
+Agent class for socmod
+
+Agent class for socmod
+}
+\details{
 Represents an individual agent in a social network. Each agent has access to
 a shared igraph-based network object and exposes methods for interacting with
 behavioral and fitness attributes, social connections, and graph metadata.
-}
-\details{
+
 Advanced note: This class uses igraph's custom \code{vertex_attr(...) <<- value} setter
 syntax internally to ensure robust and consistent assignment of dynamic vertex
 attributes. This detail is abstracted away from the user-facing API.
@@ -54,6 +58,7 @@ attributes. This detail is abstracted away from the user-facing API.
 \if{html}{\out{<a id="method-Agent-new"></a>}}
 \if{latex}{\out{\hypertarget{method-Agent-new}{}}}
 \subsection{Method \code{new()}}{
+Initialize an Agent
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Agent$new(id, graph, name = NULL)}\if{html}{\out{</div>}}
 }
@@ -65,8 +70,7 @@ attributes. This detail is abstracted away from the user-facing API.
 
 \item{\code{graph}}{An igraph object shared by all agents}
 
-\item{\code{name}}{Optional string name for the agent
-Get the agent's name}
+\item{\code{name}}{Optional string name for the agent}
 }
 \if{html}{\out{</div>}}
 }
@@ -75,19 +79,20 @@ Get the agent's name}
 \if{html}{\out{<a id="method-Agent-get_name"></a>}}
 \if{latex}{\out{\hypertarget{method-Agent-get_name}{}}}
 \subsection{Method \code{get_name()}}{
+Get the agent's name
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Agent$get_name()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
 A character string representing the agent's name
-Set the agent's name
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Agent-set_name"></a>}}
 \if{latex}{\out{\hypertarget{method-Agent-set_name}{}}}
 \subsection{Method \code{set_name()}}{
+Set the agent's name
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Agent$set_name(value)}\if{html}{\out{</div>}}
 }
@@ -95,8 +100,7 @@ Set the agent's name
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{value}}{A string name
-Get the current behavior}
+\item{\code{value}}{A string name}
 }
 \if{html}{\out{</div>}}
 }
@@ -105,19 +109,20 @@ Get the current behavior}
 \if{html}{\out{<a id="method-Agent-get_behavior"></a>}}
 \if{latex}{\out{\hypertarget{method-Agent-get_behavior}{}}}
 \subsection{Method \code{get_behavior()}}{
+Get the current behavior
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Agent$get_behavior()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
 A string representing the agent's current behavior
-Set the current behavior
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Agent-set_behavior"></a>}}
 \if{latex}{\out{\hypertarget{method-Agent-set_behavior}{}}}
 \subsection{Method \code{set_behavior()}}{
+Set the current behavior
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Agent$set_behavior(value)}\if{html}{\out{</div>}}
 }
@@ -125,8 +130,7 @@ Set the current behavior
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{value}}{A string behavior type
-Get the next behavior}
+\item{\code{value}}{A string behavior type}
 }
 \if{html}{\out{</div>}}
 }
@@ -135,6 +139,7 @@ Get the next behavior}
 \if{html}{\out{<a id="method-Agent-get_next_behavior"></a>}}
 \if{latex}{\out{\hypertarget{method-Agent-get_next_behavior}{}}}
 \subsection{Method \code{get_next_behavior()}}{
+Get the next behavior
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Agent$get_next_behavior()}\if{html}{\out{</div>}}
 }
@@ -155,9 +160,7 @@ Set the next behavior
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{value}}{A string behavior type
-Advance to the next behavior
-Get the current fitness value}
+\item{\code{value}}{A string behavior type}
 }
 \if{html}{\out{</div>}}
 }
@@ -166,6 +169,7 @@ Get the current fitness value}
 \if{html}{\out{<a id="method-Agent-advance_behavior"></a>}}
 \if{latex}{\out{\hypertarget{method-Agent-advance_behavior}{}}}
 \subsection{Method \code{advance_behavior()}}{
+Advance to the next behavior
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Agent$advance_behavior()}\if{html}{\out{</div>}}
 }
@@ -175,19 +179,20 @@ Get the current fitness value}
 \if{html}{\out{<a id="method-Agent-get_fitness"></a>}}
 \if{latex}{\out{\hypertarget{method-Agent-get_fitness}{}}}
 \subsection{Method \code{get_fitness()}}{
+Get the current fitness value
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Agent$get_fitness()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
 A numeric fitness value
-Set the current fitness
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Agent-set_fitness"></a>}}
 \if{latex}{\out{\hypertarget{method-Agent-set_fitness}{}}}
 \subsection{Method \code{set_fitness()}}{
+Set the current fitness
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Agent$set_fitness(value)}\if{html}{\out{</div>}}
 }
@@ -195,8 +200,7 @@ Set the current fitness
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{value}}{A numeric fitness score
-Get the next fitness value}
+\item{\code{value}}{A numeric fitness score}
 }
 \if{html}{\out{</div>}}
 }
@@ -205,19 +209,20 @@ Get the next fitness value}
 \if{html}{\out{<a id="method-Agent-get_next_fitness"></a>}}
 \if{latex}{\out{\hypertarget{method-Agent-get_next_fitness}{}}}
 \subsection{Method \code{get_next_fitness()}}{
+Get the next fitness value
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Agent$get_next_fitness()}\if{html}{\out{</div>}}
 }
 
 \subsection{Returns}{
 A numeric fitness value
-Set the next fitness value
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Agent-set_next_fitness"></a>}}
 \if{latex}{\out{\hypertarget{method-Agent-set_next_fitness}{}}}
 \subsection{Method \code{set_next_fitness()}}{
+Set the next fitness value
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Agent$set_next_fitness(value)}\if{html}{\out{</div>}}
 }
@@ -225,9 +230,7 @@ Set the next fitness value
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{value}}{A numeric fitness score
-Advance to the next fitness value
-Get a graph vertex attribute by name}
+\item{\code{value}}{A numeric fitness score}
 }
 \if{html}{\out{</div>}}
 }
@@ -236,6 +239,7 @@ Get a graph vertex attribute by name}
 \if{html}{\out{<a id="method-Agent-advance_fitness"></a>}}
 \if{latex}{\out{\hypertarget{method-Agent-advance_fitness}{}}}
 \subsection{Method \code{advance_fitness()}}{
+Advance to the next fitness value
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Agent$advance_fitness()}\if{html}{\out{</div>}}
 }
@@ -245,6 +249,7 @@ Get a graph vertex attribute by name}
 \if{html}{\out{<a id="method-Agent-get_attr"></a>}}
 \if{latex}{\out{\hypertarget{method-Agent-get_attr}{}}}
 \subsection{Method \code{get_attr()}}{
+Get a graph vertex attribute by name
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Agent$get_attr(name)}\if{html}{\out{</div>}}
 }
@@ -258,13 +263,13 @@ Get a graph vertex attribute by name}
 }
 \subsection{Returns}{
 The value of the attribute
-Set a graph vertex attribute
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Agent-set_attr"></a>}}
 \if{latex}{\out{\hypertarget{method-Agent-set_attr}{}}}
 \subsection{Method \code{set_attr()}}{
+Set a graph vertex attribute
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Agent$set_attr(name, value)}\if{html}{\out{</div>}}
 }
@@ -274,8 +279,7 @@ Set a graph vertex attribute
 \describe{
 \item{\code{name}}{Name of the attribute}
 
-\item{\code{value}}{Value to assign
-Add one or more neighbors}
+\item{\code{value}}{Value to assign}
 }
 \if{html}{\out{</div>}}
 }
@@ -284,6 +288,7 @@ Add one or more neighbors}
 \if{html}{\out{<a id="method-Agent-add_neighbors"></a>}}
 \if{latex}{\out{\hypertarget{method-Agent-add_neighbors}{}}}
 \subsection{Method \code{add_neighbors()}}{
+Add one or more neighbors
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Agent$add_neighbors(...)}\if{html}{\out{</div>}}
 }
@@ -291,8 +296,7 @@ Add one or more neighbors}
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{Agent instances to add as neighbors
-Remove one or more neighbors}
+\item{\code{...}}{Agent instances to add as neighbors}
 }
 \if{html}{\out{</div>}}
 }
@@ -301,6 +305,7 @@ Remove one or more neighbors}
 \if{html}{\out{<a id="method-Agent-remove_neighbors"></a>}}
 \if{latex}{\out{\hypertarget{method-Agent-remove_neighbors}{}}}
 \subsection{Method \code{remove_neighbors()}}{
+Remove one or more neighbors
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Agent$remove_neighbors(...)}\if{html}{\out{</div>}}
 }
@@ -308,8 +313,7 @@ Remove one or more neighbors}
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{Agent instances to remove from neighbors
-Get the degree of the agent in the graph}
+\item{\code{...}}{Agent instances to remove from neighbors}
 }
 \if{html}{\out{</div>}}
 }
@@ -318,6 +322,7 @@ Get the degree of the agent in the graph}
 \if{html}{\out{<a id="method-Agent-degree"></a>}}
 \if{latex}{\out{\hypertarget{method-Agent-degree}{}}}
 \subsection{Method \code{degree()}}{
+Get the degree of the agent in the graph
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Agent$degree(mode = "all")}\if{html}{\out{</div>}}
 }

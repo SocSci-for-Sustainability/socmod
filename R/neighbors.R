@@ -21,13 +21,11 @@ Neighbors <- R6::R6Class(
       length(self$agents)
     },
     
+    #' @description
     #' Get a neighbor by index or name
     #'
     #' @param key An integer index or character name of the neighbor
     #' @return An Agent instance
-    #' @examples
-    #' nbrs$get(1)
-    #' nbrs$get("a2")
     get = function(key) {
       if (is.numeric(key)) {
         return(self$agents[[key]])
@@ -41,6 +39,7 @@ Neighbors <- R6::R6Class(
       }
     },
     
+    #' @description
     #' Filter neighbors using a predicate function
     #'
     #' @param predicate A function taking an Agent and returning TRUE or FALSE
@@ -51,6 +50,7 @@ Neighbors <- R6::R6Class(
       Neighbors$new(Filter(predicate, self$agents))
     },
     
+    #' @description
     #' Sample one or more neighbors
     #'
     #' @param n Number of neighbors to sample
@@ -76,6 +76,7 @@ Neighbors <- R6::R6Class(
       }
     },
     
+    #' @description
     #' Add one or more agents to the neighbors list
     #'
     #' @param ... Agent objects to add
@@ -86,6 +87,7 @@ Neighbors <- R6::R6Class(
       self$agents <- unique(c(self$agents, new_agents))
     },
     
+    #' @description
     #' Remove one or more agents from the neighbors list
     #'
     #' @param ... Agent objects to remove
