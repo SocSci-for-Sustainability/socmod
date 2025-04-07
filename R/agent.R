@@ -1,146 +1,80 @@
-.agent_exposure_prob <- function(agent) {
-  
-  curr_behaviors <- agent$neighbors$map(\(a) { a$curr_behavior })
-  
-  n_neighbors_adopted <- sum(
-    purrr::map_vec(curr_behaviors, \(b) { ifelse(b == "Adaptive", 1, 0) })
-  )
-  
-  return (n_neighbors_adopted / agent$neighbors$n)
-}
-
-
-#' Agent for use with AgentBasedModel instances
-#' 
-#' @description
-#' Agent attributes include information about previous, current, and next behaviors, 
-#' neighbors (an instance of the Neighbors class). Use class methods 
-#' to calculate exposure probability, add neighbors, or set agent fitness.
+#' Agent class for socmod
+#'
+#' Represents an individual agent in a social network with cognitive and behavioral attributes.
+#'
 #' @export
-Agent <- R6Class(classname="Agent", public = list(
-  
-  #' @field prev_behavior Previous agent behavior.
-  prev_behavior = "",
-  #' @field curr_behavior Current agent behavior.
-  curr_behavior = "",
-  #' @field next_behavior Next behavior the agent could do, depending on iterate_model.
-  next_behavior = "",
-  #' @field neighbors Initial set of neighbors.
-  neighbors = c(),
-  #' @field prev_fitness Previous agent fitness.
-  prev_fitness = 0.0,
-  #' @field curr_fitness Current agent fitness.
-  curr_fitness = 0.0,
-  #' @field next_fitness Next fitness.
-  next_fitness = 0.0,
-  #' @field name Agent's name.
-  name = NULL,
-  #' @field group Agent's group.
-  group = NULL,
-
-  #' @description
-  #' Create a new Agent instance. 
-  #' @param behavior Initial agent behavior.
-  #' @param fitness Agent fitness.
-  #' @param name Agent name; should be unique or maybe face unexpected problems.
-  #' @param neighbors Initialize neighbors; typically done in ABM initialization.
-  #' @return A new `Agent` object.
-  initialize = 
-    function(behavior = "", fitness = 0.0, name = NULL, neighbors = c(), group = NULL) {
-      
-      self$prev_behavior <- behavior
-      self$curr_behavior <- behavior
-      self$next_behavior <- behavior
-      # print(fitness)
-      self$prev_fitness <- fitness
-      self$curr_fitness <- fitness
-      self$next_fitness <- fitness
-      
-      # print(self$curr_fitness)
-      
+Agent <- R6::R6Class(
+  "Agent",
+  public = list(
+    id = NULL,
+    graph = NULL,
+    name = NULL,
+    neighbors = NULL,
+    
+    initialize = function(id, graph, name = NULL) {
+      stopifnot(igraph::is.igraph(graph))
+      self$id <- id
+      self$graph <- graph
       self$name <- name
-      self$add_neighbors(neighbors)  
-
-      self$group <- group
-  },
-  
-  #' Add agents to this agent's `neighbor` field
-  #'
-  #' @param new_neighbors List of Agents to add as neighbors.
-  #' @return self (Agent)
-  add_neighbors = function(new_neighbors) {
+      self$neighbors <- Neighbors$new()
+    },
     
-    self$neighbors <- Neighbors$new(c(self$neighbors$agents, new_neighbors))
-
-    invisible(self)
-  },  
-
-  #' Calculate the exposure probability for this agent. 
-  #' 
-  #' @return Float ≥ 0 and ≤ 1 representing the probability of a non-trivial 
-  #' exposure to the adaptive behavior, where *non-trivial* exposure means the learner
-  #' is doing the legacy behavior and selects an agent doing the adaptive behavior.
-  exposure_prob = function() {
-    return (.agent_exposure_prob(self))
-  },
-
-  #' Set the agent's current fitness value.
-  #' 
-  #' @param fitness The fitness to assign.
-  #' @return self
-  set_fitness = function(fitness) {
+    get_name = function() {
+      self$name
+    },
     
-    self$curr_fitness = fitness
+    set_name = function(value) {
+      self$name <- value
+    },
     
-    invisible(self)
-  }
-))
-
-#' Encapsulation of an agent's neighbors.
-#'
-#' @description
-#' Encapsulate neighbors to easily access them by name, know how many there are,
-#' check if an agent is among another's neighbors, or map a function across
-#' all the agents.
-#'
-#' @export
-Neighbors <- R6Class(classname = "Neighbors", public = list(
-  
-  #' @field agents Get neighbors as list of agents.
-  agents = c(),
-  
-  #' @field n Number of neighbors
-  n = 0,
-  
-  #' Create a new instance of Neighbors using a list of Agents.
-  #' @param agents The agents to be included as neighbors.
-  initialize = function(agents) { 
-    self$agents <- agents 
-    self$n <- length(agents)
-    invisible(self)
-  },
-  
-  #' Get neighbor by name, returning NULL if named agent is not a neighbor.
-  #' @param name Agent name
-  get = function(name) { 
-    return (self$agents[[name]]) 
-  },
-  
-  #' Wrap purrr::map to apply function to all neighbor agents.
-  #'
-  #' @param f Function to apply to all neighbors.
-  #' @return the result of the mapping, *not* self
-  map = function(f) { 
+    get_behavior = function() {
+      igraph::vertex_attr(self$graph, "behavior_current", index = self$id)
+    },
     
-    return(purrr::map(self$agents, f))
-  },
-
-  #' Check by name if an agent is one of the neighbors.
-  #'
-  #' @param name Name of the agent to check.
-  #' @return boolean indicating whether named agent is a neighbor
-  contains = function(name) {
-     
-    return (name %in% names(self$agents))
-  }
-))
+    set_next_behavior = function(value) {
+      igraph::vertex_attr(self$graph, "behavior_next", index = self$id) <<- value
+    },
+    
+    advance_behavior = function() {
+      next_val <- self$get_attr("behavior_next")
+      self$set_attr("behavior_current", next_val)
+    },
+    
+    get_fitness = function() {
+      igraph::vertex_attr(self$graph, "fitness_current", index = self$id)
+    },
+    
+    set_next_fitness = function(value) {
+      igraph::vertex_attr(self$graph, "fitness_next", index = self$id) <<- value
+    },
+    
+    advance_fitness = function() {
+      next_val <- self$get_attr("fitness_next")
+      self$set_attr("fitness_current", next_val)
+    },
+    
+    get_attr = function(name) {
+      igraph::vertex_attr(self$graph, name, index = self$id)
+    },
+    
+    set_attr = function(name, value) {
+      igraph::vertex_attr(self$graph, name, index = self$id) <<- value
+    },
+    
+    add_neighbors = function(...) {
+      if (is.null(self$neighbors))
+        self$neighbors <- Neighbors$new()
+      self$neighbors$add(...)
+    },
+    
+    remove_neighbors = function(...) {
+      if (!is.null(self$neighbors)) {
+        self$neighbors$remove(...)
+      }
+    },
+    
+    degree = function(mode = "all") {
+      igraph::degree(self$graph, v = self$id, mode = mode)
+    }
+  )
+)
