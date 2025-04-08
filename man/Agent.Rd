@@ -9,48 +9,36 @@ Agent class for socmod
 Agent class for socmod
 }
 \details{
-Represents an individual agent in a social network. Each agent has access to
-a shared igraph-based network object and exposes methods for interacting with
-behavioral and fitness attributes, social connections, and graph metadata.
-
-Advanced note: This class uses igraph's custom \code{vertex_attr(...) <<- value} setter
-syntax internally to ensure robust and consistent assignment of dynamic vertex
-attributes. This detail is abstracted away from the user-facing API.
-}
-\section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{id}}{The internal vertex ID of the agent in the igraph object}
-
-\item{\code{graph}}{The igraph network shared across all agents}
-
-\item{\code{name}}{A unique string name for the agent}
-
-\item{\code{neighbors}}{A Neighbors object managing local social connections}
-}
-\if{html}{\out{</div>}}
+Represents an individual agent in a social network. Each agent stores behavioral,
+fitness, and neighbor information. This class is designed to be encapsulated,
+with all data access via getter/setter methods.
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-Agent-new}{\code{Agent$new()}}
+\item \href{#method-Agent-get_id}{\code{Agent$get_id()}}
 \item \href{#method-Agent-get_name}{\code{Agent$get_name()}}
 \item \href{#method-Agent-set_name}{\code{Agent$set_name()}}
 \item \href{#method-Agent-get_behavior}{\code{Agent$get_behavior()}}
 \item \href{#method-Agent-set_behavior}{\code{Agent$set_behavior()}}
 \item \href{#method-Agent-get_next_behavior}{\code{Agent$get_next_behavior()}}
 \item \href{#method-Agent-set_next_behavior}{\code{Agent$set_next_behavior()}}
-\item \href{#method-Agent-advance_behavior}{\code{Agent$advance_behavior()}}
 \item \href{#method-Agent-get_fitness}{\code{Agent$get_fitness()}}
 \item \href{#method-Agent-set_fitness}{\code{Agent$set_fitness()}}
 \item \href{#method-Agent-get_next_fitness}{\code{Agent$get_next_fitness()}}
 \item \href{#method-Agent-set_next_fitness}{\code{Agent$set_next_fitness()}}
+\item \href{#method-Agent-advance_behavior}{\code{Agent$advance_behavior()}}
 \item \href{#method-Agent-advance_fitness}{\code{Agent$advance_fitness()}}
-\item \href{#method-Agent-get_attr}{\code{Agent$get_attr()}}
-\item \href{#method-Agent-set_attr}{\code{Agent$set_attr()}}
+\item \href{#method-Agent-get_neighbors}{\code{Agent$get_neighbors()}}
+\item \href{#method-Agent-set_neighbors}{\code{Agent$set_neighbors()}}
 \item \href{#method-Agent-add_neighbors}{\code{Agent$add_neighbors()}}
 \item \href{#method-Agent-remove_neighbors}{\code{Agent$remove_neighbors()}}
 \item \href{#method-Agent-degree}{\code{Agent$degree()}}
+\item \href{#method-Agent-set_attribute}{\code{Agent$set_attribute()}}
+\item \href{#method-Agent-get_attribute}{\code{Agent$get_attribute()}}
+\item \href{#method-Agent-set_attributes}{\code{Agent$set_attributes()}}
+\item \href{#method-Agent-get_attributes}{\code{Agent$get_attributes()}}
 \item \href{#method-Agent-clone}{\code{Agent$clone()}}
 }
 }
@@ -60,20 +48,28 @@ attributes. This detail is abstracted away from the user-facing API.
 \subsection{Method \code{new()}}{
 Initialize an Agent
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Agent$new(id, graph, name = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Agent$new(id, name = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{id}}{The vertex ID in the graph}
+\item{\code{id}}{Integer vertex ID in the graph}
 
-\item{\code{graph}}{An igraph object shared by all agents}
-
-\item{\code{name}}{Optional string name for the agent}
+\item{\code{name}}{Optional character name for the agent}
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Agent-get_id"></a>}}
+\if{latex}{\out{\hypertarget{method-Agent-get_id}{}}}
+\subsection{Method \code{get_id()}}{
+Get the agent's vertex ID
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Agent$get_id()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Agent-get_name"></a>}}
@@ -84,9 +80,6 @@ Get the agent's name
 \if{html}{\out{<div class="r">}}\preformatted{Agent$get_name()}\if{html}{\out{</div>}}
 }
 
-\subsection{Returns}{
-A character string representing the agent's name
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Agent-set_name"></a>}}
@@ -94,13 +87,13 @@ A character string representing the agent's name
 \subsection{Method \code{set_name()}}{
 Set the agent's name
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Agent$set_name(value)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Agent$set_name(name)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{value}}{A string name}
+\item{\code{name}}{New name to assign}
 }
 \if{html}{\out{</div>}}
 }
@@ -109,20 +102,17 @@ Set the agent's name
 \if{html}{\out{<a id="method-Agent-get_behavior"></a>}}
 \if{latex}{\out{\hypertarget{method-Agent-get_behavior}{}}}
 \subsection{Method \code{get_behavior()}}{
-Get the current behavior
+Get current behavior
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Agent$get_behavior()}\if{html}{\out{</div>}}
 }
 
-\subsection{Returns}{
-A string representing the agent's current behavior
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Agent-set_behavior"></a>}}
 \if{latex}{\out{\hypertarget{method-Agent-set_behavior}{}}}
 \subsection{Method \code{set_behavior()}}{
-Set the current behavior
+Set current behavior
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Agent$set_behavior(value)}\if{html}{\out{</div>}}
 }
@@ -130,7 +120,7 @@ Set the current behavior
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{value}}{A string behavior type}
+\item{\code{value}}{New current behavior}
 }
 \if{html}{\out{</div>}}
 }
@@ -139,20 +129,17 @@ Set the current behavior
 \if{html}{\out{<a id="method-Agent-get_next_behavior"></a>}}
 \if{latex}{\out{\hypertarget{method-Agent-get_next_behavior}{}}}
 \subsection{Method \code{get_next_behavior()}}{
-Get the next behavior
+Get next behavior
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Agent$get_next_behavior()}\if{html}{\out{</div>}}
 }
 
-\subsection{Returns}{
-A string representing the agent's next behavior
-Set the next behavior
-}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Agent-set_next_behavior"></a>}}
 \if{latex}{\out{\hypertarget{method-Agent-set_next_behavior}{}}}
 \subsection{Method \code{set_next_behavior()}}{
+Set next behavior
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Agent$set_next_behavior(value)}\if{html}{\out{</div>}}
 }
@@ -160,7 +147,61 @@ Set the next behavior
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{value}}{A string behavior type}
+\item{\code{value}}{New next behavior}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Agent-get_fitness"></a>}}
+\if{latex}{\out{\hypertarget{method-Agent-get_fitness}{}}}
+\subsection{Method \code{get_fitness()}}{
+Get current fitness
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Agent$get_fitness()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Agent-set_fitness"></a>}}
+\if{latex}{\out{\hypertarget{method-Agent-set_fitness}{}}}
+\subsection{Method \code{set_fitness()}}{
+Set current fitness
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Agent$set_fitness(value)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{value}}{Numeric value to assign}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Agent-get_next_fitness"></a>}}
+\if{latex}{\out{\hypertarget{method-Agent-get_next_fitness}{}}}
+\subsection{Method \code{get_next_fitness()}}{
+Get next fitness
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Agent$get_next_fitness()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Agent-set_next_fitness"></a>}}
+\if{latex}{\out{\hypertarget{method-Agent-set_next_fitness}{}}}
+\subsection{Method \code{set_next_fitness()}}{
+Set next fitness
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Agent$set_next_fitness(value)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{value}}{Numeric value to assign}
 }
 \if{html}{\out{</div>}}
 }
@@ -176,110 +217,38 @@ Advance to the next behavior
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Agent-get_fitness"></a>}}
-\if{latex}{\out{\hypertarget{method-Agent-get_fitness}{}}}
-\subsection{Method \code{get_fitness()}}{
-Get the current fitness value
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Agent$get_fitness()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-A numeric fitness value
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Agent-set_fitness"></a>}}
-\if{latex}{\out{\hypertarget{method-Agent-set_fitness}{}}}
-\subsection{Method \code{set_fitness()}}{
-Set the current fitness
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Agent$set_fitness(value)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{value}}{A numeric fitness score}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Agent-get_next_fitness"></a>}}
-\if{latex}{\out{\hypertarget{method-Agent-get_next_fitness}{}}}
-\subsection{Method \code{get_next_fitness()}}{
-Get the next fitness value
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Agent$get_next_fitness()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-A numeric fitness value
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Agent-set_next_fitness"></a>}}
-\if{latex}{\out{\hypertarget{method-Agent-set_next_fitness}{}}}
-\subsection{Method \code{set_next_fitness()}}{
-Set the next fitness value
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Agent$set_next_fitness(value)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{value}}{A numeric fitness score}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Agent-advance_fitness"></a>}}
 \if{latex}{\out{\hypertarget{method-Agent-advance_fitness}{}}}
 \subsection{Method \code{advance_fitness()}}{
-Advance to the next fitness value
+Advance to the next fitness
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Agent$advance_fitness()}\if{html}{\out{</div>}}
 }
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Agent-get_attr"></a>}}
-\if{latex}{\out{\hypertarget{method-Agent-get_attr}{}}}
-\subsection{Method \code{get_attr()}}{
-Get a graph vertex attribute by name
+\if{html}{\out{<a id="method-Agent-get_neighbors"></a>}}
+\if{latex}{\out{\hypertarget{method-Agent-get_neighbors}{}}}
+\subsection{Method \code{get_neighbors()}}{
+Get neighbors object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Agent$get_attr(name)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Agent$get_neighbors()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{name}}{Name of the attribute}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-The value of the attribute
-}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Agent-set_attr"></a>}}
-\if{latex}{\out{\hypertarget{method-Agent-set_attr}{}}}
-\subsection{Method \code{set_attr()}}{
-Set a graph vertex attribute
+\if{html}{\out{<a id="method-Agent-set_neighbors"></a>}}
+\if{latex}{\out{\hypertarget{method-Agent-set_neighbors}{}}}
+\subsection{Method \code{set_neighbors()}}{
+Set neighbors object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Agent$set_attr(name, value)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Agent$set_neighbors(nbrs)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{name}}{Name of the attribute}
-
-\item{\code{value}}{Value to assign}
+\item{\code{nbrs}}{A Neighbors instance}
 }
 \if{html}{\out{</div>}}
 }
@@ -313,7 +282,7 @@ Remove one or more neighbors
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{Agent instances to remove from neighbors}
+\item{\code{...}}{Agent instances to remove}
 }
 \if{html}{\out{</div>}}
 }
@@ -322,21 +291,77 @@ Remove one or more neighbors
 \if{html}{\out{<a id="method-Agent-degree"></a>}}
 \if{latex}{\out{\hypertarget{method-Agent-degree}{}}}
 \subsection{Method \code{degree()}}{
-Get the degree of the agent in the graph
+Get agent's degree (via neighbors)
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Agent$degree(mode = "all")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Agent$degree()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Integer degree
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Agent-set_attribute"></a>}}
+\if{latex}{\out{\hypertarget{method-Agent-set_attribute}{}}}
+\subsection{Method \code{set_attribute()}}{
+Set an arbitrary named attribute
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Agent$set_attribute(key, value)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{mode}}{Degree mode passed to igraph::degree()}
+\item{\code{key}}{Attribute name}
+
+\item{\code{value}}{Value to assign}
 }
 \if{html}{\out{</div>}}
 }
-\subsection{Returns}{
-Integer degree count
 }
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Agent-get_attribute"></a>}}
+\if{latex}{\out{\hypertarget{method-Agent-get_attribute}{}}}
+\subsection{Method \code{get_attribute()}}{
+Get the value of a named attribute
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Agent$get_attribute(key)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{key}}{Attribute name}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Agent-set_attributes"></a>}}
+\if{latex}{\out{\hypertarget{method-Agent-set_attributes}{}}}
+\subsection{Method \code{set_attributes()}}{
+Set multiple attributes
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Agent$set_attributes(attr_list)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{attr_list}}{A named list of attributes}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Agent-get_attributes"></a>}}
+\if{latex}{\out{\hypertarget{method-Agent-get_attributes}{}}}
+\subsection{Method \code{get_attributes()}}{
+Get all custom attributes as a named list
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Agent$get_attributes()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Agent-clone"></a>}}

@@ -7,6 +7,5 @@
 frequency_bias_select_teacher(agent, model)
 }
 \description{
-Don't use teacher selection for frequency bias since this is a "what" bias,
-not a "who" bias.
+Frequency biased teacher selection does nothing
 }

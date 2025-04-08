@@ -1,173 +1,177 @@
 #' Agent class for socmod
 #'
-#' Represents an individual agent in a social network. Each agent has access to
-#' a shared igraph-based network object and exposes methods for interacting with
-#' behavioral and fitness attributes, social connections, and graph metadata.
-#'
-#' Advanced note: This class uses igraph's custom `vertex_attr(...) <<- value` setter
-#' syntax internally to ensure robust and consistent assignment of dynamic vertex
-#' attributes. This detail is abstracted away from the user-facing API.
-#'
-#' @field id The internal vertex ID of the agent in the igraph object
-#' @field graph The igraph network shared across all agents
-#' @field name A unique string name for the agent
-#' @field neighbors A Neighbors object managing local social connections
+#' Represents an individual agent in a social network. Each agent stores behavioral,
+#' fitness, and neighbor information. This class is designed to be encapsulated,
+#' with all data access via getter/setter methods.
 #'
 #' @export
 Agent <- R6::R6Class(
   "Agent",
-  public = list(
+  private = list(
     id = NULL,
-    graph = NULL,
     name = NULL,
+    behavior_current = NULL,
+    behavior_next = NULL,
+    fitness_current = NULL,
+    fitness_next = NULL,
     neighbors = NULL,
-    
+    attributes = list()
+  ),
+  public = list(
     #' @description
     #' Initialize an Agent
-    #' @param id The vertex ID in the graph
-    #' @param graph An igraph object shared by all agents
-    #' @param name Optional string name for the agent
-    initialize = function(id, graph, name = NULL) {
-      stopifnot(igraph::is.igraph(graph))
-      self$id <- id
-      self$graph <- graph
-      self$name <- name
-      self$neighbors <- Neighbors$new()
+    #' @param id Integer vertex ID in the graph
+    #' @param name Optional character name for the agent
+    initialize = function(id, name = NULL) {
+      private$id <- id
+      private$name <- name %||% paste0("a", id)
+      private$neighbors <- Neighbors$new()
+    },
+    
+    #' @description
+    #' Get the agent's vertex ID
+    get_id = function() {
+      private$id
     },
     
     #' @description
     #' Get the agent's name
-    #' @return A character string representing the agent's name
     get_name = function() {
-      self$name
+      private$name
     },
     
     #' @description
     #' Set the agent's name
-    #' @param value A string name
-    set_name = function(value) {
-      self$name <- value
+    #' @param name New name to assign
+    set_name = function(name) {
+      private$name <- name
     },
     
     #' @description
-    #' Get the current behavior
-    #' @return A string representing the agent's current behavior
+    #' Get current behavior
     get_behavior = function() {
-      igraph::vertex_attr(self$graph, "behavior_current", index = self$id)
+      private$behavior_current
     },
     
     #' @description
-    #' Set the current behavior
-    #' @param value A string behavior type
+    #' Set current behavior
+    #' @param value New current behavior
     set_behavior = function(value) {
-      self$set_attr("behavior_current", value)
+      private$behavior_current <- as.character(value)
     },
     
     #' @description
-    #' Get the next behavior
-    #' @return A string representing the agent's next behavior
+    #' Get next behavior
     get_next_behavior = function() {
-      self$get_attr("behavior_next")
+      private$behavior_next
     },
     
-    #' Set the next behavior
-    #' @param value A string behavior type
+    #' @description
+    #' Set next behavior
+    #' @param value New next behavior
     set_next_behavior = function(value) {
-      igraph::set_vertex_attr(self$graph, name = "behavior_next", 
-                              index = self$id, value = value)
+      private$behavior_next <- as.character(value)
+    },
+    
+    #' @description
+    #' Get current fitness
+    get_fitness = function() {
+      private$fitness_current
+    },
+    
+    #' @description
+    #' Set current fitness
+    #' @param value Numeric value to assign
+    set_fitness = function(value) {
+      private$fitness_current <- value
+    },
+    
+    #' @description
+    #' Get next fitness
+    get_next_fitness = function() {
+      private$fitness_next
+    },
+    
+    #' @description
+    #' Set next fitness
+    #' @param value Numeric value to assign
+    set_next_fitness = function(value) {
+      private$fitness_next <- value
     },
     
     #' @description
     #' Advance to the next behavior
     advance_behavior = function() {
-      self$set_behavior(self$get_next_behavior())
+      private$behavior_current <- private$behavior_next
     },
     
     #' @description
-    #' Get the current fitness value
-    #' @return A numeric fitness value
-    get_fitness = function() {
-      igraph::vertex_attr(self$graph, "fitness_current", index = self$id)
-    },
-    
-    #' @description
-    #' Set the current fitness
-    #' @param value A numeric fitness score
-    set_fitness = function(value) {
-      self$set_vertex_attr(self$graph, name = "fitness_current", 
-                           index = self$id, value = value)
-    },
-    
-    #' @description
-    #' Get the next fitness value
-    #' @return A numeric fitness value
-    get_next_fitness = function() {
-      self$get_attr("fitness_next")
-    },
-    
-    #' @description
-    #' Set the next fitness value
-    #' @param value A numeric fitness score
-    set_next_fitness = function(value) {
-      igraph::set_vertex_attr(self$graph, name = "fitness_next", 
-                              index = self$id, value = value)
-    },
-    
-    #' @description
-    #' Advance to the next fitness value
+    #' Advance to the next fitness
     advance_fitness = function() {
-      self$set_fitness(self$get_next_fitness())
+      private$fitness_current <- private$fitness_next
     },
     
     #' @description
-    #' Get a graph vertex attribute by name
-    #' @param name Name of the attribute
-    #' @return The value of the attribute
-    get_attr = function(name) {
-      igraph::vertex_attr(self$graph, name, index = self$id)
+    #' Get neighbors object
+    get_neighbors = function() {
+      private$neighbors
     },
     
     #' @description
-    #' Set a graph vertex attribute
-    #' @param name Name of the attribute
-    #' @param value Value to assign
-    set_attr = function(name, value) {
-      igraph::set_vertex_attr(self$graph, name, index = self$id, value)
+    #' Set neighbors object
+    #' @param nbrs A Neighbors instance
+    set_neighbors = function(nbrs) {
+      private$neighbors <- nbrs
     },
     
     #' @description
     #' Add one or more neighbors
     #' @param ... Agent instances to add as neighbors
     add_neighbors = function(...) {
-      if (is.null(self$neighbors))
-        self$neighbors <- Neighbors$new()
-      self$neighbors$add(...)
+      private$neighbors$add(...)
     },
     
     #' @description
     #' Remove one or more neighbors
-    #' @param ... Agent instances to remove from neighbors
+    #' @param ... Agent instances to remove
     remove_neighbors = function(...) {
-      if (!is.null(self$neighbors)) {
-        self$neighbors$remove(...)
-      }
+      private$neighbors$remove(...)
     },
     
     #' @description
-    #' Get the degree of the agent in the graph
-    #' @param mode Degree mode passed to igraph::degree()
-    #' @return Integer degree count
-    degree = function(mode = "all") {
-      igraph::degree(self$graph, v = self$id, mode = mode)
+    #' Get agent's degree (via neighbors)
+    #' @return Integer degree
+    degree = function() {
+      private$neighbors$length()
     },
     
-    #' @description Compute the probability of exposure to Adaptive behavior
-    #' @return A numeric value between 0 and 1
-    exposure_prob = function() {
-      if (is.null(self$neighbors) || self$neighbors$length() == 0) return(0)
-      
-      adaptive <- self$neighbors$filter(\(a) a$get_behavior() == "Adaptive")
-      adaptive$length() / self$neighbors$length()
+    #' @description
+    #' Set an arbitrary named attribute
+    #' @param key Attribute name
+    #' @param value Value to assign
+    set_attribute = function(key, value) {
+      private$attributes[[key]] <- value
+    },
+    
+    #' @description
+    #' Get the value of a named attribute
+    #' @param key Attribute name
+    get_attribute = function(key) {
+      private$attributes[[key]]
+    },
+    
+    #' @description
+    #' Set multiple attributes
+    #' @param attr_list A named list of attributes
+    set_attributes = function(attr_list) {
+      stopifnot(is.list(attr_list))
+      private$attributes <- modifyList(private$attributes, attr_list)
+    },
+    
+    #' @description
+    #' Get all custom attributes as a named list
+    get_attributes = function() {
+      private$attributes
     }
   )
 )

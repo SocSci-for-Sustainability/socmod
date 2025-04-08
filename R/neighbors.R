@@ -14,7 +14,9 @@ Neighbors <- R6::R6Class(
     },
     
     map = function(f) {
-      vapply(self$agents, f, FUN.VALUE = character(1))
+      # Just apply the function without forcing the result to be a specific type.
+      # This allows the function to return whatever is appropriate, like a string.
+      lapply(self$agents, f)
     },
     
     length = function() {

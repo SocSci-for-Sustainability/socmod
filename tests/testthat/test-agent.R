@@ -1,95 +1,60 @@
-test_that("Agent exposure probability works as expected", {
-  florentine_m <- netrankr::florentine_m
-  florentine_m <- igraph::delete_vertices(florentine_m, which(igraph::degree(florentine_m) == 0))
+test_that("Agent initialization and name management works", {
+  a <- Agent$new(id = 1, name = "a1")
   
-  m <- AgentBasedModel$new(graph = florentine_m)
+  expect_equal(a$get_id(), 1)
+  expect_equal(a$get_name(), "a1")
   
-  alb <- m$get_agent("Albizzi")
-  alb$set_behavior("Adaptive")
-  
-  gin <- m$get_agent("Ginori")
-  gua <- m$get_agent("Guadagni")
-  med <- m$get_agent("Medici")
-  
-  expect_equal(gin$exposure_prob(), 1)
-  expect_equal(gua$exposure_prob(), 1 / 4)
-  expect_equal(med$exposure_prob(), 1 / 6)
-  
-  total_exposure <- sum(purrr::map_dbl(m$agents, \(a) a$exposure_prob()))
-  expect_equal(total_exposure, 1 + 1 / 4 + 1 / 6)
+  a$set_name("alpha")
+  expect_equal(a$get_name(), "alpha")
 })
 
-test_that("Agent behavior and fitness lifecycle works", {
-  g <- igraph::make_ring(1)
-  igraph::V(g)$name <- "solo"
-  m <- AgentBasedModel$new(graph = g)
-  a <- m$get_agent("solo")
+test_that("Agent behavior and fitness getters/setters work", {
+  a <- Agent$new(id = 1, name = "a1")
   
-  # Name
-  expect_equal(a$get_name(), "solo")
-  a$set_name("renamed")
-  expect_equal(a$get_name(), "renamed")
+  a$set_behavior("Legacy")
+  a$set_next_behavior("Adaptive")
+  expect_equal(a$get_behavior(), "Legacy")
+  expect_equal(a$get_next_behavior(), "Adaptive")
   
-  # Behavior
-  a$set_next_behavior("Curious")
   a$advance_behavior()
-  expect_equal(a$get_behavior(), "Curious")
-  
-  # Fitness
-  a$set_next_fitness(0.42)
-  a$advance_fitness()
-  expect_equal(a$get_fitness(), 0.42)
-  
-  # Generic attr
-  a$set_attr("flag", TRUE)
-  expect_true(a$get_attr("flag"))
-})
-
-test_that("Agent behavior and fitness accessors are symmetric", {
-  g <- igraph::make_empty_graph(1)
-  igraph::V(g)$name <- "a1"
-  m <- AgentBasedModel$new(graph = g)
-  a <- m$get_agent("a1")
-  
-  # Behavior: set, get, set_next, advance
-  a$set_behavior("Adaptive")
   expect_equal(a$get_behavior(), "Adaptive")
   
-  a$set_next_behavior("Imitative")
-  a$advance_behavior()
-  expect_equal(a$get_behavior(), "Imitative")
+  a$set_fitness(1.0)
+  a$set_next_fitness(2.0)
+  expect_equal(a$get_fitness(), 1.0)
+  expect_equal(a$get_next_fitness(), 2.0)
   
-  # Fitness: set, get, set_next, advance
-  a$set_fitness(0.25)
-  expect_equal(a$get_fitness(), 0.25)
-  
-  a$set_next_fitness(0.5)
   a$advance_fitness()
-  expect_equal(a$get_fitness(), 0.5)
+  expect_equal(a$get_fitness(), 2.0)
 })
 
-test_that("Agent next behavior and fitness getters work", {
-  g <- igraph::make_ring(1)
-  igraph::V(g)$name <- "solo"
-  m <- AgentBasedModel$new(graph = g)
-  a <- m$get_agent("solo")
+test_that("Agent custom attributes work", {
+  a <- Agent$new(id = 2, name = "a2")
   
-  a$set_next_behavior("Learning")
-  expect_equal(a$get_next_behavior(), "Learning")
+  a$set_attribute("learning_type", "success-biased")
+  expect_equal(a$get_attribute("learning_type"), "success-biased")
   
-  a$set_next_fitness(0.75)
-  expect_equal(a$get_next_fitness(), 0.75)
+  a$set_attributes(list(strategy = "risk-averse", group = "X"))
+  attrs <- a$get_attributes()
+  expect_equal(attrs$strategy, "risk-averse")
+  expect_equal(attrs$group, "X")
 })
 
-test_that("Agent neighbors field is a Neighbors object", {
-  g <- igraph::make_ring(3)
-  igraph::V(g)$name <- c("a1", "a2", "a3")
-  m <- AgentBasedModel$new(graph = g)
+test_that("Agent neighbor management works", {
+  a <- Agent$new(id = 2, name = "a2")
+  b <- Agent$new(id = 3, name = "a3")
+  c <- Agent$new(id = 4, name = "a4")
   
-  a2 <- m$get_agent("a2")
-  nbrs <- a2$neighbors
+  a$add_neighbors(b, c)
   
-  expect_true(inherits(nbrs, "Neighbors"))
-  expect_equal(nbrs$length(), 2)
-  expect_equal(nbrs$map(\(a) a$get_name()), c("a1", "a3"))
+  neighbors <- a$get_neighbors()
+  expect_equal(neighbors$length(), 2)
+  expect_equal(
+    sort(unlist(neighbors$map(\(n) n$get_name()), use.names = FALSE)), 
+    c("a3", "a4")
+  )
+  
+  a$remove_neighbors(c)
+  expect_equal(neighbors$length(), 1)
+  expect_equal(neighbors$get(1)$get_name(), "a3")
 })

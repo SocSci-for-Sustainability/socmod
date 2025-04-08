@@ -149,7 +149,7 @@ Sample one or more neighbors
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-A Neighbors object containing the sampled agents
+A Neighbors object or a single Agent depending on \code{n}
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}

@@ -9,15 +9,10 @@ frequency_bias_interact(learner, ., model)
 \arguments{
 \item{learner}{Agent currently selected as learner.}
 
-\item{.}{No selected teacher with frequency-biased learning.}
+\item{.}{Not used (no teacher for frequency bias).}
 
-\item{model}{Model variable will be the agent-based model.}
+\item{model}{The ABM instance}
 }
 \description{
 Interaction function for frequency-biased adaptive learning.
-}
-\examples{
-net <- make_regular_lattice(10, 4)
-model <- AgentBasedModel$new(network = net)
-output <- run(model, 10, interact = frequency_bias_interact)
 }

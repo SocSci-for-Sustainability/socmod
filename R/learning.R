@@ -27,33 +27,30 @@ frequency_bias_select_teacher <- function(agent, model) { return (NULL) }
 #' @return NULL 
 #' @export
 frequency_bias_interact <- function(learner, ., model) {
-  if (is.null(model$params$learning_prob) || (runif(1) < model$params$learning_prob)) {
-    behavior_counts <- learner$neighbors$map(\(a) a$get_behavior()) |>
-      table() |>
-      as.data.frame()
-    
-    names(behavior_counts) <- c("curr_behavior", "n")
-    
-    behavior_counts$selection_prob <- behavior_counts$n / sum(behavior_counts$n)
-    
-    selected <- sample(behavior_counts$curr_behavior, 1, prob = behavior_counts$selection_prob)[[1]]
-    learner$set_next_behavior(selected)
-  }
+
+  behaviors <- learner$get_neighbors()$map(\(a) a$get_behavior())
+  
+  behavior_counts <- table(as.character(behaviors)) |> as.data.frame()
+  
+  names(behavior_counts) <- c("curr_behavior", "n")
+  behavior_counts$selection_prob <- behavior_counts$n / sum(behavior_counts$n)
+  
+  selected <- sample(behavior_counts$curr_behavior, 1, 
+                     prob = behavior_counts$selection_prob)[[1]]
+
+  learner$set_next_behavior(as.character(selected))
 }
+
 
 ### ----- SUCCESS BIAS --------
 
-#' Success-biased teacher selection
-#'
-#' @return Agent selected from neighbors as teacher.
-#' @export 
 success_bias_select_teacher <- function(learner, model) {
-  learner$neighbors$sample(
+  learner$get_neighbors()$sample(
     weights = \(a) {
-      val <- a$get_fitness()
-      if (is.numeric(val) && length(val) == 1 && !is.na(val)) val else 0
-    },
-    n = 1
+      fitness <- a$get_fitness()
+      if (!is.numeric(fitness) || length(fitness) != 1 || is.na(fitness)) return(0)
+      fitness
+    }
   )
 }
 

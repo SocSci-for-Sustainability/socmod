@@ -1,0 +1,143 @@
+#' AgentBasedModel class for socmod
+#'
+#' This class represents the main simulation container, holding agents and a social network.
+#' It ensures synchronization between the agent states and the underlying igraph network.
+#'
+#' @export
+AgentBasedModel <- R6::R6Class(
+  "AgentBasedModel",
+  public = list(
+    agents = NULL,
+    graph = NULL,
+    
+    #' @description Initialize a model with either a graph, agents, or n_agents
+    #' @param graph An igraph object (optional)
+    #' @param agents A list of Agent objects (optional)
+    #' @param n_agents Integer number of agents to create (optional)
+    initialize = function(graph = NULL, agents = NULL, n_agents = NULL) {
+      if (!is.null(graph)) {
+        stopifnot(igraph::is_igraph(graph))
+        self$graph <- graph
+      } else if (!is.null(n_agents)) {
+        self$graph <- igraph::make_full_graph(n_agents, directed = FALSE)
+      } else {
+        stop("Either 'graph' or 'n_agents' must be provided.")
+      }
+      
+      private$.params <- list()
+      
+      if (is.null(igraph::V(self$graph)$name)) {
+        igraph::V(self$graph)$name <- paste0("a", seq_len(igraph::vcount(self$graph)))
+      }
+      
+      # If agents are provided, make sure names sync
+      if (!is.null(agents)) {
+        self$agents <- agents
+        names(self$agents) <- purrr::map_chr(self$agents, \(a) a$get_name())
+        
+        graph_names <- igraph::V(self$graph)$name
+        agent_names <- names(self$agents)
+        
+        if (!all(agent_names %in% graph_names)) {
+          igraph::V(self$graph)$name <- agent_names  # overwrite to match agents
+        }
+        
+        self$sync_network("neighbors_only")
+      } else {
+        self$agents <- purrr::map2(
+          seq_len(igraph::vcount(self$graph)),
+          igraph::V(self$graph)$name,
+          \(i, nm) Agent$new(id = i, name = nm)
+        )
+        names(self$agents) <- purrr::map_chr(self$agents, \(a) a$get_name())
+        self$sync_network("from_graph")
+      }
+    },
+    
+    #' @description Synchronize agent and network fields
+    #' @param direction "to_graph", "from_graph", or "neighbors_only"
+    sync_network = function(direction = c("to_graph", "from_graph", "neighbors_only")) {
+      direction <- match.arg(direction)
+      for (agent in self$agents) {
+        vname <- agent$get_name()
+        if (direction == "from_graph") {
+          igv <- igraph::V(self$graph)
+          agent$set_name(igv[vname]$name)
+          agent$set_behavior(igv[vname]$behavior_current)
+          agent$set_next_behavior(igv[vname]$behavior_next)
+          agent$set_fitness(igv[vname]$fitness_current)
+          agent$set_next_fitness(igv[vname]$fitness_next)
+        } else if (direction == "to_graph") {
+          # Ensure graph vertex names match agent names before syncing
+          igraph::V(self$graph)$name <- names(self$agents)
+          vid <- agent$get_id()
+          self$graph <- igraph::set_vertex_attr(self$graph, "behavior_current", index = vid, value = agent$get_behavior())
+          self$graph <- igraph::set_vertex_attr(self$graph, "behavior_next",    index = vid, value = agent$get_next_behavior())
+          self$graph <- igraph::set_vertex_attr(self$graph, "fitness_current",  index = vid, value = agent$get_fitness())
+          self$graph <- igraph::set_vertex_attr(self$graph, "fitness_next",     index = vid, value = agent$get_next_fitness())
+        }
+      }
+      
+      if (direction %in% c("from_graph", "neighbors_only")) {
+        for (agent in self$agents) {
+          nbr_ids <- igraph::neighbors(self$graph, v = agent$get_id())
+          neighbors <- purrr::map(
+            nbr_ids,
+            \(v) self$get_agent(igraph::V(self$graph)[v]$name)
+          )
+          agent$set_neighbors(Neighbors$new(neighbors))
+        }
+      }
+    },
+    
+    #' @description Get the agent associated with a given ID or name
+    #' @param key Integer index or character name
+    get_agent = function(key) {
+      if (is.character(key)) {
+        return(self$agents[[key]])
+      } else {
+        return(self$agents[[key]])
+      }
+    },
+    
+    #' @description Return the igraph network (after syncing from agents)
+    get_network = function() {
+      # Ensure vertex names are consistent before syncing
+      if (is.null(igraph::V(self$graph)$name) || 
+          !all(names(self$agents) %in% igraph::V(self$graph)$name)) {
+        igraph::V(self$graph)$name <- names(self$agents)
+      }
+      self$sync_network("to_graph")
+      return(self$graph)
+    },
+    
+    #' @description Get the list of model parameters
+    get_parameters = function() {
+      return(private$.params)
+    },
+    
+    #' @description Set multiple model parameters
+    #' @param params Named list of parameters to set
+    set_parameters = function(params) {
+      stopifnot(is.list(params))
+      private$.params <- modifyList(private$.params, params)
+    },
+    
+    #' @description Set a single model parameter
+    #' @param key Parameter name
+    #' @param value Parameter value
+    set_parameter = function(key, value) {
+      private$.params[[key]] <- value
+    },
+    
+    #' @description Get a single model parameter
+    #' @param key Parameter name
+    get_parameter = function(key) {
+      return(private$.params[[key]])
+    }
+  ),
+  
+  private = list(
+    .params = NULL
+  )
+)

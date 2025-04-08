@@ -2,27 +2,10 @@
 % Please edit documentation in R/learning.R
 \name{success_bias_interact}
 \alias{success_bias_interact}
-\title{Success-biased interaction to be paired with success_bias_teacher_selection
-that sets the learner's next behavior and fitness to be the teacher's current
-behavior and fitness.}
+\title{Success-biased interaction function}
 \usage{
 success_bias_interact(learner, teacher, model)
 }
 \description{
-Success-biased interaction to be paired with success_bias_teacher_selection
-that sets the learner's next behavior and fitness to be the teacher's current
-behavior and fitness.
-}
-\examples{
-net <- make_regular_lattice(10, 4)
-model <- AgentBasedModel$new(network = net)
-for (agent in model$agents) {
-  # Agents need non-zero fitness for success bias to work
-  agent$curr_fitness <- 1
-}
-output <- run(model, 10, 
-              interact = success_bias_interact, 
-              partner_selection = success_bias_select_teacher,
-              iterate_model = iterate_learning_model)
-
+Success-biased interaction function
 }
