@@ -35,6 +35,7 @@
 #'   ggplot2::geom_bar(position = "fill") +
 #'   ggplot2::ylab("Proportion of agents") +
 #'   ggplot2::theme_minimal()
+#' @export
 Trial <- R6::R6Class(
   "Trial",
   public = list(
@@ -112,7 +113,70 @@ Trial <- R6::R6Class(
 
 #' @description Predicate function that returns TRUE if the model has fixated on one behavior
 #' @param model An AgentBasedModel
+#' @export
 fixated <- function(model) {
   behaviors <- unlist(purrr::map(model$agents, \(a) as.character(a$get_behavior())), use.names = FALSE)
   length(unique(behaviors)) == 1
+}
+
+
+#' Run a Trial on an AgentBasedModel with standard learning loop
+#'
+#' @param model An AgentBasedModel
+#' @param partner_selection Function for selecting interaction partner
+#' @param interaction Function for modifying agents based on partner
+#' @param iterate Optional function for updating model state
+#' @param stop Stopping condition: max steps (int) or predicate function (default: 50)
+#' @return A Trial object
+#' @export
+#' @examples
+#' agents <- list(
+#'   Agent$new(name = "1", behavior = "Legacy", fitness = 1),
+#'   Agent$new(name = "2", behavior = "Adaptive", fitness = 4),
+#'   Agent$new(name = "3", behavior = "Legacy", fitness = 1),
+#'   Agent$new(name = "4", behavior = "Legacy", fitness = 2)
+#' )
+#' net <- igraph::make_graph(~ 1-2, 1-3, 1-4, 3-2)
+#' model <- AgentBasedModel$new(agents = agents, network = net)
+#' trial <- run_trial(model, stop = 10)
+run_trial <- function(model,
+                      partner_selection = success_bias_select_teacher,
+                      interaction = success_bias_interact,
+                      iterate = iterate_learning_model,
+                      stop = 50) {
+  trial <- Trial$new(
+    model = model,
+    partner_selection = partner_selection,
+    interaction = interaction,
+    iterate = iterate
+  )
+  print(trial$model$get_agent(1)$get_neighbors()$agents)
+  trial$run(stop = stop)
+  return (trial)
+}
+
+
+#' Plot adoption counts of selected behaviors over time
+#'
+#' @param trial A Trial object
+#' @param behaviors Character vector of behaviors to track (e.g., c("Adaptive", "Legacy"))
+#' @return A ggplot object
+#' @export
+#' @examples
+#' # Assuming you have run a trial as in the run_trial() example:
+#' plot_adoption(trial, behaviors = c("Adaptive", "Legacy"))
+plot_adoption <- function(trial, behaviors = c("Adaptive")) {
+  obs <- trial$get_observations()
+  
+  obs_filtered <- obs %>%
+    dplyr::filter(behavior %in% behaviors) %>%
+    dplyr::group_by(t, behavior) %>%
+    dplyr::summarise(count = dplyr::n(), .groups = "drop")
+  
+  ggplot2::ggplot(obs_filtered, ggplot2::aes(x = t, y = count, color = behavior)) +
+    ggplot2::geom_line(linewidth = 1) +
+    ggplot2::xlab("Time step") +
+    ggplot2::ylab("Agent count") +
+    ggplot2::theme_classic() +
+    ggplot2::scale_color_brewer(palette = "Set1")
 }

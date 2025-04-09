@@ -27,6 +27,8 @@ Imports:
     purrr,
     R6,
     rlang,
-    tibble
+    tibble,
+    ggraph,
+    uuid
 URL: https://css4s.github.io/socmod/
 VignetteBuilder: knitr

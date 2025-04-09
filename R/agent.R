@@ -3,6 +3,26 @@
 #' Represents an individual agent in a social network. Each agent stores behavioral,
 #' fitness, and neighbor information. This class is designed to be encapsulated,
 #' with all data access via getter/setter methods.
+#' 
+#' @examples
+#' # Create a basic agent with default settings
+#' a1 <- Agent$new(1)
+#'
+#' # Create a named agent with specific behavior and fitness
+#' a2 <- Agent$new(id = 1, name = "Mia", behavior = "1", fitness = 0.75)
+#'
+#' # Access ID and name
+#' a2$get_id()
+#' a2$get_name()
+#'
+#' # Check and update behavior
+#' a2$get_behavior()
+#' a2$set_behavior("0")
+#' a2$advance_behavior()
+#'
+#' # Set and retrieve custom attributes
+#' a2$set_attribute("group", "treatment")
+#' a2$get_attribute("group")
 #'
 #' @export
 Agent <- R6::R6Class(
@@ -18,15 +38,28 @@ Agent <- R6::R6Class(
     attributes = list()
   ),
   public = list(
+    
     #' @description
     #' Initialize an Agent
-    #' @param id Integer vertex ID in the graph
-    #' @param name Optional character name for the agent
-    initialize = function(id, name = NULL) {
+    #'
+    #' Sets up a new Agent instance with an ID, optional name, initial behavior,
+    #' and fitness values. Behavior and fitness are copied into both the current
+    #' and next state fields. A Neighbors container is also initialized.
+    #'
+    #' @param id Integer or string ID for the agent (used internally, not necessarily name)
+    #' @param name Optional character name for the agent. Defaults to "a{id}".
+    #' @param behavior Initial behavior (character). Default is "0".
+    #' @param fitness Initial fitness (numeric). Default is 0.
+    initialize = function(id, name = NULL, behavior = "0", fitness = 0) {
       private$id <- id
-      private$name <- name %||% paste0("a", id)
+      self$set_name(name %||% paste0("a", id))
+      self$set_behavior(behavior)
+      self$set_next_behavior(behavior)
+      self$set_fitness(fitness)
+      self$set_next_fitness(fitness)
       private$neighbors <- Neighbors$new()
     },
+    
     
     #' @description
     #' Get the agent's vertex ID

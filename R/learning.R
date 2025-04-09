@@ -43,7 +43,7 @@ frequency_bias_interact <- function(learner, ., model) {
 
 
 ### ----- SUCCESS BIAS --------
-
+#' @export
 success_bias_select_teacher <- function(learner, model) {
   learner$get_neighbors()$sample(
     weights = \(a) {

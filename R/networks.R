@@ -221,16 +221,6 @@ make_preferential_attachment <- function(N) {
 }
 
 
-
-ggnetplot <- function(g, layout_fun = layout_in_circle, ...) {
-  
-  return(
-    ggplot(ggnetwork(g, layout = layout_fun(g)), 
-           aes(x=x, y=y, xend=xend, yend=yend, ...))
-  )
-}
-
-
 #' Command that operates like ggplot
 #'
 #' @param net Network to plot
@@ -252,15 +242,17 @@ ggnetplot <- function(g, layout_fun = layout_in_circle, ...) {
 #'   theme_blank()
 ggnetplot <- function(net, layout = NULL, ...) {
   
-  if (is.null(layout)) {
-    
-    ret <- ggplot(ggnetwork(net), aes(x=x, y=y, xend=xend, yend=yend, ...))
-    
-  } else {
-    
-    ret <- ggplot(ggnetwork(net, layout = layout), aes(x=x, y=y, xend=xend, yend=yend, ...))
-  }
+  assert_that(
+    inherits(net, "igraph"),
+    msg = "net must be an igraph object"
+  )
   
+  if (is.null(layout)) {
+    ret <- ggplot(ggnetwork(net), aes(x=x, y=y, xend=xend, yend=yend, ...))
+  } else {
+    ret <- ggplot(ggnetwork(net, layout = layout(net)), aes(x=x, y=y, xend=xend, yend=yend, ...))
+  }
+
   return (ret)
 }
 
@@ -464,3 +456,240 @@ make_homophily_network <- function(group_sizes = c(3, 7), mean_degree = 2,
   return (net)
 }
 
+#' Simulate Feld's 1991 Marketville Network
+#'
+#' Creates an undirected network using the degree distribution from
+#' Feld (1991) based on the "Marketville" high school data. Uses
+#' the configuration model to generate the network structure.
+#'
+#' The friendship paradox—where most individuals have fewer friends
+#' than their friends do—emerges naturally due to degree heterogeneity
+#' in this network.
+#'
+#' @param seed Integer. Random seed for reproducibility. Default is 42.
+#'
+#' @return An igraph object representing the simulated network.
+#'
+#' @examples
+#' # Generate the network
+#' g <- simulate_feld_1991(seed = 42)
+#'
+#' # Plot degree vs. mean degree of friends to show the paradox
+#' deg <- igraph::degree(g)
+#' mean_neighbor_deg <- sapply(igraph::V(g), function(v) {
+#'   nbs <- igraph::neighbors(g, v)
+#'   if (length(nbs) == 0) return(NA)
+#'   mean(igraph::degree(g, v = nbs))
+#' })
+#'
+#' plot(deg, mean_neighbor_deg,
+#'      xlab = "Individual's Friends",
+#'      ylab = "Mean Friends of Friends")
+#' abline(0, 1, col = "red")
+#'
+#' # Proportion of individuals with fewer friends than their friends
+#' mean(deg < mean_neighbor_deg, na.rm = TRUE)
+#'
+#' @export
+simulate_feld_1991 <- function(seed = 42) {
+  if (!requireNamespace("igraph", quietly = TRUE)) {
+    stop("Please install the 'igraph' package to use this function.")
+  }
+  
+  # Degree distribution from Feld (1991), Fig. 3a
+  degree_dist <- data.frame(
+    degree = 1:7,
+    count = c(20, 29, 35, 20, 14, 20, 8)
+  )
+  
+  # Create degree sequence
+  degrees <- rep(degree_dist$degree, degree_dist$count)
+  
+  # Generate network
+  set.seed(seed)
+  g <- igraph::sample_degseq(degrees, method = "simple.no.multiple")
+  
+  return(g)
+}
+
+#' Compare Friendship Paradox in a Network
+#'
+#' For each node, compares the number of friends (degree) to the mean number
+#' of friends among their neighbors. Calculates the proportion of nodes
+#' that have fewer friends than the average of their friends (the friendship paradox).
+#'
+#' Supports both `igraph` and `tidygraph::tbl_graph` inputs.
+#'
+#' @param graph An `igraph` or `tidygraph::tbl_graph` object representing an undirected network.
+#' @param return_node_data Logical. If TRUE, includes a data frame with node-level results.
+#'
+#' @return A list with:
+#'   - `paradox_proportion`: Proportion of nodes experiencing the friendship paradox
+#'   - `summary`: A data frame with average degree and average neighbor degree
+#'   - `nodes`: (Optional) A data frame with node-level metrics if `return_node_data = TRUE`
+#'
+#' @examples
+#' # Use with a tidygraph network
+#' library(tidygraph)
+#' g <- simulate_feld_1991_tbl()
+#' result <- compare_friendship_paradox(g)
+#' result$summary
+#'
+#' # Use with an igraph network
+#' library(igraph)
+#' g_ig <- simulate_feld_1991()
+#' compare_friendship_paradox(g_ig)
+#'
+#' # Return node-level metrics too
+#' result2 <- compare_friendship_paradox(g, return_node_data = TRUE)
+#' head(result2$nodes)
+#'
+#' @export
+compare_friendship_paradox <- function(graph, return_node_data = FALSE) {
+  if (inherits(graph, "tbl_graph")) {
+    g <- graph
+  } else if (inherits(graph, "igraph")) {
+    g <- tidygraph::as_tbl_graph(graph)
+  } else {
+    stop("Input must be an igraph or tbl_graph object.")
+  }
+  
+  g <- g %>%
+    tidygraph::mutate(
+      degree = tidygraph::centrality_degree(),
+      mean_neighbor_degree = tidygraph::map_local(~ mean(.x$degree, na.rm = TRUE)),
+      paradox = degree < mean_neighbor_degree
+    )
+  
+  paradox_proportion <- mean(g$paradox, na.rm = TRUE)
+  degree_mean <- mean(g$degree, na.rm = TRUE)
+  neighbor_mean <- mean(g$mean_neighbor_degree, na.rm = TRUE)
+  
+  out <- list(
+    paradox_proportion = paradox_proportion,
+    summary = data.frame(
+      mean_degree = degree_mean,
+      mean_neighbor_degree = neighbor_mean,
+      paradox_proportion = paradox_proportion
+    )
+  )
+  
+  if (return_node_data) {
+    out$nodes <- as.data.frame(g)
+  }
+  
+  return(out)
+}
+
+
+#' Plot Friendship Paradox Comparison
+#'
+#' Plots each node's number of friends (degree) against the mean number
+#' of friends among their friends (mean neighbor degree), with a 1:1 reference line.
+#' Useful for visualizing the strength and spread of the friendship paradox.
+#'
+#' @param graph An `igraph` or `tidygraph::tbl_graph` object.
+#' @param label Logical. If TRUE, adds node labels.
+#' @param point_size Size of points in the scatterplot.
+#' @param ... Additional arguments passed to `ggplot2::geom_point()`.
+#'
+#' @return A `ggplot2` object.
+#'
+#' @examples
+#' library(tidygraph)
+#' library(ggplot2)
+#'
+#' g <- simulate_feld_1991_tbl()
+#' plot_friendship_paradox(g)
+#'
+#' @export
+plot_friendship_paradox <- function(graph, label = FALSE, point_size = 2, ...) {
+  if (!requireNamespace("ggplot2", quietly = TRUE)) {
+    stop("The 'ggplot2' package is required.")
+  }
+  
+  if (inherits(graph, "tbl_graph")) {
+    g <- graph
+  } else if (inherits(graph, "igraph")) {
+    g <- tidygraph::as_tbl_graph(graph)
+  } else {
+    stop("Input must be an igraph or tbl_graph object.")
+  }
+  
+  g <- g %>%
+    tidygraph::mutate(
+      degree = tidygraph::centrality_degree(),
+      mean_neighbor_degree = tidygraph::map_local(~ mean(.x$degree, na.rm = TRUE))
+    )
+  
+  df <- as.data.frame(g)
+  df$id <- seq_len(nrow(df))  # fallback label
+  
+  p <- ggplot2::ggplot(df, ggplot2::aes(x = degree, y = mean_neighbor_degree)) +
+    ggplot2::geom_point(size = point_size, ...) +
+    ggplot2::geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "red") +
+    ggplot2::labs(
+      x = "Individual's Number of Friends",
+      y = "Mean Number of Friends of Friends",
+      title = "Friendship Paradox: Degree vs. Friends-of-Friends"
+    ) +
+    ggplot2::theme_minimal()
+  
+  if (label && "name" %in% names(df)) {
+    p <- p + ggplot2::geom_text(ggplot2::aes(label = name), hjust = 1.2, vjust = 1.2, size = 3)
+  }
+  
+  return(p)
+}
+
+#' Load Feld's 1991 data.
+#' 
+#' @example 
+#' feld_net <- get_feld_1991_network()
+#' ggnetplot(fnet, layout_with_fr) + 
+#'   geom_edges(linewidth=0.7) + 
+#'   geom_nodes(color = "#008566", size=9) + 
+#'   geom_nodetext(aes(label = name), color = "white") + 
+#'   theme_blank()
+#' @export
+get_feld_1991_network <- function() {
+ 
+  return (
+  # Read included CSV and return graph.
+  load_igraph_from_csv(
+    system.file("extdata", "marketville-friends-coleman-feld.csv", 
+                package = "socmod")
+  )
+ )
+}
+
+
+#' Load an Undirected igraph Object from a CSV Edge List
+#'
+#' Loads a graph from a CSV file containing a two-column edge list.
+#' Assumes columns are either `from` and `to`, or `source` and `target`.
+#'
+#' @param csv_file Path to a CSV file with two columns representing edges.
+#' @return An undirected igraph object.
+#'
+#' @examples
+#' fnet <- load_igraph_from_csv("marketville-friends-coleman-feld.csv")
+#'
+#' @export
+load_igraph_from_csv <- function(csv_file) {
+  if (!file.exists(csv_file)) {
+    stop("File does not exist: ", csv_file)
+  }
+  
+  # Load csv that has two columns of node names defining edges between them.
+  edges <- read.csv(csv_file, colClasses = c("character", "character"))
+  
+  # Force first two columns to be character.
+  edges[[1]] <- as.character(edges[[1]])
+  edges[[2]] <- as.character(edges[[2]])
+  
+  # igraph expects this in call below.
+  colnames(edges)[1:2] <- c("from", "to")
+  
+  return (igraph::graph_from_data_frame(edges, directed = FALSE))
+}

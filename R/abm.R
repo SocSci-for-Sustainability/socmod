@@ -27,7 +27,8 @@ AgentBasedModel <- R6::R6Class(
       private$.params <- list()
       
       if (is.null(igraph::V(self$graph)$name)) {
-        igraph::V(self$graph)$name <- paste0("a", seq_len(igraph::vcount(self$graph)))
+        igraph::V(self$graph)$name <- 
+          paste0("a", seq_len(igraph::vcount(self$graph)))
       }
       
       # If agents are provided, make sure names sync
@@ -47,9 +48,12 @@ AgentBasedModel <- R6::R6Class(
         self$agents <- purrr::map2(
           seq_len(igraph::vcount(self$graph)),
           igraph::V(self$graph)$name,
-          \(i, nm) Agent$new(id = i, name = nm)
+          \(i, nm) Agent$new(id = i, name = nm, behavior = "Legacy", fitness = 1.0)
         )
+        
         names(self$agents) <- purrr::map_chr(self$agents, \(a) a$get_name())
+        
+        self$sync_network("to_graph")
         self$sync_network("from_graph")
       }
     },
@@ -80,7 +84,9 @@ AgentBasedModel <- R6::R6Class(
       
       if (direction %in% c("from_graph", "neighbors_only")) {
         for (agent in self$agents) {
-          nbr_ids <- igraph::neighbors(self$graph, v = agent$get_id())
+          # nbr_ids <- igraph::neighbors(self$graph, v = agent$get_id())
+          nbr_ids <- igraph::neighbors(self$graph, v = agent$get_name())
+          
           neighbors <- purrr::map(
             nbr_ids,
             \(v) self$get_agent(igraph::V(self$graph)[v]$name)

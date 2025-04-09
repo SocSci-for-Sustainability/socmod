@@ -13,6 +13,27 @@ Represents an individual agent in a social network. Each agent stores behavioral
 fitness, and neighbor information. This class is designed to be encapsulated,
 with all data access via getter/setter methods.
 }
+\examples{
+# Create a basic agent with default settings
+a1 <- Agent$new(1)
+
+# Create a named agent with specific behavior and fitness
+a2 <- Agent$new(id = 1, name = "Mia", behavior = "1", fitness = 0.75)
+
+# Access ID and name
+a2$get_id()
+a2$get_name()
+
+# Check and update behavior
+a2$get_behavior()
+a2$set_behavior("0")
+a2$advance_behavior()
+
+# Set and retrieve custom attributes
+a2$set_attribute("group", "treatment")
+a2$get_attribute("group")
+
+}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
@@ -47,16 +68,24 @@ with all data access via getter/setter methods.
 \if{latex}{\out{\hypertarget{method-Agent-new}{}}}
 \subsection{Method \code{new()}}{
 Initialize an Agent
+
+Sets up a new Agent instance with an ID, optional name, initial behavior,
+and fitness values. Behavior and fitness are copied into both the current
+and next state fields. A Neighbors container is also initialized.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Agent$new(id, name = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Agent$new(id, name = NULL, behavior = "0", fitness = 0)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{id}}{Integer vertex ID in the graph}
+\item{\code{id}}{Integer or string ID for the agent (used internally, not necessarily name)}
 
-\item{\code{name}}{Optional character name for the agent}
+\item{\code{name}}{Optional character name for the agent. Defaults to "a{id}".}
+
+\item{\code{behavior}}{Initial behavior (character). Default is "0".}
+
+\item{\code{fitness}}{Initial fitness (numeric). Default is 0.}
 }
 \if{html}{\out{</div>}}
 }
