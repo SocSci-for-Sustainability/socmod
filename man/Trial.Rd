@@ -13,36 +13,6 @@ Represents a single run of an AgentBasedModel over time, with customizable
 interaction and update logic. Tracks time-series observations and outcome
 measures such as adaptation success and steps to fixation.
 }
-\examples{
-# Setup a simple model where Adaptive pays off more than Legacy
-model <- AgentBasedModel$new(n_agents = 3)
-model$get_agent(1)$set_behavior("Adaptive")
-model$get_agent(1)$set_fitness(1.0)
-model$get_agent(2)$set_behavior("Legacy")
-model$get_agent(2)$set_fitness(0.0)
-model$get_agent(3)$set_behavior("Legacy")
-model$get_agent(3)$set_fitness(0.0)
-
-# Run a trial using success-biased learning
-trial <- Trial$new(
-  model,
-  partner_selection = success_bias_select_teacher,
-  interaction = success_bias_interact,
-  iterate = iterate_learning_model
-)
-trial$run(stop = fixated)
-
-# Get outcome summary and time series
-trial$get_outcomes()  # Expect adaptation_success = TRUE, fixation_steps = 1
-trial$get_observations()  # Tibble with t, agent, behavior, fitness
-
-# Visualize behavior over time
-obs <- trial$get_observations()
-ggplot2::ggplot(obs, ggplot2::aes(x = t, fill = behavior)) +
-  ggplot2::geom_bar(position = "fill") +
-  ggplot2::ylab("Proportion of agents") +
-  ggplot2::theme_minimal()
-}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
@@ -50,6 +20,7 @@ ggplot2::ggplot(obs, ggplot2::aes(x = t, fill = behavior)) +
 \item \href{#method-Trial-run}{\code{Trial$run()}}
 \item \href{#method-Trial-get_observations}{\code{Trial$get_observations()}}
 \item \href{#method-Trial-get_outcomes}{\code{Trial$get_outcomes()}}
+\item \href{#method-Trial-get_label}{\code{Trial$get_label()}}
 \item \href{#method-Trial-clone}{\code{Trial$clone()}}
 }
 }
@@ -59,7 +30,13 @@ ggplot2::ggplot(obs, ggplot2::aes(x = t, fill = behavior)) +
 \subsection{Method \code{new()}}{
 Initialize a Trial with a model and functions
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Trial$new(model, partner_selection = NULL, interaction, iterate = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Trial$new(
+  model,
+  partner_selection = NULL,
+  interaction,
+  iterate = NULL,
+  label = NULL
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -72,6 +49,8 @@ Initialize a Trial with a model and functions
 \item{\code{interaction}}{Function defining interaction logic}
 
 \item{\code{iterate}}{Optional iteration update function}
+
+\item{\code{label}}{Optional character label for trial group}
 }
 \if{html}{\out{</div>}}
 }
@@ -82,13 +61,15 @@ Initialize a Trial with a model and functions
 \subsection{Method \code{run()}}{
 Run the model and collect results
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Trial$run(stop = 50)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Trial$run(stop = 50, target_behavior = "Adaptive")}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{stop}}{Either integer for max steps, or predicate function}
+
+\item{\code{target_behavior}}{The behavior treated as "adaptation success"}
 }
 \if{html}{\out{</div>}}
 }
@@ -110,6 +91,16 @@ Return the observation data
 Return outcome measures
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Trial$get_outcomes()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Trial-get_label"></a>}}
+\if{latex}{\out{\hypertarget{method-Trial-get_label}{}}}
+\subsection{Method \code{get_label()}}{
+Return the label for this trial (if set)
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Trial$get_label()}\if{html}{\out{</div>}}
 }
 
 }

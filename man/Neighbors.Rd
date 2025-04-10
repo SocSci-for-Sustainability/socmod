@@ -18,26 +18,34 @@ sampling, and modification.
 ## Method `Neighbors$filter`
 ## ------------------------------------------------
 
+\dontrun{
 nbrs$filter(\(a) a$get_fitness() > 1)
+}
 
 ## ------------------------------------------------
 ## Method `Neighbors$sample`
 ## ------------------------------------------------
 
+\dontrun{
 nbrs$sample(2)
 nbrs$sample(weights = \(a) a$get_fitness())
+}
 
 ## ------------------------------------------------
 ## Method `Neighbors$add`
 ## ------------------------------------------------
 
+\dontrun{
 nbrs$add(agent1, agent2)
+}
 
 ## ------------------------------------------------
 ## Method `Neighbors$remove`
 ## ------------------------------------------------
 
+\dontrun{
 nbrs$remove(agent2)
+}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -121,7 +129,9 @@ A new Neighbors object containing only the filtered agents
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{nbrs$filter(\(a) a$get_fitness() > 1)
+\preformatted{\dontrun{
+nbrs$filter(\(a) a$get_fitness() > 1)
+}
 }
 \if{html}{\out{</div>}}
 
@@ -153,8 +163,10 @@ A Neighbors object or a single Agent depending on \code{n}
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{nbrs$sample(2)
+\preformatted{\dontrun{
+nbrs$sample(2)
 nbrs$sample(weights = \(a) a$get_fitness())
+}
 }
 \if{html}{\out{</div>}}
 
@@ -179,7 +191,9 @@ Add one or more agents to the neighbors list
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{nbrs$add(agent1, agent2)
+\preformatted{\dontrun{
+nbrs$add(agent1, agent2)
+}
 }
 \if{html}{\out{</div>}}
 
@@ -204,7 +218,9 @@ Remove one or more agents from the neighbors list
 }
 \subsection{Examples}{
 \if{html}{\out{<div class="r example copy">}}
-\preformatted{nbrs$remove(agent2)
+\preformatted{\dontrun{
+nbrs$remove(agent2)
+}
 }
 \if{html}{\out{</div>}}
 

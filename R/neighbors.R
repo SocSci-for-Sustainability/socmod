@@ -47,7 +47,9 @@ Neighbors <- R6::R6Class(
     #' @param predicate A function taking an Agent and returning TRUE or FALSE
     #' @return A new Neighbors object containing only the filtered agents
     #' @examples
+    #' \dontrun{
     #' nbrs$filter(\(a) a$get_fitness() > 1)
+    #' }
     filter = function(predicate) {
       Neighbors$new(Filter(predicate, self$agents))
     },
@@ -59,20 +61,21 @@ Neighbors <- R6::R6Class(
     #' @param replace Logical: sample with replacement?
     #' @param weights Either a numeric vector or a function returning weights for each agent
     #' @return A Neighbors object or a single Agent depending on `n`
-    #' @examples
+    #' @examples \dontrun{
     #' nbrs$sample(2)
     #' nbrs$sample(weights = \(a) a$get_fitness())
+    #' }
     sample = function(n = 1, replace = FALSE, weights = NULL) {
       if (is.function(weights)) {
         prob <- vapply(self$agents, \(a) {
           val <- weights(a)
           if (is.numeric(val) && length(val) == 1 && !is.na(val)) val else 0
         }, numeric(1))
-      } else {
-        prob <- weights
+      } else if (is.null(weights)) {
+        prob <- rep(1, length(self$agents))
       }
       
-      # Only keep neighbors with positive probability
+      # Only keep neighbors with positive probability.
       valid_idxs <- which(prob > 0)
       
       if (length(valid_idxs) < n) {
@@ -99,7 +102,9 @@ Neighbors <- R6::R6Class(
     #'
     #' @param ... Agent objects to add
     #' @examples
+    #' \dontrun{
     #' nbrs$add(agent1, agent2)
+    #' }
     add = function(...) {
       new_agents <- list(...)
       self$agents <- unique(c(self$agents, new_agents))
@@ -110,7 +115,9 @@ Neighbors <- R6::R6Class(
     #'
     #' @param ... Agent objects to remove
     #' @examples
+    #' \dontrun{
     #' nbrs$remove(agent2)
+    #' }
     remove = function(...) {
       to_remove <- list(...)
       self$agents <- self$filter(\(a) ! any(vapply(

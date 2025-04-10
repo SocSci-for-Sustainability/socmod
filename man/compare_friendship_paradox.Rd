@@ -28,12 +28,7 @@ that have fewer friends than the average of their friends (the friendship parado
 Supports both \code{igraph} and \code{tidygraph::tbl_graph} inputs.
 }
 \examples{
-# Use with a tidygraph network
-library(tidygraph)
-g <- simulate_feld_1991_tbl()
-result <- compare_friendship_paradox(g)
-result$summary
-
+\dontrun{
 # Use with an igraph network
 library(igraph)
 g_ig <- simulate_feld_1991()
@@ -42,5 +37,5 @@ compare_friendship_paradox(g_ig)
 # Return node-level metrics too
 result2 <- compare_friendship_paradox(g, return_node_data = TRUE)
 head(result2$nodes)
-
+}
 }

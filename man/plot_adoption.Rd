@@ -18,6 +18,5 @@ A ggplot object
 Plot adoption counts of selected behaviors over time
 }
 \examples{
-# Assuming you have run a trial as in the run_trial() example:
 plot_adoption(trial, behaviors = c("Adaptive", "Legacy"))
 }

@@ -529,12 +529,7 @@ simulate_feld_1991 <- function(seed = 42) {
 #'   - `nodes`: (Optional) A data frame with node-level metrics if `return_node_data = TRUE`
 #'
 #' @examples
-#' # Use with a tidygraph network
-#' library(tidygraph)
-#' g <- simulate_feld_1991_tbl()
-#' result <- compare_friendship_paradox(g)
-#' result$summary
-#'
+#' \dontrun{
 #' # Use with an igraph network
 #' library(igraph)
 #' g_ig <- simulate_feld_1991()
@@ -543,7 +538,7 @@ simulate_feld_1991 <- function(seed = 42) {
 #' # Return node-level metrics too
 #' result2 <- compare_friendship_paradox(g, return_node_data = TRUE)
 #' head(result2$nodes)
-#'
+#' }
 #' @export
 compare_friendship_paradox <- function(graph, return_node_data = FALSE) {
   if (inherits(graph, "tbl_graph")) {

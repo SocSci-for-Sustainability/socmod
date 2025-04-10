@@ -81,3 +81,14 @@ test_that("Model parameters can be set and retrieved individually and in bulk", 
   expect_true("seed_strategy" %in% names(all_params))
   expect_equal(all_params$seed_strategy, "friendship")
 })
+
+
+test_that("AgentBasedModel initializes with n_agents only", {
+  model <- AgentBasedModel$new(n_agents = 100)
+  
+  expect_s3_class(model, "AgentBasedModel")
+  expect_equal(length(model$agents), 100)
+  expect_true(igraph::is_igraph(model$get_network()))
+  expect_equal(igraph::vcount(model$get_network()), 100)
+  expect_equal(names(model$agents), igraph::V(model$get_network())$name)
+})

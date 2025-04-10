@@ -9,7 +9,9 @@ run_trial(
   partner_selection = success_bias_select_teacher,
   interaction = success_bias_interact,
   iterate = iterate_learning_model,
-  stop = 50
+  stop = 50,
+  label = NULL,
+  target_behavior = "Adaptive"
 )
 }
 \arguments{
@@ -21,7 +23,11 @@ run_trial(
 
 \item{iterate}{Optional function for updating model state}
 
-\item{stop}{Stopping condition: max steps (int) or predicate function (default: 50)}
+\item{stop}{Stopping condition: max steps (int) or predicate function}
+
+\item{label}{Optional label to tag the trial (e.g. "success", "frequency")}
+
+\item{target_behavior}{The behavior treated as "adaptation success". Default is "Adaptive".}
 }
 \value{
 A Trial object
@@ -32,11 +38,9 @@ Run a Trial on an AgentBasedModel with standard learning loop
 \examples{
 agents <- list(
   Agent$new(name = "1", behavior = "Legacy", fitness = 1),
-  Agent$new(name = "2", behavior = "Adaptive", fitness = 4),
-  Agent$new(name = "3", behavior = "Legacy", fitness = 1),
-  Agent$new(name = "4", behavior = "Legacy", fitness = 2)
+  Agent$new(name = "2", behavior = "Adaptive", fitness = 4)
 )
-net <- igraph::make_graph(~ 1-2, 1-3, 1-4, 3-2)
-model <- AgentBasedModel$new(agents = agents, network = net)
+net <- igraph::make_graph(~ 1-2)
+model <- AgentBasedModel$new(agents = agents, graph = net)
 trial <- run_trial(model, stop = 10)
 }

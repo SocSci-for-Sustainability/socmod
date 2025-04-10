@@ -48,3 +48,47 @@ test_that("Trial stops after max steps and adapts outcomes", {
   expect_false(out$adaptation_success)
   expect_equal(out$fixation_steps, 3)
 })
+
+test_that("run_trials() returns expected number of Trial objects", {
+  gen <- function() {
+    agents <- list(
+      Agent$new(1, name = "1", behavior = "Legacy", fitness = 1),
+      Agent$new(2, name = "2", behavior = "Adaptive", fitness = 4)
+    )
+    net <- igraph::make_graph(~ 1-2)
+    AgentBasedModel$new(agents = agents, graph = net)
+  }
+  
+  trials <- run_trials(n = 5, model_generator = gen, stop = 10)
+  expect_length(trials, 5)
+  expect_true(all(purrr::map_lgl(trials, ~ inherits(.x, "Trial"))))
+  
+  # optional: check observation structure
+  obs_list <- purrr::map(trials, ~ .x$get_observations())
+  expect_true(all(purrr::map_lgl(obs_list, tibble::is_tibble)))
+})
+
+
+test_that("summarise_by_label() correctly aggregates trial outcomes", {
+  gen <- function() {
+    agents <- list(
+      Agent$new(1, name = "1", behavior = "Adaptive", fitness = 4),
+      Agent$new(2, name = "2", behavior = "Legacy", fitness = 1)
+    )
+    graph <- igraph::make_graph(~ 1-2)
+    AgentBasedModel$new(agents = agents, graph = graph)
+  }
+  
+  trials <- append(
+    run_trials(3, gen, label = "success", stop = 5),
+    run_trials(2, gen, label = "control", stop = 5)
+  )
+  # str(trials[[1]]$get_observations())
+  summary <- summarise_adoption(trials)
+  result <- summarise_by_label(summary)
+  
+  expect_true(is.data.frame(result))
+  expect_true(all(c("label", "n_trials", "success_rate", "mean_fixation", "sd_fixation") %in% names(result)))
+  expect_equal(nrow(result), 2)
+  expect_equal(sort(unique(result$label)), c("control", "success"))
+})
