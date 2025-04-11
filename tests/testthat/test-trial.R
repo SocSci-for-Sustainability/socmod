@@ -98,6 +98,7 @@ test_that("summarise_by_label() correctly aggregates trial outcomes", {
       names(result)
     )
   )
+  
   expect_equal(nrow(result), 2)
   expect_equal(sort(unique(result$label)), c("control", "success"))
 })

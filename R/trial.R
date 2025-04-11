@@ -274,8 +274,8 @@ plot_adoption <- function(trial, behaviors = c("Adaptive")) {
     dplyr::filter(Behavior %in% behaviors) %>%
     dplyr::group_by(t, Behavior) %>%
     dplyr::summarise(count = dplyr::n()) %>%
-    tidyr::complete(Behavior = behaviors, fill = list(count = 0), .groups = "drop")
-    
+    tidyr::complete(Behavior = behaviors, fill = list(count = 0))
+  
   
   ggplot2::ggplot(obs_filtered, ggplot2::aes(x = t, y = count, color = Behavior)) +
     ggplot2::geom_line(linewidth = 1) +
