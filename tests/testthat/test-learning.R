@@ -22,13 +22,18 @@ test_that("Success-bias selects the agent with highest fitness", {
   
   model$get_agent(1)$set_behavior("Legacy")
   model$get_agent(1)$set_fitness(1.0)
+  
   model$get_agent(2)$set_behavior("Adaptive")
   model$get_agent(2)$set_fitness(5.0)
+  
   model$get_agent(3)$set_behavior("Legacy")
   model$get_agent(3)$set_fitness(0.1)
   
   a1 <- model$get_agent(1)
-  selected <- purrr::map_chr(1:1000, \(.) success_bias_select_teacher(a1, model)$get_name())
+  selected <- purrr::map_chr(
+    1:1000, 
+    \(.) success_bias_select_teacher(a1, model)$get_name()
+  )
   
   tbl <- table(selected)
   p2_expected <- 5.0 / (5.0 + 0.1)
@@ -39,7 +44,9 @@ test_that("Success-bias selects the agent with highest fitness", {
   expect_equal(p2_observed, p2_expected, tolerance = rel_tol)
 })
 
+
 test_that("Frequency bias adopts more common behavior", {
+  
   model <- AgentBasedModel$new(n_agents = 4)
   
   model$get_agent(1)$set_behavior("Legacy")
@@ -64,7 +71,6 @@ test_that("Frequency bias adopts more common behavior", {
   expect_true(after %in% c("Adaptive", "Legacy"))
 })
 
-# Inside the test for frequency bias
 
 test_that("Frequency bias fixates roughly equally when starting with tie", {
   n_reps <- 500

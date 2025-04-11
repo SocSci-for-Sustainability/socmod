@@ -42,13 +42,26 @@ Trial <- R6::R6Class(
         self$observations,
         tibble::tibble(
           t = 0,
-          agent = unlist(purrr::map(self$model$agents, \(a) a$get_name()), use.names = FALSE),
-          behavior = unlist(purrr::map(self$model$agents, \(a) as.character(a$get_behavior())), use.names = FALSE),
-          fitness = unlist(purrr::map(self$model$agents, \(a) a$get_fitness()), use.names = FALSE),
+          agent = unlist(
+            purrr::map(self$model$agents, \(a) a$get_name()), 
+            use.names = FALSE
+          ),
+          Behavior = unlist(
+            purrr::map(self$model$agents, 
+                       \(a) as.character(a$get_behavior())), 
+            use.names = FALSE
+          ),
+          Fitness = unlist(
+            purrr::map(self$model$agents, 
+                       \(a) a$get_fitness()), 
+            use.names = FALSE
+          ),
           label = self$label
         )
       )
+      
       while (TRUE) {
+        
         step <- step + 1
         
         for (agent in self$model$agents) {
@@ -59,15 +72,21 @@ Trial <- R6::R6Class(
           self$interaction(agent, teacher, self$model)
         }
         
-        if (!is.null(self$iterate)) self$iterate(self$model)
+        if (!is.null(self$iterate)) {
+          self$iterate(self$model)
+        }
         
         self$observations <- dplyr::bind_rows(
           self$observations,
           tibble::tibble(
             t = step,
-            agent = unlist(purrr::map(self$model$agents, \(a) a$get_name()), use.names = FALSE),
-            behavior = unlist(purrr::map(self$model$agents, \(a) as.character(a$get_behavior())), use.names = FALSE),
-            fitness = unlist(purrr::map(self$model$agents, \(a) a$get_fitness()), use.names = FALSE),
+            agent = unlist(purrr::map(self$model$agents, \(a) a$get_name()), 
+                           use.names = FALSE),
+            Behavior = unlist(purrr::map(self$model$agents, \(a) 
+                                         as.character(a$get_behavior())), 
+                              use.names = FALSE),
+            Fitness = unlist(purrr::map(self$model$agents, \(a) a$get_fitness()), 
+                             use.names = FALSE),
             label = self$label
           )
         )
@@ -79,8 +98,14 @@ Trial <- R6::R6Class(
         }
       }
       
-      behaviors <- unlist(purrr::map(self$model$agents, \(a) as.character(a$get_behavior())), use.names = FALSE)
-      self$outcomes$adaptation_success <- length(unique(behaviors)) == 1 && unique(behaviors) == target_behavior
+      behaviors <- unlist(
+        purrr::map(self$model$agents, \(a) as.character(a$get_behavior())), 
+        use.names = FALSE
+      )
+      
+      self$outcomes$adaptation_success <- 
+        length(unique(behaviors)) == 1 && unique(behaviors) == target_behavior
+      
       self$outcomes$fixation_steps <- step
     },
     
@@ -100,7 +125,7 @@ Trial <- R6::R6Class(
     }
   )
 )
-# [Same Trial class definition as before — no changes to @examples needed]
+
 
 #' Predicate function: has the model fixated on a single behavior?
 #'
@@ -110,7 +135,11 @@ Trial <- R6::R6Class(
 #' @examples
 #' # fixated(model) — typically used as a stopping rule in Trial$run(stop = fixated)
 fixated <- function(model) {
-  behaviors <- unlist(purrr::map(model$agents, \(a) as.character(a$get_behavior())), use.names = FALSE)
+  behaviors <- unlist(
+    purrr::map(model$agents, 
+               \(a) as.character(a$get_behavior())), 
+               use.names = FALSE)
+  
   length(unique(behaviors)) == 1
 }
 
@@ -151,6 +180,7 @@ run_trial <- function(model,
   return (trial)
 }
 
+
 #' Run multiple trials with a model generator
 #'
 #' @param n Number of trials
@@ -176,6 +206,7 @@ run_trials <- function(n, model_generator, label = NULL, ...) {
   })
 }
 
+
 #' Summarize behavior adoption over time from multiple trials
 #'
 #' @param trials A list of Trial objects
@@ -191,10 +222,10 @@ summarise_adoption <- function(trials, behaviors = NULL) {
     outcome <- trial$get_outcomes()
     
     if (!is.null(behaviors)) {
-      obs <- dplyr::filter(obs, behavior %in% behaviors)
+      obs <- dplyr::filter(obs, Behavior %in% behaviors)
     }
     label <- trial$get_label()
-    dplyr::group_by(obs, t, behavior) %>%
+    dplyr::group_by(obs, t, Behavior) %>%
       dplyr::summarise(count = dplyr::n(), .groups = "drop") %>%
       dplyr::mutate(
         trial = i,
@@ -204,6 +235,7 @@ summarise_adoption <- function(trials, behaviors = NULL) {
       )
   })
 }
+
 
 #' Summarize trial-level outcomes by label
 #'
@@ -226,6 +258,7 @@ summarise_by_label <- function(summary_df) {
     )
 }
 
+
 #' Plot adoption counts of selected behaviors over time
 #'
 #' @param trial A Trial object
@@ -238,11 +271,13 @@ plot_adoption <- function(trial, behaviors = c("Adaptive")) {
   obs <- trial$get_observations()
   
   obs_filtered <- obs %>%
-    dplyr::filter(behavior %in% behaviors) %>%
-    dplyr::group_by(t, behavior) %>%
-    dplyr::summarise(count = dplyr::n(), .groups = "drop")
+    dplyr::filter(Behavior %in% behaviors) %>%
+    dplyr::group_by(t, Behavior) %>%
+    dplyr::summarise(count = dplyr::n()) %>%
+    tidyr::complete(Behavior = behaviors, fill = list(count = 0), .groups = "drop")
+    
   
-  ggplot2::ggplot(obs_filtered, ggplot2::aes(x = t, y = count, color = behavior)) +
+  ggplot2::ggplot(obs_filtered, ggplot2::aes(x = t, y = count, color = Behavior)) +
     ggplot2::geom_line(linewidth = 1) +
     ggplot2::xlab("Time step") +
     ggplot2::ylab("Agent count") +
@@ -258,8 +293,8 @@ plot_adoption <- function(trial, behaviors = c("Adaptive")) {
 #' @examples
 #' plot_summary(summary)
 plot_summary <- function(summary_df) {
-  ggplot2::ggplot(summary_df, ggplot2::aes(x = t, y = count, color = behavior)) +
-    ggplot2::geom_line(ggplot2::aes(group = interaction(trial, behavior)), alpha = 0.3) +
+  ggplot2::ggplot(summary_df, ggplot2::aes(x = t, y = count, color = Behavior)) +
+    ggplot2::geom_line(ggplot2::aes(group = interaction(trial, Behavior)), alpha = 0.3) +
     ggplot2::facet_wrap(~ label) +
     ggplot2::xlab("Time step") +
     ggplot2::ylab("Agent count") +

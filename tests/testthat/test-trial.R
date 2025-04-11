@@ -1,7 +1,8 @@
 # test-trial.R
 
 test_that("Trial records observations and outcomes correctly", {
-  # Minimal model with adaptive initialization
+  
+  # Minimal model with adaptive initialization.
   g <- igraph::make_ring(3)
   model <- AgentBasedModel$new(graph = g)
   
@@ -10,7 +11,7 @@ test_that("Trial records observations and outcomes correctly", {
     agent$set_fitness(1.0)
   }
   
-  # Define trivial interaction and iteration
+  # Define trivial interaction and iteration.
   interact <- function(learner, teacher, model) {}
   iterate <- function(model) {}
   
@@ -22,7 +23,7 @@ test_that("Trial records observations and outcomes correctly", {
   
   expect_s3_class(obs, "tbl_df")
   expect_true(nrow(obs) >= 1)
-  expect_true("behavior" %in% names(obs))
+  expect_true("Behavior" %in% names(obs))
   expect_true(out$adaptation_success)
   expect_equal(out$fixation_steps, 1)
 })
@@ -83,12 +84,20 @@ test_that("summarise_by_label() correctly aggregates trial outcomes", {
     run_trials(3, gen, label = "success", stop = 5),
     run_trials(2, gen, label = "control", stop = 5)
   )
-  # str(trials[[1]]$get_observations())
+  
   summary <- summarise_adoption(trials)
   result <- summarise_by_label(summary)
   
+  # print(summary)
+  # print(result)
+  
   expect_true(is.data.frame(result))
-  expect_true(all(c("label", "n_trials", "success_rate", "mean_fixation", "sd_fixation") %in% names(result)))
+  expect_true(
+    all(
+      c("label", "n_trials", "success_rate", "mean_fixation", "sd_fixation") %in% 
+      names(result)
+    )
+  )
   expect_equal(nrow(result), 2)
   expect_equal(sort(unique(result$label)), c("control", "success"))
 })
