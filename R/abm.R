@@ -14,7 +14,11 @@ AgentBasedModel <- R6::R6Class(
     #' @param graph An igraph object (optional)
     #' @param agents A list of Agent objects (optional)
     #' @param n_agents Integer number of agents to create (optional)
-    initialize = function(graph = NULL, agents = NULL, n_agents = NULL) {
+    initialize = function(graph = NULL, agents = NULL, 
+                          n_agents = NULL, parameters = NULL) {
+      
+      # Handle logic of setting ABM graph to user-provided, or create 
+      # a fully-connected one with `n_agents` vertices.
       if (!is.null(graph)) {
         stopifnot(igraph::is_igraph(graph))
         self$graph <- graph
@@ -24,7 +28,17 @@ AgentBasedModel <- R6::R6Class(
         stop("Either 'graph' or 'n_agents' must be provided.")
       }
       
-      private$.params <- list()
+      # Initialize model parameters, stored as key-value list.
+      private$.parameters <- list()
+      if (!is.null(parameters)) {
+        stopifnot(is.list(parameters))
+        self$set_parameters(parameters)
+      }
+      
+      if (!is.null(parameters)) {
+        stopifnot(is.list(parameters))
+        self$set_parameters(parameters)
+      }
       
       if (is.null(igraph::V(self$graph)$name)) {
         igraph::V(self$graph)$name <- 
@@ -40,16 +54,21 @@ AgentBasedModel <- R6::R6Class(
         agent_names <- names(self$agents)
         
         if (!all(agent_names %in% graph_names)) {
-          igraph::V(self$graph)$name <- agent_names  # overwrite to match agents
+          # Overwrite igraph vertex names to match agent names.
+          igraph::V(self$graph)$name <- agent_names  
         }
         
         self$sync_network("neighbors_only")
       } else {
-        self$agents <- purrr::map2(
-          seq_len(igraph::vcount(self$graph)),
-          igraph::V(self$graph)$name,
-          \(i, nm) Agent$new(id = i, name = nm, behavior = "Legacy", fitness = 1.0)
-        )
+        self$agents <- 
+          purrr::map2(
+            seq_len(igraph::vcount(self$graph)),
+            igraph::V(self$graph)$name,
+            \(i, nm) {
+              Agent$new(id = i, name = nm, 
+                        behavior = "Legacy", fitness = 1.0)
+            }
+          )
         
         names(self$agents) <- purrr::map_chr(self$agents, \(a) a$get_name())
         
@@ -119,31 +138,31 @@ AgentBasedModel <- R6::R6Class(
     
     #' @description Get the list of model parameters
     get_parameters = function() {
-      return(private$.params)
+      return(private$.parameters)
     },
     
     #' @description Set multiple model parameters
     #' @param params Named list of parameters to set
     set_parameters = function(params) {
       stopifnot(is.list(params))
-      private$.params <- modifyList(private$.params, params)
+      private$.parameters <- modifyList(private$.parameters, params)
     },
     
     #' @description Set a single model parameter
     #' @param key Parameter name
     #' @param value Parameter value
     set_parameter = function(key, value) {
-      private$.params[[key]] <- value
+      private$.parameters[[key]] <- value
     },
     
     #' @description Get a single model parameter
     #' @param key Parameter name
     get_parameter = function(key) {
-      return(private$.params[[key]])
+      return(private$.parameters[[key]])
     }
   ),
   
   private = list(
-    .params = NULL
+    .parameters = NULL
   )
 )

@@ -35,7 +35,8 @@ Initialize a Trial with a model and functions
   partner_selection = NULL,
   interaction,
   iterate = NULL,
-  label = NULL
+  label = NULL,
+  metadata = list()
 )}\if{html}{\out{</div>}}
 }
 
