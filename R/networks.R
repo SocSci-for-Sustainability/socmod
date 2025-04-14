@@ -186,7 +186,7 @@ get_all_possible_edges <- function(N, directed = FALSE) {
 #' @return igraph::graph
 make_small_world <- function(N, k, p) {
   return (
-    rewire(make_regular_lattice(N, k), each_edge(p))
+    igraph::rewire(make_regular_lattice(N, k), igraph::each_edge(p))
   )
 }
 
@@ -455,6 +455,7 @@ make_homophily_network <- function(group_sizes = c(3, 7), mean_degree = 2,
   
   return (net)
 }
+
 
 #' Simulate Feld's 1991 Marketville Network
 #'

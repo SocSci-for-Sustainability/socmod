@@ -24,6 +24,7 @@ test_that("Trial records observations and outcomes correctly", {
   expect_s3_class(obs, "tbl_df")
   expect_true(nrow(obs) >= 1)
   expect_true("Behavior" %in% names(obs))
+  expect_true("Fitness" %in% names(obs))
   expect_true(out$adaptation_success)
   expect_equal(out$fixation_steps, 1)
 })
