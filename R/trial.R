@@ -22,7 +22,8 @@ Trial <- R6::R6Class(
     #' @param interaction Function defining interaction logic
     #' @param iterate Optional iteration update function
     #' @param label Optional character label for trial group
-    initialize = function(model, partner_selection = NULL, interaction, iterate = NULL, label = NULL) {
+    initialize = function(model, partner_selection = NULL, interaction, 
+                          iterate = NULL, label = NULL) {
       self$model <- model
       self$partner_selection <- partner_selection
       self$interaction <- interaction
