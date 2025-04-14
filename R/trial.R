@@ -8,6 +8,7 @@
 Trial <- R6::R6Class(
   "Trial",
   public = list(
+    metadata = list(),
     model = NULL,
     observations = NULL,
     outcomes = NULL,
@@ -22,12 +23,16 @@ Trial <- R6::R6Class(
     #' @param interaction Function defining interaction logic
     #' @param iterate Optional iteration update function
     #' @param label Optional character label for trial group
-    initialize = function(model, partner_selection = NULL, interaction, iterate = NULL, label = NULL) {
+    initialize = function(model, 
+                          partner_selection = NULL, 
+                          interaction, iterate = NULL, 
+                          label = NULL, metadata = list()) {
       self$model <- model
       self$partner_selection <- partner_selection
       self$interaction <- interaction
       self$iterate <- iterate
       self$label <- label
+      self$metadata <- metadata
       self$observations <- tibble::tibble()
       self$outcomes <- list()
     },
@@ -42,13 +47,33 @@ Trial <- R6::R6Class(
         self$observations,
         tibble::tibble(
           t = 0,
-          agent = unlist(purrr::map(self$model$agents, \(a) a$get_name()), use.names = FALSE),
-          behavior = unlist(purrr::map(self$model$agents, \(a) as.character(a$get_behavior())), use.names = FALSE),
-          fitness = unlist(purrr::map(self$model$agents, \(a) a$get_fitness()), use.names = FALSE),
+          agent = unlist(
+            purrr::map(
+              self$model$agents, 
+              \(a) a$get_name()
+            ), 
+            use.names = FALSE
+          ),
+          Behavior = unlist(
+            purrr::map(
+              self$model$agents, 
+              \(a) as.character(a$get_behavior())
+            ), 
+            use.names = FALSE
+          ),
+          Fitness = unlist(
+            purrr::map(
+              self$model$agents, 
+              \(a) a$get_fitness()
+            ), 
+            use.names = FALSE
+          ),
           label = self$label
         )
       )
+      
       while (TRUE) {
+        
         step <- step + 1
         
         for (agent in self$model$agents) {
@@ -59,28 +84,56 @@ Trial <- R6::R6Class(
           self$interaction(agent, teacher, self$model)
         }
         
-        if (!is.null(self$iterate)) self$iterate(self$model)
+        if (!is.null(self$iterate)) {
+          self$iterate(self$model)
+        }
         
         self$observations <- dplyr::bind_rows(
           self$observations,
           tibble::tibble(
             t = step,
-            agent = unlist(purrr::map(self$model$agents, \(a) a$get_name()), use.names = FALSE),
-            behavior = unlist(purrr::map(self$model$agents, \(a) as.character(a$get_behavior())), use.names = FALSE),
-            fitness = unlist(purrr::map(self$model$agents, \(a) a$get_fitness()), use.names = FALSE),
+            agent = unlist(
+              purrr::map(
+                self$model$agents, 
+                \(a) a$get_name()
+              ), 
+              use.names = FALSE
+            ),
+            Behavior = unlist(
+              purrr::map(
+                self$model$agents, 
+                \(a) as.character(a$get_behavior())
+              ), 
+              use.names = FALSE
+            ),
+            Fitness = unlist(
+              purrr::map(
+                self$model$agents, 
+                \(a) a$get_fitness()
+              ), 
+              use.names = FALSE
+            ),
             label = self$label
           )
         )
         
         if (is.function(stop)) {
-          if (stop(self$model)) break
+          if (stop(self$model)) {
+            break
+          }
         } else if (step >= stop) {
           break
         }
       }
       
-      behaviors <- unlist(purrr::map(self$model$agents, \(a) as.character(a$get_behavior())), use.names = FALSE)
-      self$outcomes$adaptation_success <- length(unique(behaviors)) == 1 && unique(behaviors) == target_behavior
+      behaviors <- unlist(
+        purrr::map(self$model$agents, \(a) as.character(a$get_behavior())), 
+        use.names = FALSE
+      )
+      
+      self$outcomes$adaptation_success <- 
+        length(unique(behaviors)) == 1 && unique(behaviors) == target_behavior
+      
       self$outcomes$fixation_steps <- step
     },
     
@@ -100,7 +153,7 @@ Trial <- R6::R6Class(
     }
   )
 )
-# [Same Trial class definition as before — no changes to @examples needed]
+
 
 #' Predicate function: has the model fixated on a single behavior?
 #'
@@ -134,18 +187,21 @@ fixated <- function(model) {
 #' model <- AgentBasedModel$new(agents = agents, graph = net)
 #' trial <- run_trial(model, stop = 10)
 run_trial <- function(model,
-                      partner_selection = success_bias_select_teacher,
+                      partner_selection = 
+                        success_bias_select_teacher,
                       interaction = success_bias_interact,
                       iterate = iterate_learning_model,
                       stop = 50,
                       label = NULL,
-                      target_behavior = "Adaptive") {
+                      target_behavior = "Adaptive",
+                      metadata = list()) {
   trial <- Trial$new(
     model = model,
     partner_selection = partner_selection,
     interaction = interaction,
     iterate = iterate,
-    label = label
+    label = label,
+    metadata = metadata
   )
   trial$run(stop = stop, target_behavior = target_behavior)
   return (trial)
@@ -179,22 +235,22 @@ run_trials <- function(n, model_generator, label = NULL, ...) {
 #' Summarize behavior adoption over time from multiple trials
 #'
 #' @param trials A list of Trial objects
-#' @param behaviors Optional vector of behaviors to include
+#' @param tracked_behaviors Optional vector of behaviors to include
 #' @return A tibble with columns: trial, t, behavior, count, label, adaptation_success, fixation_steps
 #' @export
 #' @examples
 #' summary <- summarise_adoption(trials)
 #' dplyr::filter(summary, behavior == "Adaptive")
-summarise_adoption <- function(trials, behaviors = NULL) {
+summarise_adoption <- function(trials, tracked_behaviors = NULL) {
   purrr::map2_dfr(trials, seq_along(trials), function(trial, i) {
     obs <- trial$get_observations()
     outcome <- trial$get_outcomes()
     
-    if (!is.null(behaviors)) {
-      obs <- dplyr::filter(obs, behavior %in% behaviors)
+    if (!is.null(tracked_behaviors)) {
+      obs <- dplyr::filter(obs, Behavior %in% tracked_behaviors)
     }
     label <- trial$get_label()
-    dplyr::group_by(obs, t, behavior) %>%
+    dplyr::group_by(obs, t, Behavior) %>%
       dplyr::summarise(count = dplyr::n(), .groups = "drop") %>%
       dplyr::mutate(
         trial = i,
@@ -226,23 +282,24 @@ summarise_by_label <- function(summary_df) {
     )
 }
 
-#' Plot adoption counts of selected behaviors over time
+#' Plot adoption counts of selected behaviors 
+#' (`tracked_behaviors`) over time.
 #'
 #' @param trial A Trial object
-#' @param behaviors Character vector of behaviors to track (e.g., c("Adaptive", "Legacy"))
+#' @param tracked_behaviors Character vector of behaviors to track (e.g., c("Adaptive", "Legacy"))
 #' @return A ggplot object
 #' @export
 #' @examples
-#' plot_adoption(trial, behaviors = c("Adaptive", "Legacy"))
-plot_adoption <- function(trial, behaviors = c("Adaptive")) {
+#' plot_adoption(trial, tracked_behaviors = c("Adaptive", "Legacy"))
+plot_adoption <- function(trial, tracked_behaviors = c("Adaptive")) {
   obs <- trial$get_observations()
   
   obs_filtered <- obs %>%
-    dplyr::filter(behavior %in% behaviors) %>%
-    dplyr::group_by(t, behavior) %>%
+    dplyr::filter(Behavior %in% tracked_behaviors) %>%
+    dplyr::group_by(t, Behavior) %>%
     dplyr::summarise(count = dplyr::n(), .groups = "drop")
   
-  ggplot2::ggplot(obs_filtered, ggplot2::aes(x = t, y = count, color = behavior)) +
+  ggplot2::ggplot(obs_filtered, ggplot2::aes(x = t, y = count, color = Behavior)) +
     ggplot2::geom_line(linewidth = 1) +
     ggplot2::xlab("Time step") +
     ggplot2::ylab("Agent count") +
