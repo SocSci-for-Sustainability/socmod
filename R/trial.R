@@ -290,6 +290,35 @@ summarise_by_label <- function(summary_df) {
 }
 
 
+#' Summarise trials by metadata fields
+#'
+#' @param trials A list of Trial objects
+#' @param fields Character vector of metadata fields to group by
+#'
+#' @return A data frame with group means of success and steps
+#' @export
+summarise_by_metadata <- function(trials, fields) {
+  df <- purrr::map_dfr(trials, function(trial) {
+    row <- as.list(trial$metadata[fields])
+    row$adaptation_success <- 
+      trial$get_outcomes()$adaptation_success
+    row$fixation_steps <- trial$outcomes$fixation_steps
+    tibble::as_tibble(row)
+  })
+  
+  return (
+    df %>%
+      dplyr::group_by(across(all_of(fields))) %>%
+      dplyr::summarise(
+        success_rate = mean(adaptation_success),
+        mean_fixation_steps = mean(fixation_steps),
+        .groups = "drop"
+      )
+  )
+}
+
+
+
 #' Plot adoption counts of selected behaviors over time
 #' Plot adoption counts of selected behaviors 
 #' (`tracked_behaviors`) over time.

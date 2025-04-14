@@ -103,3 +103,38 @@ test_that("summarise_by_label() correctly aggregates trial outcomes", {
   expect_equal(nrow(result), 2)
   expect_equal(sort(unique(result$label)), c("control", "success"))
 })
+
+
+test_that("summarise_by_metadata correctly summarizes grouped trial outcomes", {
+  # Create simple trials with fake metadata
+  trials <- purrr::map(1:4, function(i) {
+    model <- AgentBasedModel$new(n_agents = 10)
+    trial <- run_trial(
+      model,
+      interaction = success_bias_interact,
+      iterate = iterate_learning_model,
+      stop = 3,
+      label = paste0("Trial", i),
+      metadata = list(
+        seed_set = ifelse(i <= 2, "A", "B"),
+        adaptive_fitness = ifelse(i %% 2 == 0, 1.2, 1.0)
+      )
+    )
+    trial$outcomes$success <- (i %% 2 == 0)  # Even trials succeed
+    trial$outcomes$steps <- i + 1
+    return(trial)
+  })
+  
+  # Run summary
+  summary <- summarise_by_metadata(trials, fields = c("adaptive_fitness", "seed_set"))
+  
+  # Check columns
+  expect_true(all(c("adaptive_fitness", "seed_set", "success_rate", "mean_fixation_steps") %in% colnames(summary)))
+  
+  # Check group count and shape
+  expect_equal(nrow(summary), 4)  # 2 seed_sets × 2 fitness levels
+  
+  # Check expected values
+  result <- summary %>% dplyr::filter(seed_set == "A", adaptive_fitness == 1.0)
+  expect_equal(result$success_rate, 0)  # Only odd i trials (i = 1)
+})

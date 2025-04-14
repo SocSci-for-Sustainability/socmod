@@ -2,21 +2,25 @@
 % Please edit documentation in R/trial.R
 \name{plot_adoption}
 \alias{plot_adoption}
-\title{Plot adoption counts of selected behaviors over time}
+\title{Plot adoption counts of selected behaviors over time
+Plot adoption counts of selected behaviors
+(\code{tracked_behaviors}) over time.}
 \usage{
-plot_adoption(trial, behaviors = c("Adaptive"))
+plot_adoption(trial, tracked_behaviors = c("Adaptive"))
 }
 \arguments{
 \item{trial}{A Trial object}
 
-\item{behaviors}{Character vector of behaviors to track (e.g., c("Adaptive", "Legacy"))}
+\item{tracked_behaviors}{Character vector of behaviors to track (e.g., c("Adaptive", "Legacy"))}
 }
 \value{
 A ggplot object
 }
 \description{
 Plot adoption counts of selected behaviors over time
+Plot adoption counts of selected behaviors
+(\code{tracked_behaviors}) over time.
 }
 \examples{
-plot_adoption(trial, behaviors = c("Adaptive", "Legacy"))
+plot_adoption(trial, tracked_behaviors = c("Adaptive", "Legacy"))
 }

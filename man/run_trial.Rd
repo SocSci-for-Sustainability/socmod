@@ -11,7 +11,8 @@ run_trial(
   iterate = iterate_learning_model,
   stop = 50,
   label = NULL,
-  target_behavior = "Adaptive"
+  target_behavior = "Adaptive",
+  metadata = list()
 )
 }
 \arguments{

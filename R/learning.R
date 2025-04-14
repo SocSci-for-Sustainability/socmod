@@ -160,7 +160,7 @@ contagion_interaction <- function(learner, teacher, model) {
 #' @param model An AgentBasedModel instance with parameter "drop_rate".
 #' @return None. Updates agent behaviors.
 #' @examples
-#' model <- example_model_with_params(list(drop_rate = 0.5))
+#' model <- abm$new(n_agents = 10, parameters = list(drop_rate = 0.5))
 #' contagion_model_step(model)
 #' @export
 contagion_model_step <- function(model) {

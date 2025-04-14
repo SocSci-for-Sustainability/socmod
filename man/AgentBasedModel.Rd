@@ -32,7 +32,12 @@ It ensures synchronization between the agent states and the underlying igraph ne
 \subsection{Method \code{new()}}{
 Initialize a model with either a graph, agents, or n_agents
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{AgentBasedModel$new(graph = NULL, agents = NULL, n_agents = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{AgentBasedModel$new(
+  graph = NULL,
+  agents = NULL,
+  n_agents = NULL,
+  parameters = NULL
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

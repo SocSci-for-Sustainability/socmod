@@ -4,12 +4,12 @@
 \alias{summarise_adoption}
 \title{Summarize behavior adoption over time from multiple trials}
 \usage{
-summarise_adoption(trials, behaviors = NULL)
+summarise_adoption(trials, tracked_behaviors = NULL)
 }
 \arguments{
 \item{trials}{A list of Trial objects}
 
-\item{behaviors}{Optional vector of behaviors to include}
+\item{tracked_behaviors}{Optional vector of behaviors to include}
 }
 \value{
 A tibble with columns: trial, t, behavior, count, label, adaptation_success, fixation_steps
