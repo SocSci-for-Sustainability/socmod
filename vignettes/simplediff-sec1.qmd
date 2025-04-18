@@ -1,0 +1,79 @@
+---
+title: "Simple Diffusion: Learning Strategies and Adaptive Fitness"
+format: html
+---
+
+```{r setup, include=FALSE}
+if (requireNamespace("devtools", quietly = TRUE) && dir.exists("../socmod")) {
+  devtools::load_all("../socmod")
+} else {
+  library(socmod)
+}
+
+library(dplyr)
+library(purrr)
+library(tidyr)
+library(ggplot2)
+library(igraph)
+
+# Define learning strategies
+partner_selection <- list(
+  success_bias_select_teacher,
+  frequency_bias_select_teacher
+)
+
+interaction <- list(
+  success_bias_interact,
+  frequency_bias_interact
+)
+
+# Create toy 4-agent ABM
+make_example_learning_abm <- function(adaptive_fitness) {
+  agent_1 <- Agent$new(1, behavior = "Legacy", fitness = 1, name = "1")
+  agent_2 <- Agent$new(2, behavior = "Adaptive", fitness = adaptive_fitness, name = "2")
+  agent_3 <- Agent$new(3, behavior = "Legacy", fitness = 1, name = "3")
+  agent_4 <- Agent$new(4, behavior = "Legacy", fitness = 2, name = "4")
+  
+  agents <- list(agent_1, agent_2, agent_3, agent_4)
+  graph <- make_graph(~ 1-2, 1-3, 1-4, 3-2)
+  return (AgentBasedModel$new(agents = agents, graph = graph))
+}
+
+
+# Run trials across strategies and fitness values
+results <- run_trials_grid(
+  adaptive_fitness = seq(0.8, 2.0, by = 0.2),
+  partner_selection = partner_selection,
+  interaction = interaction,
+  n = 25,
+  model_generator = function(adaptive_fitness) {
+    function() make_example_learning_abm(adaptive_fitness)
+  },
+  iterate = iterate_learning_model,
+  stop = 10
+)
+
+# Summarize and label
+summary_df <- summarise_by_metadata(results)
+
+summary_df$behavior <- factor(summary_df$behavior, levels = c("Adaptive", "Legacy"))
+
+summary_df <- summary_df |>
+  mutate(strategy = case_when(
+    identical(interaction, success_bias_interact) ~ "Success",
+    identical(interaction, frequency_bias_interact) ~ "Frequency",
+    TRUE ~ "Other"
+  ))
+
+# Plot
+ggplot(summary_df, aes(x = adaptive_fitness, y = proportion, color = strategy)) +
+  geom_line(linewidth = 1) +
+  facet_wrap(~behavior) +
+  labs(
+    title = "Behavior Adoption by Adaptive Fitness and Learning Strategy",
+    x = "Adaptive Fitness",
+    y = "Proportion of Agents",
+    color = "Strategy"
+  ) +
+  theme_minimal(base_size = 14)
+```

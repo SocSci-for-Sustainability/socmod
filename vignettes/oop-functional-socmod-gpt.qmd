@@ -1,0 +1,147 @@
+---
+title: "Object-oriented and functional programming in socmod"
+format: html
+---
+```{r setup, include=FALSE}
+# Try loading from source if in dev mode, fallback to installed package
+if (requireNamespace("devtools", quietly = TRUE) && dir.exists("../socmod")) {
+  devtools::load_all("../socmod")
+} else {
+  library(socmod)
+}
+
+library(purrr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(igraph)
+```
+
+## Introduction
+
+Functional programming offers a concise, declarative approach to working with data and behavior. It's at the core of the tidyverse, which revolutionized how R users conduct data science. But when modeling adaptive behavior, cooperation, and influence in structured populations, we face challenges that go beyond tidy data: we must track individuals, their relationships, and how interactions shape them over time.
+
+This is why `socmod` fuses **functional** and **object-oriented programming**:
+
+- We use `purrr` to compose and chain transformations across large collections of agents, trials, and model conditions.
+- We use `R6` to encapsulate **agents**, **social networks**, **model state**, and **trial results** as interactive objects.
+
+In this vignette, we explore how these paradigms work together in `socmod` to improve clarity, reduce bugs, and shorten the path from theoretical insight to working simulation.
+
+One broader point worth noting: **software shapes thought**. How we write code affects how we conceptualize agents, interactions, and dynamics. `socmod` is designed to support cleaner, more expressive scientific modeling — and possibly, more ambitious theory.
+
+---
+
+## Functional programming essentials for `socmod`
+
+In `socmod`, agents learn through repeated interaction using modular **functions** for learning, interaction, and selection. These are passed to `run_trial()` and used inside the model’s simulation loop. Functional programming also helps batch, combine, and analyze simulations efficiently.
+
+```{r}
+library(purrr)
+
+# A function passed to run_trial
+success_bias_select_teacher
+```
+
+### 🔄 Core `purrr` functions used in `socmod`
+
+- `map()` — iterate over a vector and return a list
+- `map_chr()`, `map_int()` — return vectors of a specific type
+- `map2()` — iterate over two vectors in parallel
+- `pmap()` — iterate over a list or dataframe of parameter sets--function variable names must match 
+- `keep()` — keep only elements of a list that match a certain condition
+- `walk()` — like `map()`, but used for side effects (e.g., printing, saving plots)
+
+We use these to:
+- Run simulation ensembles
+- Attach metadata to trials
+- Summarize results
+
+```{r}
+# Run trials while varying strategy and fitness
+map2(strategies, fitness_values, ~ run_trial(...))
+```
+
+---
+
+## Object-oriented programming with `R6`
+
+`R6` lets us build objects that have internal state and methods. These are the core components of a `socmod` simulation.
+
+### 🧠 `Agent`
+
+Represents an individual in the simulation.
+
+- Fields: `behavior`, `fitness`, `neighbors`
+- Methods: `get_behavior()`, `set_behavior()`, `get_neighbors()`
+
+### 🌐 `AgentBasedModel`
+
+Encapsulates the network and the agents.
+
+- Fields: `agents`, `graph`
+- Methods: `sync_network()`, `get_agent()`, `run_step()`
+
+### 🤝 `Neighbors`
+
+Tracks the local network from each agent’s perspective.
+
+- Holds a list of other agents
+- Used to query who influences whom
+
+### 🧪 `Trial`
+
+Handles a single simulation run.
+
+- Records all agent behaviors over time
+- Generates a summary outcome (e.g., final behaviors, adoption rates)
+
+This structure helps cleanly separate the model logic (e.g., how an agent learns) from the network (e.g., who can influence whom) and from the data (e.g., what happened across time steps).
+
+---
+
+## Putting it together: Functional patterns over OOP agents
+
+Here's how we can use `purrr` to run and analyze ensembles of object-oriented trials.
+
+```{r}
+make_example_learning_abm <- function() {
+  agent_1 <- Agent$new(1, behavior = "Legacy", fitness = 1, name = "1")
+  agent_2 <- Agent$new(2, behavior = "Adaptive", fitness = 4, name = "2")
+  agent_3 <- Agent$new(3, behavior = "Legacy", fitness = 1, name = "3")
+  agent_4 <- Agent$new(4, behavior = "Legacy", fitness = 2, name = "4")
+
+  agents <- list(agent_1, agent_2, agent_3, agent_4)
+  socnet <- igraph::make_graph(~ 1-2, 1-3, 1-4, 3-2)
+  AgentBasedModel$new(agents = agents, graph = socnet)
+}
+
+# Vary fitness and strategy
+results <- map2(
+  rep(c(1.5, 2.0), each = 2),
+  rep(c("success", "frequency"), 2),
+  function(f_A, strategy) {
+    run_trials(
+      n = 10,
+      model_generator = function() {
+        abm <- make_example_learning_abm()
+        abm$get_agent("2")$set_fitness(f_A)
+        return(abm)
+      },
+      partner_selection = strategies[[strategy]]$partner_selection,
+      interaction = strategies[[strategy]]$interaction,
+      iterate = iterate_learning_model,
+      stop = 10
+    ) |> map(~ .x$add_metadata(list(f_A = f_A, strategy = strategy)))
+  }
+) |> flatten()
+```
+
+```{r}
+# Summarize results by metadata
+summary_df <- summarise_by_metadata(results)
+```
+
+---
+
+This blend of **object structure** and **functional orchestration** is what powers `socmod`. It helps you build expressive, modular simulations while keeping the logic transparent and easy to extend.

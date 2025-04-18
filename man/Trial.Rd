@@ -18,6 +18,8 @@ measures such as adaptation success and steps to fixation.
 \itemize{
 \item \href{#method-Trial-new}{\code{Trial$new()}}
 \item \href{#method-Trial-run}{\code{Trial$run()}}
+\item \href{#method-Trial-add_metadata}{\code{Trial$add_metadata()}}
+\item \href{#method-Trial-get_metadata}{\code{Trial$get_metadata()}}
 \item \href{#method-Trial-get_observations}{\code{Trial$get_observations()}}
 \item \href{#method-Trial-get_outcomes}{\code{Trial$get_outcomes()}}
 \item \href{#method-Trial-get_label}{\code{Trial$get_label()}}
@@ -70,9 +72,42 @@ Run the model and collect results
 \describe{
 \item{\code{stop}}{Either integer for max steps, or predicate function}
 
-\item{\code{target_behavior}}{The behavior treated as "adaptation success"}
+\item{\code{target_behavior}}{The behavior treated as "adaptation success"
+Add or update metadata in a Trial object}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Trial-add_metadata"></a>}}
+\if{latex}{\out{\hypertarget{method-Trial-add_metadata}{}}}
+\subsection{Method \code{add_metadata()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Trial$add_metadata(new_metadata)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{new_metadata}}{A named list to merge into existing metadata}
+
+\item{\code{self}}{The Trial object}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Trial-get_metadata"></a>}}
+\if{latex}{\out{\hypertarget{method-Trial-get_metadata}{}}}
+\subsection{Method \code{get_metadata()}}{
+Return the trial's metadata as a named list.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Trial$get_metadata()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+A named list containing metadata values for this trial, including
+any scalar or function-valued inputs specified during setup.
 }
 }
 \if{html}{\out{<hr>}}

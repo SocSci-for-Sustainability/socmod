@@ -8,7 +8,7 @@
 Trial <- R6::R6Class(
   "Trial",
   public = list(
-    metadata = list(),
+    
     model = NULL,
     observations = NULL,
     outcomes = NULL,
@@ -16,6 +16,7 @@ Trial <- R6::R6Class(
     interaction = NULL,
     iterate = NULL,
     label = NULL,
+    metadata = list(),
     
     #' @description Initialize a Trial with a model and functions
     #' @param model An AgentBasedModel instance
@@ -137,6 +138,22 @@ Trial <- R6::R6Class(
       self$outcomes$fixation_steps <- step
     },
     
+    #' Add or update metadata in a Trial object
+    #'
+    #' @param self The Trial object
+    #' @param new_metadata A named list to merge into existing metadata
+    add_metadata = function(new_metadata) {
+      self$metadata <- modifyList(self$metadata, new_metadata)
+      invisible(self)
+    },
+    
+    #' @description Return the trial's metadata as a named list.
+    #' @return A named list containing metadata values for this trial, including
+    #' any scalar or function-valued inputs specified during setup.
+    get_metadata = function() {
+      return (self$metadata)
+    },
+    
     #' @description Return the observation data
     get_observations = function() {
       return (self$observations)
@@ -171,6 +188,7 @@ fixated <- function(model) {
   length(unique(behaviors)) == 1
 }
 
+
 #' Run a Trial on an AgentBasedModel with standard learning loop
 #'
 #' @param model An AgentBasedModel
@@ -191,20 +209,29 @@ fixated <- function(model) {
 #' model <- AgentBasedModel$new(agents = agents, graph = net)
 #' trial <- run_trial(model, stop = 10)
 run_trial <- function(model,
-                      partner_selection = 
-                        success_bias_select_teacher,
+                      partner_selection = success_bias_teacher_selection,
                       interaction = success_bias_interact,
+                      learning_strategy = NULL,
                       iterate = iterate_learning_model,
                       stop = 50,
                       label = NULL,
                       target_behavior = "Adaptive",
                       metadata = list()) {
+  
+  # If learning_strategy is not null, add the strategy label to the metadata and
+  # override the interaction and partner_selection functions passed as arguments.
+  if (!is.null(learning_strategy)) {
+    metadata$learning_strategy <- learning_strategy$get_label()
+    partner_selection <- learning_strategy$get_partner_selection()
+    interaction <- learning_strategy$get_interaction()
+  }
+  
+  # 
   trial <- Trial$new(
     model = model,
     partner_selection = partner_selection,
     interaction = interaction,
     iterate = iterate,
-    label = label,
     metadata = metadata
   )
   trial$run(stop = stop, target_behavior = target_behavior)
@@ -230,12 +257,83 @@ run_trial <- function(model,
 #'   AgentBasedModel$new(agents = agents, graph = net)
 #' }
 #' trials <- run_trials(3, gen, label = "success", stop = 10)
-run_trials <- function(n, model_generator, label = NULL, ...) {
-  purrr::map(seq_len(n), function(i) {
+run_trials <- function(n_trials, model_generator,  = NULL, ...) {
+  purrr::map(seq_len(n_trials), function(i) {
     model <- model_generator()
     run_trial(model, label = label, ...)
   })
 }
+
+
+#' Run a grid of trial ensembles with parameter metadata
+#'
+#' Runs trial ensembles across a parameter grid. All scalar and function-valued parameters
+#' used in model construction or trial dynamics are included in metadata for transparency.
+#'
+#' @param ... Named vectors or lists of scalar or function parameters to cross.
+#' @param n Number of trials per parameter combination.
+#' @param model_generator Function taking scalar arguments and returning a model factory.
+#' @param partner_selection Function or list of functions to select learning partners.
+#' @param interaction Function or list of functions to apply during agent interaction.
+#' @param iterate Function to iterate the model.
+#' @param stop Stopping condition (number or function).
+#'
+#' @return A flat list of Trial objects with all parameters included in metadata.
+#' @export
+run_trials_grid <- function(n_trials,
+                            model_generator,
+                            stop = 10,
+                            partner_selection = 
+                              success_biased_teacher_selection,
+                            interaction = success_biased_interaction,
+                            iterate = iterate_learning_model,
+                            learning_strategies = NULL,
+                            model_parameters = list()
+                            ) {
+  
+  # Set up learning_strategies and include in model_parameters if given.
+  if (!is.null(learning_strategies)){
+    # If learning_strategies is a singleton, put it in a list for crossing.
+    if (inherits(learning_strategies, "LearningStrategy")) {
+      learning_strategies <- list(LearningStrategy = learning_strategies)
+    } else {
+        # Otherwise first check that it's a list, stop if it's not.
+        assertthat::assert_that(
+          is.list(learning_strategies),
+          msg = "learning_strategies must be a single LearningStrategy instance or a list of LearningStrategy instances."
+        )
+    }
+    
+    model_parameters$LearningStrategy <- learning_strategies
+  }
+  
+  # Initialize dataframe where each row is a set of model parameters.
+  parameter_grid <- tidyr::crossing(!!!model_parameters)
+  parameter_grid$id <- 1:nrow(parameter_grid)
+  
+  trials <- purrr::pmap(grid, function(...) {
+    run_trial(
+      model = model_generator,
+      id = id
+    )
+        # run_trial()# Create a model generator function with the current parameters
+    # run_trials(
+    #   n_trials = n_trials,
+    #   model_generator = model_fn,
+    #   partner_selection = ps,
+    #   interaction = ix,
+    #   iterate = iterate,
+    #   stop = stop,
+    #   metadata = metadata
+    )
+  })
+  
+  # Currently trials is a list of lists. 
+  return (purrr::flatten(trials))
+}
+
+
+
 
 
 #' Summarize behavior adoption over time from multiple trials
@@ -276,18 +374,18 @@ summarise_adoption <- function(trials, tracked_behaviors = NULL) {
 #' @examples
 #' trial_summary <- summarise_by_label(summary)
 #' print(trial_summary)
-summarise_by_label <- function(summary_df) {
-  summary_df %>%
-    dplyr::distinct(label, trial, adaptation_success, fixation_steps) %>%
-    dplyr::group_by(label) %>%
-    dplyr::summarise(
-      n_trials = dplyr::n(),
-      success_rate = mean(adaptation_success),
-      mean_fixation = mean(fixation_steps),
-      sd_fixation = sd(fixation_steps),
-      .groups = "drop"
-    )
-}
+# summarise_by_label <- function(summary_df) {
+#   summary_df %>%
+#     dplyr::distinct(label, trial, adaptation_success, fixation_steps) %>%
+#     dplyr::group_by(label) %>%
+#     dplyr::summarise(
+#       n_trials = dplyr::n(),
+#       success_rate = mean(adaptation_success),
+#       mean_fixation = mean(fixation_steps),
+#       sd_fixation = sd(fixation_steps),
+#       .groups = "drop"
+#     )
+# }
 
 
 #' Summarise trials by metadata fields

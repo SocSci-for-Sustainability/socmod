@@ -31,4 +31,4 @@ Imports:
     ggraph,
     uuid
 URL: https://css4s.github.io/socmod/
-VignetteBuilder: knitr
+VignetteBuilder: quarto

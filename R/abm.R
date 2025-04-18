@@ -14,30 +14,30 @@ AgentBasedModel <- R6::R6Class(
     #' @param graph An igraph object (optional)
     #' @param agents A list of Agent objects (optional)
     #' @param n_agents Integer number of agents to create (optional)
-    initialize = function(graph = NULL, agents = NULL, 
-                          n_agents = NULL, parameters = NULL) {
+    initialize = function(model_parameters = DefaultParameters, agents = NULL) {
       
       # Handle logic of setting ABM graph to user-provided, or create 
       # a fully-connected one with `n_agents` vertices.
-      if (!is.null(graph)) {
-        stopifnot(igraph::is_igraph(graph))
-        self$graph <- graph
-      } else if (!is.null(n_agents)) {
-        self$graph <- igraph::make_full_graph(n_agents, directed = FALSE)
+      
+      # First create a short-name variable for parameters.
+      mp <- model_parameters
+      if (!is.null(mp$graph)) {
+        stopifnot(igraph::is_igraph(mp$graph))
+        self$graph <- mp$graph
+      } else if (!is.null(mp$n_agents)) {
+        self$graph <- igraph::make_full_graph(mp$n_agents, directed = FALSE)
       } else {
         stop("Either 'graph' or 'n_agents' must be provided.")
       }
       
       # Initialize model parameters, stored as key-value list.
       private$.parameters <- list()
-      if (!is.null(parameters)) {
-        stopifnot(is.list(parameters))
-        self$set_parameters(parameters)
-      }
-      
-      if (!is.null(parameters)) {
-        stopifnot(is.list(parameters))
-        self$set_parameters(parameters)
+      if (!is.null(model_parameters)) {
+        assert_that(
+          inherits(model_parameters, ModelParameters),
+          "model_parameters must be an instance of ModelParameters"
+        )
+        self$set_parameters(model_parameters)
       }
       
       if (is.null(igraph::V(self$graph)$name)) {
@@ -97,15 +97,18 @@ AgentBasedModel <- R6::R6Class(
           self$graph <- igraph::set_vertex_attr(self$graph, "behavior_current", index = vid, value = agent$get_behavior())
           self$graph <- igraph::set_vertex_attr(self$graph, "behavior_next",    index = vid, value = agent$get_next_behavior())
           self$graph <- igraph::set_vertex_attr(self$graph, "fitness_current",  index = vid, value = agent$get_fitness())
-          self$graph <- igraph::set_vertex_attr(self$graph, "fitness_next",     index = vid, value = agent$get_next_fitness())
+          self$graph <- igraph::set_vertex_attr(
+            self$graph, "fitness_next", 
+            index = vid, 
+            value = agent$get_next_fitness()
+          )
         }
       }
       
       if (direction %in% c("from_graph", "neighbors_only")) {
         for (agent in self$agents) {
-          # nbr_ids <- igraph::neighbors(self$graph, v = agent$get_id())
+
           nbr_ids <- igraph::neighbors(self$graph, v = agent$get_name())
-          
           neighbors <- purrr::map(
             nbr_ids,
             \(v) self$get_agent(igraph::V(self$graph)[v]$name)
@@ -166,3 +169,40 @@ AgentBasedModel <- R6::R6Class(
     .parameters = NULL
   )
 )
+
+
+#' Initialize an ensemble of agent-based models.
+#' 
+#' @export
+abm_ensemble <- function(model_parameters_by_variable) {
+  
+}
+
+
+#' @export
+make_abm <- function(model_parameters = DEFAULT_PARAMETERS, agents = NULL) {
+  
+  assertthat::assert_that(
+    inherits(model_parameters$learning_strategy, "LearningStrategy"),
+    "Learning strategy must be an instance of class LearningStrategy."
+  )
+  
+  assertthat::assert_that(
+    all(c("LearningStrategy", "graph", "agents", "n_agents") %in% 
+          model_parameters),
+    "Learning strategy must be expicitly defined in model_parameters."
+  )
+
+  return (
+    AgentBasedModel$new(
+      model_parameters = model_parameters,
+      agents = agents
+    )
+  )
+}
+
+#' Default parameters to create an agent-based model.
+DEFAULT_PARAMETERS <- model_parameters(learning_strategy = NULL, 
+                                       graph = NULL,
+                                       n_agents = 10,
+                                       auxiliary = list()) 

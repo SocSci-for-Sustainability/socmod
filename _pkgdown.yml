@@ -6,10 +6,14 @@ reference:
   desc: |
     Create and run agent-based models of social behavior in socmod.
   contents: AgentBasedModel
-- title: Running models
+- title: Running single model trial or trial ensembles
   desc: |
-    The `run()` function uses the specified `partner_selection`, `interaction`,  and `iterate_model` functions to specify these dynamics and iterate the `model` (an instance of `socmod::AgentBasedModel`).
-  contents: run
+    The `run_trial()` and `run_trials()` functions use the specified `partner_selection`, `interaction`,  and `iterate_model` functions to specify these dynamics and iterate the `model` (an instance of `socmod::AgentBasedModel`). `fixated` helps us tell when all agents are performing the same behavior, i.e., the population has fixated.
+  contents: 
+  - Trial
+  - run_trial
+  - run_trials
+  - fixated
 - title: Learning (strategy) functions
   desc: |
     Functions to pass to run for model iteration in a learning model,  and for either success-biased or frequency-biased adaptive learning.
@@ -17,6 +21,7 @@ reference:
   - iterate_learning_model
   - starts_with("success_bias")
   - starts_with("frequency_bias")
+  - starts_with("contagion_")
 - title: Agents and their neighbors
   desc: |
     Agents in the model are represented by a number of attributes, with select class methods to track lists of their neighbors.
@@ -37,4 +42,8 @@ reference:
   - add_unique_edge
   - get_all_possible_edges
   - not_adjacent
+  - compare_friendship_paradox
+  - get_feld_1991_network
+  - load_igraph_from_csv
+  - plot_friendship_paradox
 

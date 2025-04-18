@@ -1,0 +1,18 @@
+# Object-oriented and functional programming in socmod
+
+Functional programming is a powerful, declarative approach to programming that can improve readability and efficiency. It is especially powerful in data science, around which the tidyverse has sprung. However, in agent-based modeling, social dynamics involve interactions between people and their environment, structured by social networks. The functional style only works here if the agents, their relationships, social learning, and other factors are represented in a similarly efficient way. This is why socmod also harnesses the object-oriented style of programming to cleanly represent agents, agent neighbors and interactions between neighbors, agent-based models, and simulation trial observations and outcomes. This vignette explains how we combine functional programming, using the purrr library, and object-oriented programming, using the R6 library, to develop socmod. One possibly underappreciated factor in computational social science, and social science theory as a consequence, is that our software tools shape how we think and limit the reach of our imagination. socmod leverages software design principles to help computational social scientists think more rigorously by reducing the effort needed to translate theories into models into software.
+
+## Functional programming essentials for socmod
+
+- Basics of functional programming concepts
+- map, map2, keep, walk, others??
+- maybe explain the different flavors of map and when/why/how to use them, e.g., map_dfs (should those still be used?)
+- how run_trial()/Trial$run() expect learning strategy to be functions
+
+## Object oriented programming and classes with R6
+
+Explain how the following are constructed: Agent, AgentBasedModel, Neighbors, Trial...any others?
+
+## Techniques for using purrr functions to construct trial ensembles and analyze outputs
+
+, e.g., map2() with two different explanatory input variables to run a set of trials, like you did in the previous vignette

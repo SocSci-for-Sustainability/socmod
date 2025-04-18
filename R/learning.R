@@ -1,3 +1,89 @@
+#' LearningStrategy
+#'
+#' Represents a reusable learning strategy composed of a partner selection function,
+#' an interaction function, and a descriptive label.
+#'
+#' @export
+LearningStrategy <- R6::R6Class(
+  "LearningStrategy",
+  public = list(
+    #' @description Create a new LearningStrategy
+    #' @param partner_selection Function to select the teacher (or NULL)
+    #' @param interaction Function to define the interaction (or NULL)
+    #' @param label A string label for this strategy
+    initialize = function(partner_selection, interaction, label) {
+      private$.partner_selection <- partner_selection
+      private$.interaction <- interaction
+      private$.label <- label
+    },
+    
+    #' @description Get the partner selection function
+    #' @return Function
+    get_partner_selection = function() {
+      return (private$.partner_selection)
+    },
+    
+    #' @description Get the interaction function
+    #' @return Function
+    get_interaction = function() {
+      return (private$.interaction)
+    },
+    
+    #' @description Get the strategy label
+    #' @return Character string
+    get_label = function() {
+      return (private$.label)
+    }
+  ),
+  
+  private = list(
+    .partner_selection = NULL,
+    .interaction = NULL,
+    .label = NULL
+  )
+)
+
+
+#' Factory function for creating a LearningStrategy
+#'
+#' @param partner_selection A function to select a teacher (or NULL)
+#' @param interaction A function defining interaction (or NULL)
+#' @param label A string label for this strategy
+#'
+#' @return A `LearningStrategy` instance
+#' @export
+#'
+#' @examples
+#' s <- make_learning_strategy(
+#'   partner_selection = success_bias_select_teacher,
+#'   interaction = success_bias_interact,
+#'   label = "Success-biased"
+#' )
+make_learning_strategy <- function(partner_selection, interaction, label) {
+  return (
+    LearningStrategy$new(
+      partner_selection = partner_selection,
+      interaction = interaction,
+      label = label
+    )
+  )
+}
+
+
+#' Make a dummy learning strategy for mockups and testing.
+#' 
+#' @export
+dummy_learning_strategy <- function() {
+  return (
+    make_learning_strategy(
+      partner_selection = \() NULL,
+      interaction = \() NULL,
+      label = "DummyStrategy"
+    )
+  )
+}
+
+
 #' A generic method for iterating a learning model, setting the current 
 #' behavior and fitness to be whatever was identified as the next behavior
 #' and fitness.
