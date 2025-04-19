@@ -5,18 +5,20 @@
 \title{Run a grid of trial ensembles with parameter metadata}
 \usage{
 run_trials_grid(
-  n_trials,
+  n_trials_per_param,
   model_generator,
   stop = 10,
+  learning_strategies = NULL,
+  auxlilary_parameters = list(),
   partner_selection = success_biased_teacher_selection,
   interaction = success_biased_interaction,
-  iterate = iterate_learning_model,
-  learning_strategies = NULL,
-  model_parameters = list()
+  model_iterate = iterate_learning_model
 )
 }
 \arguments{
-\item{model_generator}{Function taking scalar arguments and returning a model factory.}
+\item{n_trials_per_param}{Number of trials per parameter combination.}
+
+\item{model_generator}{Returns a new AgentBasedModel instance according to model_parameters.}
 
 \item{stop}{Stopping condition (number or function).}
 
@@ -24,14 +26,10 @@ run_trials_grid(
 
 \item{interaction}{Function or list of functions to apply during agent interaction.}
 
-\item{iterate}{Function to iterate the model.}
-
-\item{...}{Named vectors or lists of scalar or function parameters to cross.}
-
-\item{n}{Number of trials per parameter combination.}
+\item{model_iterate}{Function to iterate the model.}
 }
 \value{
-A flat list of Trial objects with all parameters included in metadata.
+A list of Trial objects
 }
 \description{
 Runs trial ensembles across a parameter grid. All scalar and function-valued parameters

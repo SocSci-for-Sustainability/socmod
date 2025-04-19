@@ -17,7 +17,3 @@ A tibble with columns: trial, t, behavior, count, label, adaptation_success, fix
 \description{
 Summarize behavior adoption over time from multiple trials
 }
-\examples{
-summary <- summarise_adoption(trials)
-dplyr::filter(summary, behavior == "Adaptive")
-}

@@ -97,7 +97,7 @@ Return the igraph network (after syncing from agents)
 \if{html}{\out{<a id="method-AgentBasedModel-get_parameters"></a>}}
 \if{latex}{\out{\hypertarget{method-AgentBasedModel-get_parameters}{}}}
 \subsection{Method \code{get_parameters()}}{
-Get the list of model parameters
+Get the of model parameters
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{AgentBasedModel$get_parameters()}\if{html}{\out{</div>}}
 }

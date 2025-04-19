@@ -270,26 +270,25 @@ run_trials <- function(n_trials, model_generator, ...) {
 #' Runs trial ensembles across a parameter grid. All scalar and function-valued parameters
 #' used in model construction or trial dynamics are included in metadata for transparency.
 #'
-#' @param ... Named vectors or lists of scalar or function parameters to cross.
-#' @param n Number of trials per parameter combination.
-#' @param model_generator Function taking scalar arguments and returning a model factory.
+#' @param n_trials_per_param Number of trials per parameter combination.
+#' @param model_generator Returns a new AgentBasedModel instance according to model_parameters.
+#' @param stop Stopping condition (number or function).
+#' 
 #' @param partner_selection Function or list of functions to select learning partners.
 #' @param interaction Function or list of functions to apply during agent interaction.
-#' @param iterate Function to iterate the model.
-#' @param stop Stopping condition (number or function).
+#' @param model_iterate Function to iterate the model.
 #'
-#' @return A flat list of Trial objects with all parameters included in metadata.
+#' @return A list of Trial objects 
 #' @export
-run_trials_grid <- function(n_trials,
+run_trials_grid <- function(n_trials_per_param,
                             model_generator,
                             stop = 10,
+                            learning_strategies = NULL,
+                            auxlilary_parameters = list(),
                             partner_selection = 
                               success_biased_teacher_selection,
                             interaction = success_biased_interaction,
-                            iterate = iterate_learning_model,
-                            learning_strategies = NULL,
-                            model_parameters = list()
-                            ) {
+                            model_iterate = iterate_learning_model) {
   
   # Set up learning_strategies and include in model_parameters if given.
   if (!is.null(learning_strategies)){
@@ -311,29 +310,17 @@ run_trials_grid <- function(n_trials,
   parameter_grid <- tidyr::crossing(!!!model_parameters)
   parameter_grid$id <- 1:nrow(parameter_grid)
   
-  trials <- purrr::pmap(grid, function(...) {
+  # Create a list of trials 
+  trials <- purrr::pmap(parameter_grid, function(...) {
     run_trial(
-      model = model_generator,
+      model = model_generator(model_parameters),
       id = id
     )
-        # run_trial()# Create a model generator function with the current parameters
-    # run_trials(
-    #   n_trials = n_trials,
-    #   model_generator = model_fn,
-    #   partner_selection = ps,
-    #   interaction = ix,
-    #   iterate = iterate,
-    #   stop = stop,
-    #   metadata = metadata
-    
   })
   
-  # Currently trials is a list of lists. 
-  return (purrr::flatten(trials))
+  # # Currently trials is a list of lists. 
+  # return (purrr::flatten(trials))
 }
-
-
-
 
 
 #' Summarize behavior adoption over time from multiple trials
@@ -342,9 +329,6 @@ run_trials_grid <- function(n_trials,
 #' @param tracked_behaviors Optional vector of behaviors to include
 #' @return A tibble with columns: trial, t, behavior, count, label, adaptation_success, fixation_steps
 #' @export
-#' @examples
-#' summary <- summarise_adoption(trials)
-#' dplyr::filter(summary, behavior == "Adaptive")
 summarise_adoption <- function(trials, tracked_behaviors = NULL) {
   purrr::map2_dfr(trials, seq_along(trials), function(trial, i) {
     obs <- trial$get_observations()
@@ -364,28 +348,6 @@ summarise_adoption <- function(trials, tracked_behaviors = NULL) {
       )
   })
 }
-
-
-#' Summarize trial-level outcomes by label
-#'
-#' @param summary_df A tibble from summarise_adoption()
-#' @return A tibble with one row per label and outcome stats
-#' @export
-#' @examples
-#' trial_summary <- summarise_by_label(summary)
-#' print(trial_summary)
-# summarise_by_label <- function(summary_df) {
-#   summary_df %>%
-#     dplyr::distinct(label, trial, adaptation_success, fixation_steps) %>%
-#     dplyr::group_by(label) %>%
-#     dplyr::summarise(
-#       n_trials = dplyr::n(),
-#       success_rate = mean(adaptation_success),
-#       mean_fixation = mean(fixation_steps),
-#       sd_fixation = sd(fixation_steps),
-#       .groups = "drop"
-#     )
-# }
 
 
 #' Summarise trials by metadata fields
@@ -416,7 +378,6 @@ summarise_by_metadata <- function(trials, fields) {
 }
 
 
-
 #' Plot adoption counts of selected behaviors over time
 #' Plot adoption counts of selected behaviors 
 #' (`tracked_behaviors`) over time.
@@ -426,7 +387,6 @@ summarise_by_metadata <- function(trials, fields) {
 #' @return A ggplot object
 #' @export
 #' @examples
-#' plot_adoption(trial, tracked_behaviors = c("Adaptive", "Legacy"))
 plot_adoption <- function(trial, tracked_behaviors = c("Adaptive")) {
   obs <- trial$get_observations()
   
@@ -443,13 +403,12 @@ plot_adoption <- function(trial, tracked_behaviors = c("Adaptive")) {
     ggplot2::scale_color_brewer(palette = "Set1")
 }
 
+
 #' Plot a summary of behavior adoption over time across trials
 #'
 #' @param summary_df A tibble from summarise_adoption()
 #' @return A ggplot object
 #' @export
-#' @examples
-#' plot_summary(summary)
 plot_summary <- function(summary_df) {
   ggplot2::ggplot(summary_df, ggplot2::aes(x = t, y = count, color = Behavior)) +
     ggplot2::geom_line(ggplot2::aes(group = interaction(trial, Behavior)), alpha = 0.3) +

@@ -1,6 +1,6 @@
 ModelParameters <- R6::R6Class(
   
-  "model-parameters",
+  "ModelParameters",
   
   public = list(
     initialize = function(learning_strategy = success_biased_strategy, 
@@ -19,21 +19,36 @@ ModelParameters <- R6::R6Class(
     get_graph = function() {
       return (private$.graph)
     },
+
+    set_graph = function(graph) {
+      private$.graph <- graph
+    },
     
     get_n_agents = function() {
       return (private$.n_agents)
+    },
+
+    set_n_agents = function(n_agents) {
+      private$.n_agents <- n_agents
     },
     
     get_auxiliary = function() {
       return (private$.auxiliary)
     },
+
+    set_auxiliary = function(params) {
+      private$.auxiliary <- params
+    },
     
     as_list = function() {
-      return (list(
-        learning_strategy = self$get_learning_strategy(),
-        graph = self$get_graph(),
-        n_agents = self$get_n_agents(),
-        auxiliary = self$get_auxiliary() # <- a list itself, so we're concatenating all.
+      return (
+        modifyList(
+          list(
+            learning_strategy = self$get_learning_strategy(),
+            graph = self$get_graph(),
+            n_agents = self$get_n_agents()
+          ),
+          self$get_auxiliary() 
       ))
     }
   ),
@@ -49,19 +64,18 @@ ModelParameters <- R6::R6Class(
 
 #' Wrapper for initializing new ModelParameters instance.
 #' @export
-model_parameters <- function(learning_strategy = NULL, 
+make_model_parameters <- function(learning_strategy = NULL, 
                              graph = NULL,
                              n_agents = NULL,
                              ...)   {
-  auxiliary <- list(...)
   return (
-    ModelParameters$new(learning_strategy, graph, n_agents, auxiliary)  
+    ModelParameters$new(learning_strategy, graph, n_agents, list(...))  
   )
 }
 
 
 #' Default parameters to create an agent-based model.
-DEFAULT_PARAMETERS <- model_parameters(learning_strategy = NULL, 
+DEFAULT_PARAMETERS <- make_model_parameters(learning_strategy = NULL, 
                                        graph = NULL,
                                        n_agents = 10,
                                        auxiliary = list()) 

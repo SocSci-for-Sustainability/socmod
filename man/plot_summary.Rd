@@ -15,6 +15,3 @@ A ggplot object
 \description{
 Plot a summary of behavior adoption over time across trials
 }
-\examples{
-plot_summary(summary)
-}

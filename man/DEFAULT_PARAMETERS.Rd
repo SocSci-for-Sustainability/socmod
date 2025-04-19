@@ -5,7 +5,7 @@
 \alias{DEFAULT_PARAMETERS}
 \title{Default parameters to create an agent-based model.}
 \format{
-An object of class \code{model-parameters} (inherits from \code{R6}) of length 8.
+An object of class \code{model-parameters} (inherits from \code{R6}) of length 11.
 }
 \usage{
 DEFAULT_PARAMETERS

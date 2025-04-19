@@ -16,6 +16,10 @@ None. Updates agent behaviors.
 Updates all agents for dropping behavior and advances model state.
 }
 \examples{
-model <- abm$new(n_agents = 10, parameters = list(drop_rate = 0.5))
+model_parameters <- make_model_parameters(
+  learning_strategy = contagion_learning_strategy,
+  n_agents = 10, adoption_rate = 0.5, drop_rate = 0.2
+)
+model <- make_abm(
 contagion_model_step(model)
 }

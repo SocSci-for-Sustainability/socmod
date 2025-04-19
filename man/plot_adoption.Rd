@@ -21,6 +21,3 @@ Plot adoption counts of selected behaviors over time
 Plot adoption counts of selected behaviors
 (\code{tracked_behaviors}) over time.
 }
-\examples{
-plot_adoption(trial, tracked_behaviors = c("Adaptive", "Legacy"))
-}

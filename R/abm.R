@@ -20,25 +20,34 @@ AgentBasedModel <- R6::R6Class(
       # a fully-connected one with `n_agents` vertices.
       
       # First create a short-name variable for parameters.
-      mp <- model_parameters
-      if (!is.null(mp$graph)) {
-        stopifnot(igraph::is_igraph(mp$graph))
-        self$graph <- mp$graph
-      } else if (!is.null(mp$n_agents)) {
-        self$graph <- igraph::make_full_graph(mp$n_agents, directed = FALSE)
+      if (!is.null(model_parameters)) {
+        assert_that(
+          inherits(model_parameters, "ModelParameters"),
+          msg = "model_parameters must be an instance of ModelParameters"
+        )
+      }
+
+      # If the graph is defined, check it's an igraph and read it in.
+      graph <- model_parameters$get_graph()
+      n_agents <- model_parameters$get_n_agents()
+      if (!is.null(graph)) {
+        stopifnot(igraph::is_igraph(graph))
+        self$graph <- graph
+
+      # If n_agents is defined when the graph is not, make a full graph for agents.
+      } else if (!is.null(n_agents)) {
+
+        self$graph <- igraph::make_full_graph(n_agents, directed = FALSE)
+
+        # Update model parameters with newly-created graph.
+        model_parameters$set_graph(self$graph)
+
       } else {
         stop("Either 'graph' or 'n_agents' must be provided.")
       }
       
       # Initialize model parameters, stored as key-value list.
-      private$.parameters <- list()
-      if (!is.null(model_parameters)) {
-        assert_that(
-          inherits(model_parameters, ModelParameters),
-          "model_parameters must be an instance of ModelParameters"
-        )
-        self$set_parameters(model_parameters)
-      }
+      # private$.parameters <- model_parameters
       
       if (is.null(igraph::V(self$graph)$name)) {
         igraph::V(self$graph)$name <- 
@@ -59,14 +68,24 @@ AgentBasedModel <- R6::R6Class(
         }
         
         self$sync_network("neighbors_only")
+
+        model_parameters$set_n_agents(length(agents))
+
       } else {
+
+        legacy_fitness <- model_parameters$as_list()$legacy_fitness
+
+        if (is.null(legacy_fitness)) {
+          legacy_fitness <- 1.0
+        }
+        
         self$agents <- 
           purrr::map2(
             seq_len(igraph::vcount(self$graph)),
             igraph::V(self$graph)$name,
             \(i, nm) {
               Agent$new(id = i, name = nm, 
-                        behavior = "Legacy", fitness = 1.0)
+                        behavior = "Legacy", fitness = legacy_fitness)
             }
           )
         
@@ -75,6 +94,9 @@ AgentBasedModel <- R6::R6Class(
         self$sync_network("to_graph")
         self$sync_network("from_graph")
       }
+
+      # Set the ABM parameters once it contains all parameters.
+      self$set_parameters(model_parameters)
     },
     
     #' @description Synchronize agent and network fields
@@ -138,8 +160,8 @@ AgentBasedModel <- R6::R6Class(
       self$sync_network("to_graph")
       return(self$graph)
     },
-    
-    #' @description Get the list of model parameters
+
+    #' @description Get the of model parameters
     get_parameters = function() {
       return(private$.parameters)
     },
@@ -147,8 +169,8 @@ AgentBasedModel <- R6::R6Class(
     #' @description Set multiple model parameters
     #' @param params Named list of parameters to set
     set_parameters = function(params) {
-      stopifnot(is.list(params))
-      private$.parameters <- modifyList(private$.parameters, params)
+      stopifnot(inherits(params, "ModelParameters"))
+      private$.parameters <- modifyList(private$.parameters, params$as_list())
     },
     
     #' @description Set a single model parameter
@@ -166,7 +188,7 @@ AgentBasedModel <- R6::R6Class(
   ),
   
   private = list(
-    .parameters = NULL
+    .parameters = list()
   )
 )
 
@@ -181,18 +203,12 @@ abm_ensemble <- function(model_parameters_by_variable) {
 
 #' @export
 make_abm <- function(model_parameters = DEFAULT_PARAMETERS, agents = NULL) {
-  
-  assertthat::assert_that(
-    inherits(model_parameters$learning_strategy, "LearningStrategy"),
-    "Learning strategy must be an instance of class LearningStrategy."
-  )
-  
-  assertthat::assert_that(
-    all(c("LearningStrategy", "graph", "agents", "n_agents") %in% 
-          model_parameters),
-    "Learning strategy must be expicitly defined in model_parameters."
-  )
 
+  assertthat::assert_that(
+    inherits(model_parameters$get_learning_strategy(), "LearningStrategy"),
+    msg = "Learning strategy must be an instance of class LearningStrategy."
+  )
+  
   return (
     AgentBasedModel$new(
       model_parameters = model_parameters,

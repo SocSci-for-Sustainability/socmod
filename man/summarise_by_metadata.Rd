@@ -2,7 +2,7 @@
 % Please edit documentation in R/trial.R
 \name{summarise_by_metadata}
 \alias{summarise_by_metadata}
-\title{Summarize trial-level outcomes by label}
+\title{Summarise trials by metadata fields}
 \usage{
 summarise_by_metadata(trials, fields)
 }
@@ -10,20 +10,10 @@ summarise_by_metadata(trials, fields)
 \item{trials}{A list of Trial objects}
 
 \item{fields}{Character vector of metadata fields to group by}
-
-\item{summary_df}{A tibble from summarise_adoption()}
 }
 \value{
-A tibble with one row per label and outcome stats
-
 A data frame with group means of success and steps
 }
 \description{
-Summarize trial-level outcomes by label
-}
-\examples{
-trial_summary <- summarise_by_label(summary)
-print(trial_summary)
 Summarise trials by metadata fields
-
 }
