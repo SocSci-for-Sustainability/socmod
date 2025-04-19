@@ -4,16 +4,16 @@
 \alias{run_trials}
 \title{Run multiple trials with a model generator}
 \usage{
-run_trials(n, model_generator, label = NULL, ...)
+run_trials(n_trials, model_generator, ...)
 }
 \arguments{
-\item{n}{Number of trials}
-
 \item{model_generator}{A function that returns a fresh AgentBasedModel}
 
-\item{label}{Optional label to attach to each trial}
-
 \item{...}{Additional arguments passed to each run_trial()}
+
+\item{n}{Number of trials}
+
+\item{label}{Optional label to attach to each trial}
 }
 \value{
 A list of Trial objects

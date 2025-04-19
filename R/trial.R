@@ -257,7 +257,7 @@ run_trial <- function(model,
 #'   AgentBasedModel$new(agents = agents, graph = net)
 #' }
 #' trials <- run_trials(3, gen, label = "success", stop = 10)
-run_trials <- function(n_trials, model_generator,  = NULL, ...) {
+run_trials <- function(n_trials, model_generator, ...) {
   purrr::map(seq_len(n_trials), function(i) {
     model <- model_generator()
     run_trial(model, label = label, ...)
@@ -325,7 +325,7 @@ run_trials_grid <- function(n_trials,
     #   iterate = iterate,
     #   stop = stop,
     #   metadata = metadata
-    )
+    
   })
   
   # Currently trials is a list of lists. 

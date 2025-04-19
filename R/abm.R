@@ -201,8 +201,3 @@ make_abm <- function(model_parameters = DEFAULT_PARAMETERS, agents = NULL) {
   )
 }
 
-#' Default parameters to create an agent-based model.
-DEFAULT_PARAMETERS <- model_parameters(learning_strategy = NULL, 
-                                       graph = NULL,
-                                       n_agents = 10,
-                                       auxiliary = list()) 

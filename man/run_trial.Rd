@@ -6,8 +6,9 @@
 \usage{
 run_trial(
   model,
-  partner_selection = success_bias_select_teacher,
+  partner_selection = success_bias_teacher_selection,
   interaction = success_bias_interact,
+  learning_strategy = NULL,
   iterate = iterate_learning_model,
   stop = 50,
   label = NULL,

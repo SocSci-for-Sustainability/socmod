@@ -11,9 +11,10 @@ LearningStrategy <- R6::R6Class(
     #' @param partner_selection Function to select the teacher (or NULL)
     #' @param interaction Function to define the interaction (or NULL)
     #' @param label A string label for this strategy
-    initialize = function(partner_selection, interaction, label) {
+    initialize = function(partner_selection, interaction, model_step, label) {
       private$.partner_selection <- partner_selection
       private$.interaction <- interaction
+      private$.model_step <- model_step
       private$.label <- label
     },
     
@@ -29,6 +30,12 @@ LearningStrategy <- R6::R6Class(
       return (private$.interaction)
     },
     
+    #' @description Get the interaction function
+    #' @return Function
+    get_model_step = function() {
+      return (private$.interaction)
+    },
+    
     #' @description Get the strategy label
     #' @return Character string
     get_label = function() {
@@ -39,6 +46,7 @@ LearningStrategy <- R6::R6Class(
   private = list(
     .partner_selection = NULL,
     .interaction = NULL,
+    .model_step = NULL,
     .label = NULL
   )
 )
@@ -46,25 +54,35 @@ LearningStrategy <- R6::R6Class(
 
 #' Factory function for creating a LearningStrategy
 #'
-#' @param partner_selection A function to select a teacher (or NULL)
-#' @param interaction A function defining interaction (or NULL)
-#' @param label A string label for this strategy
+#' @param partner_selection Function to select a partner for any `focal_agent` in the `model`.
+#' @param interaction Function for interaction between any `focal_agent` and `partner` in the `model`.
+#' @param model_step Step function for `model` run after all agents select partner and interact.
+#' @param label Character label for this strategy.
 #'
-#' @return A `LearningStrategy` instance
-#' @export
+#' @return A `LearningStrategy` instance containing social update functions and a metadata-friendly label.
 #'
 #' @examples
-#' s <- make_learning_strategy(
+#' success_bias_strategy <- make_learning_strategy(
 #'   partner_selection = success_bias_select_teacher,
 #'   interaction = success_bias_interact,
 #'   label = "Success-biased"
 #' )
-make_learning_strategy <- function(partner_selection, interaction, label) {
+#' # Mock a partner selection, interaction, and model step to show custom use.
+#' mock_selection <- function (focal_agent) NULL
+#' mock_interaction <- function (focal_agent, partner, model) NULL
+#' mock_model_step <- function (model) NULL
+#' mock_strategy <- make_learning_strategy(mock_selection, mock_interaction,
+#'                                         mock_model_step, label = "mock")
+#' # Note make_learning_strategy wraps the R6 class constructor:
+#' mock_strategy_2 <- LearningStrategy$new(mock_selection, mock_interaction,
+#'                                         mock_model_step, mock_strategy) 
+#' 
+#' @export
+make_learning_strategy <- function(partner_selection, interaction, 
+                                   model_step = NULL, label = "unlabelled") {
   return (
     LearningStrategy$new(
-      partner_selection = partner_selection,
-      interaction = interaction,
-      label = label
+      partner_selection, interaction, model_step, label
     )
   )
 }
@@ -105,6 +123,7 @@ iterate_learning_model <- function(model) {
 #' @export
 frequency_bias_select_teacher <- function(agent, model) { return (NULL) }
 
+
 #' Interaction function for frequency-biased adaptive learning.
 #'
 #' @param learner Agent currently selected as learner.
@@ -114,6 +133,7 @@ frequency_bias_select_teacher <- function(agent, model) { return (NULL) }
 #' @export
 frequency_bias_interact <- function(learner, ., model) {
   
+
   # If learner is not stubborn (i.e., receptive) this round, 
   # skip social learning.
   stubbornness <- learner$get_attribute("stubbornness")
@@ -215,6 +235,7 @@ contagion_partner_selection <- function(learner, model) {
   return (learner$get_neighbors()$sample(1))
 }
 
+
 #' @title Contagion-based interaction
 #' @description Updates learner behavior based on interaction with an Adaptive neighbor.
 #' @param learner An Agent instance.
@@ -241,6 +262,7 @@ contagion_interaction <- function(learner, teacher, model) {
   }
 }
 
+
 #' @title Contagion model step
 #' @description Updates all agents for dropping behavior and advances model state.
 #' @param model An AgentBasedModel instance with parameter "drop_rate".
@@ -263,3 +285,30 @@ contagion_model_step <- function(model) {
   
   iterate_learning_model(model)
 }
+
+
+#' Define success-biased learning strategy.
+#'
+#' @export
+success_bias_learning_strategy <- make_learning_strategy(
+  success_bias_select_teacher, success_bias_interact, 
+  label = "Success-biased"
+)
+
+
+#' Define frequency-biased learning strategy.
+#'
+#' @export
+frequency_bias_learning_strategy <- make_learning_strategy(
+  frequency_bias_select_teacher, frequency_bias_interact, 
+  label = "Frequency-biased"
+)
+
+
+#' Define contagion learning "strategy".
+#'
+#' @export
+contagion_learning_strategy <- make_learning_strategy(
+  contagion_partner_selection, contagion_interaction, 
+  contagion_model_step, label = "Contagion"
+)

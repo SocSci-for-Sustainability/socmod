@@ -52,8 +52,16 @@ ModelParameters <- R6::R6Class(
 model_parameters <- function(learning_strategy = NULL, 
                              graph = NULL,
                              n_agents = NULL,
-                             auxiliary = list())   {
+                             ...)   {
+  auxiliary <- list(...)
   return (
     ModelParameters$new(learning_strategy, graph, n_agents, auxiliary)  
   )
 }
+
+
+#' Default parameters to create an agent-based model.
+DEFAULT_PARAMETERS <- model_parameters(learning_strategy = NULL, 
+                                       graph = NULL,
+                                       n_agents = 10,
+                                       auxiliary = list()) 
