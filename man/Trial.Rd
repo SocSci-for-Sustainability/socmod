@@ -32,14 +32,7 @@ measures such as adaptation success and steps to fixation.
 \subsection{Method \code{new()}}{
 Initialize a Trial with a model and functions
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Trial$new(
-  model,
-  partner_selection = NULL,
-  interaction,
-  iterate = NULL,
-  label = NULL,
-  metadata = list()
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Trial$new(model, metadata = list())}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

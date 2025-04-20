@@ -12,11 +12,12 @@ Trial <- R6::R6Class(
     model = NULL,
     observations = NULL,
     outcomes = NULL,
-    partner_selection = NULL,
-    interaction = NULL,
-    iterate = NULL,
-    label = NULL,
     metadata = list(),
+    # partner_selection = NULL,
+    # interaction = NULL,
+    # iterate = NULL,
+    # label = NULL,
+    
     
     #' @description Initialize a Trial with a model and functions
     #' @param model An AgentBasedModel instance
@@ -24,26 +25,31 @@ Trial <- R6::R6Class(
     #' @param interaction Function defining interaction logic
     #' @param iterate Optional iteration update function
     #' @param label Optional character label for trial group
-    initialize = function(model, 
-                          partner_selection = NULL, 
-                          interaction, iterate = NULL, 
-                          label = NULL, metadata = list()) {
+    initialize = function(model, metadata = list()) {
+
+      # Sync internal variables with user-provided.
       self$model <- model
-      self$partner_selection <- partner_selection
-      self$interaction <- interaction
-      self$iterate <- iterate
-      self$label <- label
       self$metadata <- metadata
+
+      # Initialize outputs: observations and outcomes.
       self$observations <- tibble::tibble()
       self$outcomes <- list()
+
+      invisible (self)
     },
     
     #' @description Run the model and collect results
     #' @param stop Either integer for max steps, or predicate function
-    #' @param target_behavior The behavior treated as "adaptation success"
-    run = function(stop = 50, target_behavior = "Adaptive") {
+    #' @param legacy_behavior The maladaptive behavior treated as "adaptation failure"
+    #' @param adaptive_behavior The behavior treated as "adaptation success"
+    run = function(stop = 50, legacy_behavior = "Legacy", adaptive_behavior = "Adaptive") {
+      
       step <- 0
-      # Record t = 0 before any updates
+
+      self$model$set_parameter("legacy_behavior", legacy_behavior)
+      self$model$set_parameter("adaptive_behavior", adaptive_behavior)
+      
+      # Record t = 0 before any updates.
       self$observations <- dplyr::bind_rows(
         self$observations,
         tibble::tibble(
@@ -73,24 +79,37 @@ Trial <- R6::R6Class(
         )
       )
       
+      # Get learning and iteration functions from the model's
+      # learning strategy.
+      lstrat <- self$model$get_parameter("learning_strategy")
+      partner_selection <- lstrat$get_partner_selection()
+      interaction <- lstrat$get_interaction()
+      model_step <- lstrat$get_model_step()
+
+      # Main iteration loop.
       while (TRUE) {
         
         step <- step + 1
         
+        # Partner selection and interaction with selected partner.
         for (agent in self$model$agents) {
-          teacher <- NULL
-          if (!is.null(self$partner_selection)) {
-            teacher <- self$partner_selection(agent, self$model)
+          partner <- NULL
+          if (!is.null(partner_selection)) {
+            partner <- partner_selection(agent, self$model)
           }
-          self$interaction(agent, teacher, self$model)
+          interaction(agent, partner, self$model)
         }
         
-        if (!is.null(self$iterate)) {
-          self$iterate(self$model)
+        # Run model step function if provided.
+        if (!is.null(model_step)) {
+          model_step(self$model)
         }
         
+        # Update observations. 
         self$observations <- dplyr::bind_rows(
+          
           self$observations,
+          
           tibble::tibble(
             t = step,
             agent = unlist(
@@ -116,8 +135,9 @@ Trial <- R6::R6Class(
             ),
             label = self$label
           )
-        )
+        ) # End observation update.
         
+        # Stop when stop function returns TRUE or max steps reached.
         if (is.function(stop)) {
           if (stop(self$model)) {
             break
@@ -128,14 +148,19 @@ Trial <- R6::R6Class(
       }
       
       behaviors <- unlist(
-        purrr::map(self$model$agents, \(a) as.character(a$get_behavior())), 
+        purrr::map(
+          self$model$agents, \(a) as.character(a$get_behavior())
+        ), 
         use.names = FALSE
       )
       
       self$outcomes$adaptation_success <- 
-        length(unique(behaviors)) == 1 && unique(behaviors) == target_behavior
+        length(unique(behaviors)) == 1 && 
+          unique(behaviors) == adaptive_behavior
       
       self$outcomes$fixation_steps <- step
+
+      invisible (self)
     },
     
     #' Add or update metadata in a Trial object
@@ -197,7 +222,7 @@ fixated <- function(model) {
 #' @param iterate Optional function for updating model state
 #' @param stop Stopping condition: max steps (int) or predicate function
 #' @param label Optional label to tag the trial (e.g. "success", "frequency")
-#' @param target_behavior The behavior treated as "adaptation success". Default is "Adaptive".
+#' @param adaptive_behavior The behavior treated as "adaptation success". Default is "Adaptive".
 #' @return A Trial object
 #' @export
 #' @examples
@@ -209,32 +234,28 @@ fixated <- function(model) {
 #' model <- AgentBasedModel$new(agents = agents, graph = net)
 #' trial <- run_trial(model, stop = 10)
 run_trial <- function(model,
-                      partner_selection = success_bias_teacher_selection,
-                      interaction = success_bias_interact,
-                      learning_strategy = NULL,
-                      iterate = iterate_learning_model,
                       stop = 50,
-                      label = NULL,
-                      target_behavior = "Adaptive",
+                      legacy_behavior = "Legacy",
+                      adaptive_behavior = "Adaptive",
                       metadata = list()) {
   
   # If learning_strategy is not null, add the strategy label to the metadata and
   # override the interaction and partner_selection functions passed as arguments.
-  if (!is.null(learning_strategy)) {
-    metadata$learning_strategy <- learning_strategy$get_label()
-    partner_selection <- learning_strategy$get_partner_selection()
-    interaction <- learning_strategy$get_interaction()
-  }
+  # if (!is.null(model$get_learning_strategy())) {
+  #   metadata$learning_strategy <- learning_strategy$get_label()
+  #   partner_selection <- learning_strategy$get_partner_selection()
+  #   interaction <- learning_strategy$get_interaction()
+  # }
   
   # 
   trial <- Trial$new(
     model = model,
-    partner_selection = partner_selection,
-    interaction = interaction,
-    iterate = iterate,
     metadata = metadata
+  )$run(
+    stop = stop, legacy_behavior = legacy_behavior, 
+    adaptive_behavior = adaptive_behavior
   )
-  trial$run(stop = stop, target_behavior = target_behavior)
+
   return (trial)
 }
 

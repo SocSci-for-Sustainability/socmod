@@ -14,11 +14,12 @@ AgentBasedModel <- R6::R6Class(
     #' @param graph An igraph object (optional)
     #' @param agents A list of Agent objects (optional)
     #' @param n_agents Integer number of agents to create (optional)
-    initialize = function(model_parameters = DefaultParameters, agents = NULL) {
+    initialize = function(model_parameters = DEFAULT_PARAMETERS, 
+                          agents = NULL) {
       
       # Handle logic of setting ABM graph to user-provided, or create 
       # a fully-connected one with `n_agents` vertices.
-      
+      #
       # First create a short-name variable for parameters.
       if (!is.null(model_parameters)) {
         assert_that(
@@ -48,7 +49,6 @@ AgentBasedModel <- R6::R6Class(
       
       # Initialize model parameters, stored as key-value list.
       # private$.parameters <- model_parameters
-      
       if (is.null(igraph::V(self$graph)$name)) {
         igraph::V(self$graph)$name <- 
           paste0("a", seq_len(igraph::vcount(self$graph)))
@@ -75,6 +75,7 @@ AgentBasedModel <- R6::R6Class(
 
         legacy_fitness <- model_parameters$as_list()$legacy_fitness
 
+        # Set default legacy_fitness (seems like this should be in DEFAULT_PARAMETERS).
         if (is.null(legacy_fitness)) {
           legacy_fitness <- 1.0
         }
@@ -102,23 +103,39 @@ AgentBasedModel <- R6::R6Class(
     #' @description Synchronize agent and network fields
     #' @param direction "to_graph", "from_graph", or "neighbors_only"
     sync_network = function(direction = c("to_graph", "from_graph", "neighbors_only")) {
+      
       direction <- match.arg(direction)
+      
       for (agent in self$agents) {
         vname <- agent$get_name()
+        
         if (direction == "from_graph") {
+          
           igv <- igraph::V(self$graph)
           agent$set_name(igv[vname]$name)
           agent$set_behavior(igv[vname]$behavior_current)
           agent$set_next_behavior(igv[vname]$behavior_next)
           agent$set_fitness(igv[vname]$fitness_current)
           agent$set_next_fitness(igv[vname]$fitness_next)
+          
         } else if (direction == "to_graph") {
+          
           # Ensure graph vertex names match agent names before syncing
           igraph::V(self$graph)$name <- names(self$agents)
           vid <- agent$get_id()
-          self$graph <- igraph::set_vertex_attr(self$graph, "behavior_current", index = vid, value = agent$get_behavior())
-          self$graph <- igraph::set_vertex_attr(self$graph, "behavior_next",    index = vid, value = agent$get_next_behavior())
-          self$graph <- igraph::set_vertex_attr(self$graph, "fitness_current",  index = vid, value = agent$get_fitness())
+          self$graph <- igraph::set_vertex_attr(
+            self$graph, "behavior_current", index = vid, value = agent$get_behavior()
+          )
+          self$graph <- igraph::set_vertex_attr(
+            self$graph,
+            "behavior_next",
+            index = vid,
+            value = agent$get_next_behavior()
+          )
+          self$graph <- igraph::set_vertex_attr(
+            self$graph, "fitness_current", index = vid, 
+            value = agent$get_fitness()
+          )
           self$graph <- igraph::set_vertex_attr(
             self$graph, "fitness_next", 
             index = vid, 
@@ -131,10 +148,12 @@ AgentBasedModel <- R6::R6Class(
         for (agent in self$agents) {
 
           nbr_ids <- igraph::neighbors(self$graph, v = agent$get_name())
+          
           neighbors <- purrr::map(
             nbr_ids,
             \(v) self$get_agent(igraph::V(self$graph)[v]$name)
           )
+          
           agent$set_neighbors(Neighbors$new(neighbors))
         }
       }

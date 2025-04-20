@@ -33,7 +33,7 @@ LearningStrategy <- R6::R6Class(
     #' @description Get the interaction function
     #' @return Function
     get_model_step = function() {
-      return (private$.interaction)
+      return (private$.model_step)
     },
     
     #' @description Get the strategy label
@@ -254,21 +254,24 @@ contagion_partner_selection <- function(learner, model) {
 contagion_interaction <- function(learner, teacher, model) {
 
   # Extract adoption rate from the 
-  mps <- model$get_parameters()
-  adoption_rate <- mps$adoption_rate
-  adaptive_fitness <- mps$adaptive_fitness
+  adoption_rate <- model$get_parameter("adoption_rate")
+  legacy_behavior <- model$get_parameter("legacy_behavior")
+  adaptive_behavior <- model$get_parameter("adaptive_behavior")
 
   assertthat::assert_that(
     !is.null(adoption_rate), 
-    "Auxiliary model parameter adopt_rate must be defined for contagion interaction."
+    msg = "Auxiliary model parameter adopt_rate must be defined for contagion interaction."
   )
+  # assertthat::assert_that(
+  #   FALSE, 
+  #   msg = "Auxiliary model parameter adopt_rate must be defined for contagion interaction."
+  # )
 
-  if ((learner$get_behavior() == "Legacy") && 
-      (teacher$get_behavior() == "Adaptive") && 
+  if ((learner$get_behavior() == legacy_behavior) && 
+      (teacher$get_behavior() == adaptive_behavior) && 
       (runif(1) < adoption_rate)) {
     
-    learner$set_next_behavior("Adaptive")
-    learner$set_next_fitness(adaptive_fitness)
+    learner$set_next_behavior(adaptive_behavior)
   }
 }
 
@@ -278,26 +281,19 @@ contagion_interaction <- function(learner, teacher, model) {
 #' @description Updates all agents for dropping behavior and advances model state.
 #' @param model An AgentBasedModel instance with parameter "drop_rate".
 #' @return None. Updates agent behaviors.
-#' @examples
-#' model_parameters <- make_model_parameters(
-#'   learning_strategy = contagion_learning_strategy,
-#'   n_agents = 10, adoption_rate = 0.5, drop_rate = 0.2
-#' )
-#' model <- make_abm(
-#' contagion_model_step(model)
 #' @export
 contagion_model_step <- function(model) {
 
-  mps <- model$get_parameters()
-  drop_rate <- mps$drop_rate
-  legacy_fitness <- mps$legacy_fitness
+  # mps <- model$get_parameters()
+  drop_rate <- model$get_parameter("drop_rate")
+  legacy_behavior <- model$get_parameter("legacy_behavior")
+  adaptive_behavior <- model$get_parameter("adaptive_behavior")
 
   if (!is.null(drop_rate) && (drop_rate > 0)) {
     for (i in seq_along(model$agents)) {
       agent <- model$get_agent(i)
-      if ((agent$get_behavior() == "Adaptive") && (runif(1) < drop_rate)) {
-        agent$set_next_behavior("Legacy")
-        agent$set_next_fitness(legacy_fitness)
+      if ((agent$get_behavior() == adaptive_behavior) && (runif(1) < drop_rate)) {
+        agent$set_next_behavior(legacy_behavior)
       }
     }
   }

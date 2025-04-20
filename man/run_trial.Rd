@@ -4,20 +4,14 @@
 \alias{run_trial}
 \title{Run a Trial on an AgentBasedModel with standard learning loop}
 \usage{
-run_trial(
-  model,
-  partner_selection = success_bias_teacher_selection,
-  interaction = success_bias_interact,
-  learning_strategy = NULL,
-  iterate = iterate_learning_model,
-  stop = 50,
-  label = NULL,
-  target_behavior = "Adaptive",
-  metadata = list()
-)
+run_trial(model, stop = 50, target_behavior = "Adaptive", metadata = list())
 }
 \arguments{
 \item{model}{An AgentBasedModel}
+
+\item{stop}{Stopping condition: max steps (int) or predicate function}
+
+\item{target_behavior}{The behavior treated as "adaptation success". Default is "Adaptive".}
 
 \item{partner_selection}{Function for selecting interaction partner}
 
@@ -25,11 +19,7 @@ run_trial(
 
 \item{iterate}{Optional function for updating model state}
 
-\item{stop}{Stopping condition: max steps (int) or predicate function}
-
 \item{label}{Optional label to tag the trial (e.g. "success", "frequency")}
-
-\item{target_behavior}{The behavior treated as "adaptation success". Default is "Adaptive".}
 }
 \value{
 A Trial object

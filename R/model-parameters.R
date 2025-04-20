@@ -65,9 +65,9 @@ ModelParameters <- R6::R6Class(
 #' Wrapper for initializing new ModelParameters instance.
 #' @export
 make_model_parameters <- function(learning_strategy = NULL, 
-                             graph = NULL,
-                             n_agents = NULL,
-                             ...)   {
+                                  graph = NULL,
+                                  n_agents = NULL,
+                                  ...)   {
   return (
     ModelParameters$new(learning_strategy, graph, n_agents, list(...))  
   )
@@ -75,7 +75,6 @@ make_model_parameters <- function(learning_strategy = NULL,
 
 
 #' Default parameters to create an agent-based model.
-DEFAULT_PARAMETERS <- make_model_parameters(learning_strategy = NULL, 
-                                       graph = NULL,
-                                       n_agents = 10,
-                                       auxiliary = list()) 
+DEFAULT_PARAMETERS <- make_model_parameters(
+  learning_strategy = NULL, graph = NULL, n_agents = 10, auxiliary = list()
+) 
