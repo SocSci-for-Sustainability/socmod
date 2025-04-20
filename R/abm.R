@@ -91,7 +91,6 @@ AgentBasedModel <- R6::R6Class(
           )
         
         names(self$agents) <- purrr::map_chr(self$agents, \(a) a$get_name())
-        
         self$sync_network("to_graph")
         self$sync_network("from_graph")
       }

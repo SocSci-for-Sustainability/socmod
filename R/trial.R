@@ -214,7 +214,7 @@ fixated <- function(model) {
 }
 
 
-#' Run a Trial on an AgentBasedModel with standard learning loop
+#' Trial runner helper function
 #'
 #' @param model An AgentBasedModel
 #' @param partner_selection Function for selecting interaction partner
@@ -248,15 +248,14 @@ run_trial <- function(model,
   # }
   
   # 
-  trial <- Trial$new(
-    model = model,
-    metadata = metadata
-  )$run(
-    stop = stop, legacy_behavior = legacy_behavior, 
-    adaptive_behavior = adaptive_behavior
-  )
+  
 
-  return (trial)
+  return (
+    Trial$new(model = model, metadata = metadata)$run(
+        stop = stop, legacy_behavior = legacy_behavior, 
+        adaptive_behavior = adaptive_behavior
+      )
+  )
 }
 
 
@@ -301,46 +300,35 @@ run_trials <- function(n_trials, model_generator, ...) {
 #'
 #' @return A list of Trial objects 
 #' @export
-run_trials_grid <- function(n_trials_per_param,
-                            model_generator,
-                            stop = 10,
-                            learning_strategies = NULL,
-                            auxlilary_parameters = list(),
-                            partner_selection = 
-                              success_biased_teacher_selection,
-                            interaction = success_biased_interaction,
-                            model_iterate = iterate_learning_model) {
-  
-  # Set up learning_strategies and include in model_parameters if given.
-  if (!is.null(learning_strategies)){
-    # If learning_strategies is a singleton, put it in a list for crossing.
-    if (inherits(learning_strategies, "LearningStrategy")) {
-      learning_strategies <- list(LearningStrategy = learning_strategies)
-    } else {
-        # Otherwise first check that it's a list, stop if it's not.
-        assertthat::assert_that(
-          is.list(learning_strategies),
-          msg = "learning_strategies must be a single LearningStrategy instance or a list of LearningStrategy instances."
-        )
-    }
-    
-    model_parameters$LearningStrategy <- learning_strategies
-  }
-  
+run_trials_grid <- function(model_generator, n_trials_per_param = 10,
+                            stop = 10, ...) {
+  auxiliary_parameters <- list(...)
   # Initialize dataframe where each row is a set of model parameters.
-  parameter_grid <- tidyr::crossing(!!!model_parameters)
-  parameter_grid$id <- 1:nrow(parameter_grid)
+  model_parameters <- c(auxiliary_parameters, 
+                        list(replication_id = 1:(n_trials_per_param)))
   
+  parameter_grid <- tidyr::crossing(!!!model_parameters)
+  
+  legacy_behavior <- "Legacy"
+  adaptive_behavior <- "Adaptive"
+  if ("legacy_behavior" %in% auxiliary_parameters) {
+    legacy_behavior <- auxiliary_parameters$legacy_behavior
+  }
+  if ("adaptive_behavior" %in% auxiliary_parameters) {
+    adaptive_behavior <- auxiliary_parameters$adaptive_behavior
+  }
   # Create a list of trials 
   trials <- purrr::pmap(parameter_grid, function(...) {
     run_trial(
-      model = model_generator(model_parameters),
-      id = id
+      model_generator(model_parameters), stop, 
+      legacy_behavior, adaptive_behavior 
     )
   })
   
   # # Currently trials is a list of lists. 
   # return (purrr::flatten(trials))
+
+  return (trials)
 }
 
 
