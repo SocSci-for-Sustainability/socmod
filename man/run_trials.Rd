@@ -2,33 +2,53 @@
 % Please edit documentation in R/trial.R
 \name{run_trials}
 \alias{run_trials}
-\title{Run multiple trials with a model generator}
+\title{Run a grid of trial ensembles with parameter metadata}
 \usage{
-run_trials(n_trials, model_generator, ...)
+run_trials(
+  model_generator,
+  n_trials_per_param = 10,
+  stop = 10,
+  .progress = TRUE,
+  syncfile = NULL,
+  ...
+)
 }
 \arguments{
-\item{model_generator}{A function that returns a fresh AgentBasedModel}
+\item{model_generator}{Function that returns a new AgentBasedModel instance according to model_parameters, a named list of parameter label-value pairs.}
 
-\item{...}{Additional arguments passed to each run_trial()}
+\item{n_trials_per_param}{Number of trials per parameter combination.}
 
-\item{n}{Number of trials}
+\item{stop}{Stopping condition (number or function).}
 
-\item{label}{Optional label to attach to each trial}
+\item{.progress}{Whether to show progressbar when running the trials.}
+
+\item{...}{List of parameter label-value pairs; vector or singleton values.}
 }
 \value{
 A list of Trial objects
 }
 \description{
-Run multiple trials with a model generator
+Runs trial ensembles across a parameter grid. All scalar and function-valued parameters
+used in model construction or trial dynamics are included in metadata for transparency.
 }
 \examples{
-gen <- function() {
-  agents <- list(
-    Agent$new(name = "1", behavior = "Legacy", fitness = 1),
-    Agent$new(name = "2", behavior = "Adaptive", fitness = 4)
+agents = c(Agent$new(1), Agent$new(2))
+mod_gen <- function(mparam_list) { 
+  return (
+    make_abm(
+      make_model_parameters(
+        # The first three positional ModelParameters fields go first.
+        success_biased_learning_strategy, graph,
+        # Then any auxiliary label-value pairs may be flexibly added here.
+        adaptive_fitness = mparam_list$adaptive_fitness
+      ), 
+      agents = agents
+    )
   )
-  net <- igraph::make_graph(~ 1-2)
-  AgentBasedModel$new(agents = agents, graph = net)
 }
-trials <- run_trials(3, gen, label = "success", stop = 10)
+# Run 2 trials per parameter setting, stopping after 10 time steps. 
+trials <- run_trials_grid(mod_gen, n_trials_per_param = 2, stop = 10,
+  learning_strategy = success_bias_learning_strategy,
+  adaptive_fitness = c(0.8, 1.0, 1.2)
+)  # With this we'll have six total trials, two for each adaptive_fitness.
 }

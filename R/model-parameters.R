@@ -3,7 +3,7 @@ ModelParameters <- R6::R6Class(
   "ModelParameters",
   
   public = list(
-    initialize = function(learning_strategy = success_biased_strategy, 
+    initialize = function(learning_strategy = success_bias_strategy, 
                           graph = NULL, n_agents = NULL,
                           auxiliary = list()) {
       private$.learning_strategy <- learning_strategy
@@ -63,6 +63,14 @@ ModelParameters <- R6::R6Class(
 
 
 #' Wrapper for initializing new ModelParameters instance.
+#' 
+#' @param learning_strategy Learning strategy to use; must be type LearningStrategy
+#' @param graph Graph object to use; must inherit igraph
+#' @param n_agents Number of agents in the model
+#' @param ... Additional model parameters
+#' @examples
+#' # example code
+#' 
 #' @export
 make_model_parameters <- function(learning_strategy = NULL, 
                                   graph = NULL,

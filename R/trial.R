@@ -13,18 +13,10 @@ Trial <- R6::R6Class(
     observations = NULL,
     outcomes = NULL,
     metadata = list(),
-    # partner_selection = NULL,
-    # interaction = NULL,
-    # iterate = NULL,
-    # label = NULL,
-    
     
     #' @description Initialize a Trial with a model and functions
     #' @param model An AgentBasedModel instance
-    #' @param partner_selection Optional partner selection function
-    #' @param interaction Function defining interaction logic
-    #' @param iterate Optional iteration update function
-    #' @param label Optional character label for trial group
+    #' @param metadata Label-value metadata store for trial information
     initialize = function(model, metadata = list()) {
 
       # Sync internal variables with user-provided.
@@ -42,7 +34,8 @@ Trial <- R6::R6Class(
     #' @param stop Either integer for max steps, or predicate function
     #' @param legacy_behavior The maladaptive behavior treated as "adaptation failure"
     #' @param adaptive_behavior The behavior treated as "adaptation success"
-    run = function(stop = 50, legacy_behavior = "Legacy", adaptive_behavior = "Adaptive") {
+    run = function(
+        stop = 50, legacy_behavior = "Legacy", adaptive_behavior = "Adaptive") {
       
       step <- 0
 
@@ -79,8 +72,7 @@ Trial <- R6::R6Class(
         )
       )
       
-      # Get learning and iteration functions from the model's
-      # learning strategy.
+      # Get learning and iteration functions from the model's learning strategy.
       lstrat <- self$model$get_parameter("learning_strategy")
       partner_selection <- lstrat$get_partner_selection()
       interaction <- lstrat$get_interaction()
@@ -203,7 +195,13 @@ Trial <- R6::R6Class(
 #' @return TRUE if all agents have the same behavior
 #' @export
 #' @examples
-#' # fixated(model) — typically used as a stopping rule in Trial$run(stop = fixated)
+#' agents <- list(
+#'   Agent$new(name = "1", behavior = "Legacy", fitness = 1),
+#'   Agent$new(name = "2", behavior = "Adaptive", fitness = 4)
+#' )
+#' net <- igraph::make_graph(~ 1-2)
+#' model <- AgentBasedModel$new(agents = agents, graph = net)
+#' trial <- run_trial(model, stop = fixated) # <- "stop trial when fixated"
 fixated <- function(model) {
   behaviors <- unlist(
     purrr::map(model$agents, 
@@ -217,14 +215,10 @@ fixated <- function(model) {
 #' Trial runner helper function
 #'
 #' @param model An AgentBasedModel
-#' @param partner_selection Function for selecting interaction partner
-#' @param interaction Function for modifying agents based on partner
-#' @param iterate Optional function for updating model state
 #' @param stop Stopping condition: max steps (int) or predicate function
-#' @param label Optional label to tag the trial (e.g. "success", "frequency")
+#' @param adaptive_behavior The behavior treated as "adaptation success". Default is "Adaptive".
 #' @param adaptive_behavior The behavior treated as "adaptation success". Default is "Adaptive".
 #' @return A Trial object
-#' @export
 #' @examples
 #' agents <- list(
 #'   Agent$new(name = "1", behavior = "Legacy", fitness = 1),
@@ -233,23 +227,14 @@ fixated <- function(model) {
 #' net <- igraph::make_graph(~ 1-2)
 #' model <- AgentBasedModel$new(agents = agents, graph = net)
 #' trial <- run_trial(model, stop = 10)
+#' @export
 run_trial <- function(model,
                       stop = 50,
                       legacy_behavior = "Legacy",
                       adaptive_behavior = "Adaptive",
                       metadata = list()) {
   
-  # If learning_strategy is not null, add the strategy label to the metadata and
-  # override the interaction and partner_selection functions passed as arguments.
-  # if (!is.null(model$get_learning_strategy())) {
-  #   metadata$learning_strategy <- learning_strategy$get_label()
-  #   partner_selection <- learning_strategy$get_partner_selection()
-  #   interaction <- learning_strategy$get_interaction()
-  # }
-  
-  # 
-  
-
+  # Initialize, run, and return a new Trial object.
   return (
     Trial$new(model = model, metadata = metadata)$run(
         stop = stop, legacy_behavior = legacy_behavior, 
@@ -259,74 +244,68 @@ run_trial <- function(model,
 }
 
 
-#' Run multiple trials with a model generator
-#'
-#' @param n Number of trials
-#' @param model_generator A function that returns a fresh AgentBasedModel
-#' @param label Optional label to attach to each trial
-#' @param ... Additional arguments passed to each run_trial()
-#' @return A list of Trial objects
-#' @export
-#' @examples
-#' gen <- function() {
-#'   agents <- list(
-#'     Agent$new(name = "1", behavior = "Legacy", fitness = 1),
-#'     Agent$new(name = "2", behavior = "Adaptive", fitness = 4)
-#'   )
-#'   net <- igraph::make_graph(~ 1-2)
-#'   AgentBasedModel$new(agents = agents, graph = net)
-#' }
-#' trials <- run_trials(3, gen, label = "success", stop = 10)
-run_trials <- function(n_trials, model_generator, ...) {
-  purrr::map(seq_len(n_trials), function(i) {
-    model <- model_generator()
-    run_trial(model, label = label, ...)
-  })
-}
-
-
 #' Run a grid of trial ensembles with parameter metadata
 #'
 #' Runs trial ensembles across a parameter grid. All scalar and function-valued parameters
 #' used in model construction or trial dynamics are included in metadata for transparency.
-#'
+#' @param model_generator Function that returns a new AgentBasedModel instance according to model_parameters, a named list of parameter label-value pairs.
 #' @param n_trials_per_param Number of trials per parameter combination.
-#' @param model_generator Returns a new AgentBasedModel instance according to model_parameters.
 #' @param stop Stopping condition (number or function).
-#' 
-#' @param partner_selection Function or list of functions to select learning partners.
-#' @param interaction Function or list of functions to apply during agent interaction.
-#' @param model_iterate Function to iterate the model.
+#' @param .progress Whether to show progressbar when running the trials.
+#' @param ... List of parameter label-value pairs; vector or singleton values.
 #'
 #' @return A list of Trial objects 
+#' @examples
+#' agents = c(Agent$new(1), Agent$new(2))
+#' mod_gen <- function(mparam_list) { 
+#'   return (
+#'     make_abm(
+#'       make_model_parameters(
+#'         # The first three positional ModelParameters fields go first.
+#'         success_biased_learning_strategy, graph,
+#'         # Then any auxiliary label-value pairs may be flexibly added here.
+#'         adaptive_fitness = mparam_list$adaptive_fitness
+#'       ), 
+#'       agents = agents
+#'     )
+#'   )
+#' }
+#' # Run 2 trials per parameter setting, stopping after 10 time steps. 
+#' trials <- run_trials_grid(mod_gen, n_trials_per_param = 2, stop = 10,
+#'   learning_strategy = success_bias_learning_strategy,
+#'   adaptive_fitness = c(0.8, 1.0, 1.2)
+#' )  # With this we'll have six total trials, two for each adaptive_fitness.
 #' @export
-run_trials_grid <- function(model_generator, n_trials_per_param = 10,
-                            stop = 10, ...) {
-  auxiliary_parameters <- list(...)
+run_trials <- function(model_generator, n_trials_per_param = 10,
+                            stop = 10, .progress = TRUE, syncfile = NULL, ...) {
+  
   # Initialize dataframe where each row is a set of model parameters.
-  model_parameters <- c(auxiliary_parameters, 
+  model_parameters <- c(list(...), 
                         list(replication_id = 1:(n_trials_per_param)))
   
   parameter_grid <- tidyr::crossing(!!!model_parameters)
   
   legacy_behavior <- "Legacy"
   adaptive_behavior <- "Adaptive"
-  if ("legacy_behavior" %in% auxiliary_parameters) {
-    legacy_behavior <- auxiliary_parameters$legacy_behavior
+  if ("legacy_behavior" %in% model_parameters) {
+    legacy_behavior <- model_parameters$legacy_behavior
   }
-  if ("adaptive_behavior" %in% auxiliary_parameters) {
-    adaptive_behavior <- auxiliary_parameters$adaptive_behavior
+  if ("adaptive_behavior" %in% model_parameters) {
+    adaptive_behavior <- model_parameters$adaptive_behavior
   }
-  # Create a list of trials 
-  trials <- purrr::pmap(parameter_grid, function(...) {
-    run_trial(
-      model_generator(model_parameters), stop, 
-      legacy_behavior, adaptive_behavior 
-    )
-  })
-  
-  # # Currently trials is a list of lists. 
-  # return (purrr::flatten(trials))
+
+  # Create a list of trials, each trial initialized with . 
+  trials <- purrr::pmap(
+    parameter_grid, function(...) {
+      param_row <- list(...)
+      model <- model_generator(param_row)
+      run_trial( 
+        model, stop, legacy_behavior, adaptive_behavior, 
+        metadata = list(replication_id = param_row$replication_id)
+      )
+    }, 
+    .progress = .progress
+  )
 
   return (trials)
 }
@@ -346,7 +325,9 @@ summarise_adoption <- function(trials, tracked_behaviors = NULL) {
     if (!is.null(tracked_behaviors)) {
       obs <- dplyr::filter(obs, Behavior %in% tracked_behaviors)
     }
+    
     label <- trial$get_label()
+    
     dplyr::group_by(obs, t, Behavior) %>%
       dplyr::summarise(count = dplyr::n(), .groups = "drop") %>%
       dplyr::mutate(
@@ -367,11 +348,16 @@ summarise_adoption <- function(trials, tracked_behaviors = NULL) {
 #' @return A data frame with group means of success and steps
 #' @export
 summarise_by_metadata <- function(trials, fields) {
+  
   df <- purrr::map_dfr(trials, function(trial) {
-    row <- as.list(trial$metadata[fields])
+    row <- as.list(trial$model$get_parameters()[fields])
+    # Convert learning_strategy parameter to its label.
+    if ("learning_strategy" %in% names(row)) {
+      row$learning_strategy <- row$learning_strategy$get_label()
+    }
     row$adaptation_success <- 
       trial$get_outcomes()$adaptation_success
-    row$fixation_steps <- trial$outcomes$fixation_steps
+    row$fixation_steps <- trial$get_outcomes()$fixation_steps
     tibble::as_tibble(row)
   })
   

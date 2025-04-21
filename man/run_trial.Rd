@@ -2,30 +2,28 @@
 % Please edit documentation in R/trial.R
 \name{run_trial}
 \alias{run_trial}
-\title{Run a Trial on an AgentBasedModel with standard learning loop}
+\title{Trial runner helper function}
 \usage{
-run_trial(model, stop = 50, target_behavior = "Adaptive", metadata = list())
+run_trial(
+  model,
+  stop = 50,
+  legacy_behavior = "Legacy",
+  adaptive_behavior = "Adaptive",
+  metadata = list()
+)
 }
 \arguments{
 \item{model}{An AgentBasedModel}
 
 \item{stop}{Stopping condition: max steps (int) or predicate function}
 
-\item{target_behavior}{The behavior treated as "adaptation success". Default is "Adaptive".}
-
-\item{partner_selection}{Function for selecting interaction partner}
-
-\item{interaction}{Function for modifying agents based on partner}
-
-\item{iterate}{Optional function for updating model state}
-
-\item{label}{Optional label to tag the trial (e.g. "success", "frequency")}
+\item{adaptive_behavior}{The behavior treated as "adaptation success". Default is "Adaptive".}
 }
 \value{
 A Trial object
 }
 \description{
-Run a Trial on an AgentBasedModel with standard learning loop
+Trial runner helper function
 }
 \examples{
 agents <- list(

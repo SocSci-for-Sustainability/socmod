@@ -211,16 +211,13 @@ AgentBasedModel <- R6::R6Class(
 )
 
 
-#' Initialize an ensemble of agent-based models.
-#' 
-#' @export
-abm_ensemble <- function(model_parameters_by_variable) {
-  
-}
-
-
 #' @export
 make_abm <- function(model_parameters = DEFAULT_PARAMETERS, agents = NULL) {
+
+  assertthat::assert_that(
+    inherits(model_parameters, "ModelParameters"),
+    msg = "Argument model_parameters must be an instance of class ModelParameters."
+  )
 
   assertthat::assert_that(
     inherits(model_parameters$get_learning_strategy(), "LearningStrategy"),

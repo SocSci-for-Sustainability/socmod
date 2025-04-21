@@ -78,8 +78,10 @@ LearningStrategy <- R6::R6Class(
 #'                                         mock_model_step, mock_strategy) 
 #' 
 #' @export
-make_learning_strategy <- function(partner_selection, interaction, 
-                                   model_step = NULL, label = "unlabelled") {
+make_learning_strategy <- function(partner_selection, 
+                                   interaction, 
+                                   model_step = NULL, 
+                                   label = "unlabelled") {
   return (
     LearningStrategy$new(
       partner_selection, interaction, model_step, label
@@ -114,6 +116,13 @@ iterate_learning_model <- function(model) {
     agent$set_fitness(agent$get_next_fitness())
   }
 }
+
+#' More modern v0.1 alias for iterate_learning_model.
+#' @export
+#' 
+learning_model_step <- iterate_learning_model
+
+
 
 ### ------ FREQUENCY BIAS --------
 
@@ -307,7 +316,7 @@ contagion_model_step <- function(model) {
 #' @export
 success_bias_learning_strategy <- make_learning_strategy(
   success_bias_select_teacher, success_bias_interact, 
-  label = "Success-biased"
+  learning_model_step, label = "Success-biased"
 )
 
 
@@ -316,7 +325,7 @@ success_bias_learning_strategy <- make_learning_strategy(
 #' @export
 frequency_bias_learning_strategy <- make_learning_strategy(
   frequency_bias_select_teacher, frequency_bias_interact, 
-  label = "Frequency-biased"
+  learning_model_step, label = "Frequency-biased"
 )
 
 

@@ -10,35 +10,36 @@ if (requireNamespace("devtools", quietly = TRUE) && dir.exists("../socmod")) {
   library(socmod)
 }
 
-library(dplyr)
-library(purrr)
-library(tidyr)
-library(ggplot2)
-library(igraph)
+# library(dplyr)
+# library(purrr)
+# library(tidyr)
+# library(ggplot2)
+# library(igraph)
 
-# Define learning strategies
-partner_selection <- list(
-  success_bias_select_teacher,
-  frequency_bias_select_teacher
-)
+# Create list of learning strategies to pass as ModelParameters
+learning_strategies <- list(success_bias_learning_strategy,
+                            frequency_bias_learning_strategy)
 
-interaction <- list(
-  success_bias_interact,
-  frequency_bias_interact
-)
+# Check the labels for each learning strategy.
+print(purrr::map(learning_strategies, ~ .x$get_label()))
 
-# Create toy 4-agent ABM
-make_example_learning_abm <- function(adaptive_fitness) {
+# Function to create an example ABM to demo how to compare learning strategies.
+make_example_learning_abm <- function(model_parameters) {
+
   agent_1 <- Agent$new(1, behavior = "Legacy", fitness = 1, name = "1")
-  agent_2 <- Agent$new(2, behavior = "Adaptive", fitness = adaptive_fitness, name = "2")
+  agent_2 <- Agent$new(2, behavior = "Adaptive", 
+                       fitness = adaptive_fitness, name = "2")
   agent_3 <- Agent$new(3, behavior = "Legacy", fitness = 1, name = "3")
   agent_4 <- Agent$new(4, behavior = "Legacy", fitness = 2, name = "4")
   
   agents <- list(agent_1, agent_2, agent_3, agent_4)
-  graph <- make_graph(~ 1-2, 1-3, 1-4, 3-2)
+
+  model_parameters$set_graph(make_graph(~ 1-2, 1-3, 1-4, 3-2))
+
+  # return make_abm(
+
   return (AgentBasedModel$new(agents = agents, graph = graph))
 }
-
 
 # Run trials across strategies and fitness values
 results <- run_trials_grid(

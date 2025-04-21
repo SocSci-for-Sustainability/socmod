@@ -11,6 +11,19 @@ make_model_parameters(
   ...
 )
 }
+\arguments{
+\item{learning_strategy}{Learning strategy to use; must be type LearningStrategy}
+
+\item{graph}{Graph object to use; must inherit igraph}
+
+\item{n_agents}{Number of agents in the model}
+
+\item{...}{Additional model parameters}
+}
 \description{
 Wrapper for initializing new ModelParameters instance.
+}
+\examples{
+# example code
+
 }

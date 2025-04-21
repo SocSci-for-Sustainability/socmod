@@ -40,13 +40,7 @@ Initialize a Trial with a model and functions
 \describe{
 \item{\code{model}}{An AgentBasedModel instance}
 
-\item{\code{partner_selection}}{Optional partner selection function}
-
-\item{\code{interaction}}{Function defining interaction logic}
-
-\item{\code{iterate}}{Optional iteration update function}
-
-\item{\code{label}}{Optional character label for trial group}
+\item{\code{metadata}}{Label-value metadata store for trial information}
 }
 \if{html}{\out{</div>}}
 }
@@ -57,7 +51,11 @@ Initialize a Trial with a model and functions
 \subsection{Method \code{run()}}{
 Run the model and collect results
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Trial$run(stop = 50, target_behavior = "Adaptive")}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Trial$run(
+  stop = 50,
+  legacy_behavior = "Legacy",
+  adaptive_behavior = "Adaptive"
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -65,7 +63,9 @@ Run the model and collect results
 \describe{
 \item{\code{stop}}{Either integer for max steps, or predicate function}
 
-\item{\code{target_behavior}}{The behavior treated as "adaptation success"
+\item{\code{legacy_behavior}}{The maladaptive behavior treated as "adaptation failure"}
+
+\item{\code{adaptive_behavior}}{The behavior treated as "adaptation success"
 Add or update metadata in a Trial object}
 }
 \if{html}{\out{</div>}}
