@@ -7,11 +7,10 @@ reference:
     Create, run, and analyze agent-based models of social behavior in socmod.
   contents: 
   - AgentBasedModel
-  - model_parameters
+  - make_model_parameters
   - DEFAULT_PARAMETERS
-  - summarise_by_metadata
+  - summarise_by_parameters
   - summarise_adoption
-  - abm_ensemble
 - title: Running single model trial or trial ensembles
   desc: |
     The `run_trial()` and `run_trials()` functions use the specified `partner_selection`, `interaction`,  and `iterate_model` functions to specify these dynamics and iterate the `model` (an instance of `socmod::AgentBasedModel`). `fixated` helps us tell when all agents are performing the same behavior, i.e., the population has fixated.
@@ -29,6 +28,7 @@ reference:
   - starts_with("frequency_bias")
   - starts_with("contagion_")
   - ends_with("_learning_strategy")
+  - learning_model_step
 - title: Agents and their neighbors
   desc: |
     Agents in the model are represented by a number of attributes, with select class methods to track lists of their neighbors.

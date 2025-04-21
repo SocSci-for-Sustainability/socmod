@@ -6,6 +6,7 @@ ModelParameters <- R6::R6Class(
     initialize = function(learning_strategy = success_bias_strategy, 
                           graph = NULL, n_agents = NULL,
                           auxiliary = list()) {
+      
       private$.learning_strategy <- learning_strategy
       private$.graph <- graph
       private$.n_agents <- n_agents

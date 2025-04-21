@@ -271,14 +271,25 @@ run_trial <- function(model,
 #'   )
 #' }
 #' # Run 2 trials per parameter setting, stopping after 10 time steps. 
-#' trials <- run_trials_grid(mod_gen, n_trials_per_param = 2, stop = 10,
+#' trials <- run_trials(mod_gen, n_trials_per_param = 2, stop = 10,
 #'   learning_strategy = success_bias_learning_strategy,
 #'   adaptive_fitness = c(0.8, 1.0, 1.2)
 #' )  # With this we'll have six total trials, two for each adaptive_fitness.
 #' @export
 run_trials <- function(model_generator, n_trials_per_param = 10,
-                            stop = 10, .progress = TRUE, syncfile = NULL, ...) {
+                       stop = 10, .progress = TRUE, 
+                       syncfile = NULL, overwrite = FALSE, ...) {
   
+  # Check if syncfile is given...
+  if (!is.null(syncfile)) {
+    # ...and load it if it exists and we aren't overwriting existing.
+    if (file.exists(syncfile) && !overwrite) {
+      cat("\nLoading trials from syncfile:", syncfile, "\n\n")
+      load(syncfile)
+      return (trials)
+    }
+  }
+
   # Initialize dataframe where each row is a set of model parameters.
   model_parameters <- c(list(...), 
                         list(replication_id = 1:(n_trials_per_param)))
@@ -306,6 +317,14 @@ run_trials <- function(model_generator, n_trials_per_param = 10,
     }, 
     .progress = .progress
   )
+
+  # Check if syncfile is given...
+  if (!is.null(syncfile)) {
+    # ...and write if it hasn't been synced or overite is TRUE.
+    if (!file.exists(syncfile) || overwrite) {
+      save(trials, file = syncfile)
+    }
+  }
 
   return (trials)
 }
@@ -347,10 +366,14 @@ summarise_adoption <- function(trials, tracked_behaviors = NULL) {
 #'
 #' @return A data frame with group means of success and steps
 #' @export
-summarise_by_metadata <- function(trials, fields) {
+summarise_by_parameters <- function(trials, 
+                                    input_parameters, 
+                                    outcome_measures = 
+                                      c("success_rate", 
+                                        "mean_fixation_steps")) {
   
   df <- purrr::map_dfr(trials, function(trial) {
-    row <- as.list(trial$model$get_parameters()[fields])
+    row <- as.list(trial$model$get_parameters()[input_parameters])
     # Convert learning_strategy parameter to its label.
     if ("learning_strategy" %in% names(row)) {
       row$learning_strategy <- row$learning_strategy$get_label()
@@ -363,14 +386,37 @@ summarise_by_metadata <- function(trials, fields) {
   
   return (
     df %>%
-      dplyr::group_by(across(all_of(fields))) %>%
+      dplyr::group_by(across(all_of(input_parameters))) %>%
       dplyr::summarise(
         success_rate = mean(adaptation_success),
         mean_fixation_steps = mean(fixation_steps),
         .groups = "drop"
-      )
+      ) %>%
+      tidyr::pivot_longer(outcome_measures, 
+                          names_to = "Measure", values_to = "Value")
   )
 }
+
+#' Plot mean adoption over time averaged across trials.
+ #' @export
+# plot_adoptions(trials, tracked_behaviors = c("Adaptive")) {
+
+#   mean_counts_tbl <- 
+#     purrr::map_df(trials, function(trial) {
+#       trial_obs <- trial$get_observations()
+#       trial_obs$replication_id <- trial$metadata$replication_id
+      
+#       trial_obs <- 
+#         trial_obs %>% 
+#           dplyr::group_by(t, Behavior, replication_id) %>%
+#           dplyr::summarise(count = dplyr::n(), .groups = "drop")
+
+#       }) %>%
+#       dplyr::group_by(t, Behavior) %>%
+#       dplyr::summarise(mean_count, .groups = "drop")
+  
+#   ggplot(mean_counts_tbl, aes(x=t, y=mean_count
+# }
 
 
 #' Plot adoption counts of selected behaviors over time
@@ -390,7 +436,8 @@ plot_adoption <- function(trial, tracked_behaviors = c("Adaptive")) {
     dplyr::group_by(t, Behavior) %>%
     dplyr::summarise(count = dplyr::n(), .groups = "drop")
   
-  ggplot2::ggplot(obs_filtered, ggplot2::aes(x = t, y = count, color = Behavior)) +
+  ggplot2::ggplot(obs_filtered, 
+                  ggplot2::aes(x = t, y = count, color = Behavior)) +
     ggplot2::geom_line(linewidth = 1) +
     ggplot2::xlab("Time step") +
     ggplot2::ylab("Agent count") +
@@ -399,17 +446,17 @@ plot_adoption <- function(trial, tracked_behaviors = c("Adaptive")) {
 }
 
 
-#' Plot a summary of behavior adoption over time across trials
-#'
-#' @param summary_df A tibble from summarise_adoption()
-#' @return A ggplot object
-#' @export
-plot_summary <- function(summary_df) {
-  ggplot2::ggplot(summary_df, ggplot2::aes(x = t, y = count, color = Behavior)) +
-    ggplot2::geom_line(ggplot2::aes(group = interaction(trial, Behavior)), alpha = 0.3) +
-    ggplot2::facet_wrap(~ label) +
-    ggplot2::xlab("Time step") +
-    ggplot2::ylab("Agent count") +
-    ggplot2::theme_minimal() +
-    ggplot2::scale_color_brewer(palette = "Set1")
-}
+# ' Plot a summary of behavior adoption over time across trials
+# '
+# ' @param summary_df A tibble from summarise_adoption()
+# ' @return A ggplot object
+# ' @export
+# plot_summary <- function(summary_df) {
+#   ggplot2::ggplot(summary_df, ggplot2::aes(x = t, y = count, color = Behavior)) +
+#     ggplot2::geom_line(ggplot2::aes(group = interaction(trial, Behavior)), alpha = 0.3) +
+#     ggplot2::facet_wrap(~ label) +
+#     ggplot2::xlab("Time step") +
+#     ggplot2::ylab("Agent count") +
+#     ggplot2::theme_minimal() +
+#     ggplot2::scale_color_brewer(palette = "Set1")
+# }

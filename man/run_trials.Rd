@@ -10,6 +10,7 @@ run_trials(
   stop = 10,
   .progress = TRUE,
   syncfile = NULL,
+  overwrite = FALSE,
   ...
 )
 }
@@ -47,7 +48,7 @@ mod_gen <- function(mparam_list) {
   )
 }
 # Run 2 trials per parameter setting, stopping after 10 time steps. 
-trials <- run_trials_grid(mod_gen, n_trials_per_param = 2, stop = 10,
+trials <- run_trials(mod_gen, n_trials_per_param = 2, stop = 10,
   learning_strategy = success_bias_learning_strategy,
   adaptive_fitness = c(0.8, 1.0, 1.2)
 )  # With this we'll have six total trials, two for each adaptive_fitness.
