@@ -97,6 +97,8 @@ AgentBasedModel <- R6::R6Class(
 
       # Set the ABM parameters once it contains all parameters.
       self$set_parameters(model_parameters)
+      
+      return (self)
     },
     
     #' @description Synchronize agent and network fields
@@ -187,8 +189,20 @@ AgentBasedModel <- R6::R6Class(
     #' @description Set multiple model parameters
     #' @param params Named list of parameters to set
     set_parameters = function(params) {
-      stopifnot(inherits(params, "ModelParameters"))
-      private$.parameters <- modifyList(private$.parameters, params$as_list())
+      
+      # If params is a ModelParameter instance, convert to list.
+      if(inherits(params, "ModelParameters")) {
+        params <- params$as_list()        
+      
+        # If it isn't ModelParameter nor a list, throw error.
+      } else if (!is.list(params)) {
+        stop(
+          "Only ModelParameter instances and lists may be passed to Agent$set_parameters()."
+        )
+      }
+      
+      # Update model parameters list with `params` guaranteed in list format.
+      private$.parameters <- modifyList(private$.parameters, params)
     },
     
     #' @description Set a single model parameter
@@ -212,7 +226,7 @@ AgentBasedModel <- R6::R6Class(
 
 
 #' @export
-make_abm <- function(model_parameters = DEFAULT_PARAMETERS, agents = NULL) {
+make_abm <- function(model_parameters = NULL, agents = NULL) {
 
   assertthat::assert_that(
     inherits(model_parameters, "ModelParameters"),

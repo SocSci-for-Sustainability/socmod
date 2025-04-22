@@ -305,7 +305,7 @@ run_trials <- function(model_generator, n_trials_per_param = 10,
     adaptive_behavior <- model_parameters$adaptive_behavior
   }
 
-  # Create a list of trials, each trial initialized with . 
+  # Create a list of trials, each trial initialized with a param list from the grid. 
   trials <- purrr::pmap(
     parameter_grid, function(...) {
       param_row <- list(...)
@@ -336,34 +336,46 @@ run_trials <- function(model_generator, n_trials_per_param = 10,
 #' @param tracked_behaviors Optional vector of behaviors to include
 #' @return A tibble with columns: trial, t, behavior, count, label, adaptation_success, fixation_steps
 #' @export
-summarise_adoption <- function(trials, tracked_behaviors = NULL) {
-  purrr::map2_dfr(trials, seq_along(trials), function(trial, i) {
-    obs <- trial$get_observations()
-    outcome <- trial$get_outcomes()
+summarise_prevalence <- function(trials, tracked_behaviors = NULL) {
+  
+  # Calculate the behavior counts for each trial's observations:
+  count_observations <- purrr::map_dfr(trials, function(trial) {
     
+    # Extract observations. 
+    observations <- trial$get_observations()
+    
+    # If tracked_behaviors is provided, select 
+    # observations for only those behaviors.
     if (!is.null(tracked_behaviors)) {
-      obs <- dplyr::filter(obs, Behavior %in% tracked_behaviors)
+      observations <- dplyr::filter(observations, Behavior %in% tracked_behaviors)
     }
     
-    label <- trial$get_label()
-    
-    dplyr::group_by(obs, t, Behavior) %>%
-      dplyr::summarise(count = dplyr::n(), .groups = "drop") %>%
-      dplyr::mutate(
-        trial = i,
-        label = label,
-        adaptation_success = outcome$adaptation_success,
-        fixation_steps = outcome$fixation_steps
-      )
+    # Count number of agents doing tracked behaviors.
+    return (
+      dplyr::group_by(observations, t, Behavior) %>%
+        dplyr::summarise(count = dplyr::n(), .groups = "drop") 
+    )
   })
+  
+  # Now calculate and return the mean prevalence series of tracked behaviors.
+  # 
+  # First get n_agents model param.
+  trial$model$get_parameter("n_agents")
+  
+  # Return mean prevalence from count observations grouped by time and behavior.
+  return (
+    count_observations %>%
+      dplyr::group_by(t, Behavior) %>%
+      dplyr::summarise(`Mean prevalence` = mean(count) / n_agents)
+  )
 }
 
 
 #' Summarise trials by metadata fields
 #'
-#' @param trials A list of Trial objects
-#' @param fields Character vector of metadata fields to group by
-#'
+#' @param trials A list of Trial objects to summarise
+#' @param input_parameters Character vector of model parameter fields to group by
+#' @param outcome_measures A character vector of outcome measures of interest
 #' @return A data frame with group means of success and steps
 #' @export
 summarise_by_parameters <- function(trials, 
@@ -373,13 +385,19 @@ summarise_by_parameters <- function(trials,
                                         "mean_fixation_steps")) {
   
   df <- purrr::map_dfr(trials, function(trial) {
+    
+    # Initialize "row" (actually a list for now) of desired input model params.
     row <- as.list(trial$model$get_parameters()[input_parameters])
-    # Convert learning_strategy parameter to its label.
+    
+    # Convert learning_strategy parameter to its label and add to the "row".
     if ("learning_strategy" %in% names(row)) {
       row$learning_strategy <- row$learning_strategy$get_label()
     }
-    row$adaptation_success <- 
-      trial$get_outcomes()$adaptation_success
+    
+    # Add the adaptation success for this row from the trial outcomes.
+    row$adaptation_success <- trial$get_outcomes()$adaptation_success
+    
+    # Add the fixation steps for this row from the trial outcomes
     row$fixation_steps <- trial$get_outcomes()$fixation_steps
     tibble::as_tibble(row)
   })
@@ -396,27 +414,6 @@ summarise_by_parameters <- function(trials,
                           names_to = "Measure", values_to = "Value")
   )
 }
-
-#' Plot mean adoption over time averaged across trials.
- #' @export
-# plot_adoptions(trials, tracked_behaviors = c("Adaptive")) {
-
-#   mean_counts_tbl <- 
-#     purrr::map_df(trials, function(trial) {
-#       trial_obs <- trial$get_observations()
-#       trial_obs$replication_id <- trial$metadata$replication_id
-      
-#       trial_obs <- 
-#         trial_obs %>% 
-#           dplyr::group_by(t, Behavior, replication_id) %>%
-#           dplyr::summarise(count = dplyr::n(), .groups = "drop")
-
-#       }) %>%
-#       dplyr::group_by(t, Behavior) %>%
-#       dplyr::summarise(mean_count, .groups = "drop")
-  
-#   ggplot(mean_counts_tbl, aes(x=t, y=mean_count
-# }
 
 
 #' Plot adoption counts of selected behaviors over time

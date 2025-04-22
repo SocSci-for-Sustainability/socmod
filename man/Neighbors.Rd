@@ -3,6 +3,9 @@
 \name{Neighbors}
 \alias{Neighbors}
 \title{Neighbors class}
+\value{
+list of return values from applications of .f
+}
 \description{
 Neighbors class
 
@@ -21,6 +24,8 @@ sampling, and modification.
 \dontrun{
 nbrs$filter(\(a) a$get_fitness() > 1)
 }
+Sample one or more neighbors
+
 
 ## ------------------------------------------------
 ## Method `Neighbors$sample`
@@ -75,7 +80,7 @@ nbrs$remove(agent2)
 \if{latex}{\out{\hypertarget{method-Neighbors-map}{}}}
 \subsection{Method \code{map()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Neighbors$map(f)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Neighbors$map(.f)}\if{html}{\out{</div>}}
 }
 
 }
@@ -83,6 +88,7 @@ nbrs$remove(agent2)
 \if{html}{\out{<a id="method-Neighbors-length"></a>}}
 \if{latex}{\out{\hypertarget{method-Neighbors-length}{}}}
 \subsection{Method \code{length()}}{
+Number of neighbor agents, i.e., length of the neighbors agent list.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Neighbors$length()}\if{html}{\out{</div>}}
 }
@@ -132,6 +138,8 @@ A new Neighbors object containing only the filtered agents
 \preformatted{\dontrun{
 nbrs$filter(\(a) a$get_fitness() > 1)
 }
+Sample one or more neighbors
+
 }
 \if{html}{\out{</div>}}
 
@@ -142,7 +150,6 @@ nbrs$filter(\(a) a$get_fitness() > 1)
 \if{html}{\out{<a id="method-Neighbors-sample"></a>}}
 \if{latex}{\out{\hypertarget{method-Neighbors-sample}{}}}
 \subsection{Method \code{sample()}}{
-Sample one or more neighbors
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{Neighbors$sample(n = 1, replace = FALSE, weights = NULL)}\if{html}{\out{</div>}}
 }

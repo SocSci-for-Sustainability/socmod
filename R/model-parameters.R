@@ -36,11 +36,28 @@ ModelParameters <- R6::R6Class(
     get_auxiliary = function() {
       return (private$.auxiliary)
     },
-
+    
+    #' Overwrite existing auxiliary parameters.
+    #' 
+    #' @returns NULL
     set_auxiliary = function(params) {
       private$.auxiliary <- params
     },
     
+    #' Add a key-value pair to the auxiliary 
+    #' variables.
+    #' 
+    #' @returns NULL
+    add_auxiliary = function(key, value) {
+      private$.auxiliary <- modifyList(
+        private$.auxiliary,
+        list(key = value)
+      )
+    },
+    
+    #' Add a list of key-value pairs to aux params.
+    #'
+    #' @returns NULL
     as_list = function() {
       return (
         modifyList(
@@ -73,10 +90,12 @@ ModelParameters <- R6::R6Class(
 #' # example code
 #' 
 #' @export
-make_model_parameters <- function(learning_strategy = NULL, 
-                                  graph = NULL,
-                                  n_agents = NULL,
-                                  ...)   {
+make_model_parameters <- 
+  function(learning_strategy =
+             success_bias_learning_strategy, 
+           graph = NULL,
+           n_agents = NULL,
+           ...)   {
   return (
     ModelParameters$new(learning_strategy, graph, n_agents, list(...))  
   )

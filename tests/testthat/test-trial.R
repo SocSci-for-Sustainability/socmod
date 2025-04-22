@@ -4,19 +4,18 @@ test_that("Trial records observations and outcomes correctly", {
 
   # Minimal model with adaptive initialization.
   g <- igraph::make_ring(3)
-  model <- AgentBasedModel$new(graph = g)
+  model <- AgentBasedModel$new(make_model_parameters(graph = g))
 
   for (agent in model$agents) {
     agent$set_behavior("Adaptive")
     agent$set_fitness(1.0)
   }
 
-  # Define trivial interaction and iteration.
-  interact <- function(learner, teacher, model) {}
-  iterate <- function(model) {}
 
-  trial <- Trial$new(model, interaction = interact, iterate = iterate)
-  trial$run(stop = fixated)
+
+  # trial <- Trial$new(model, )
+  # trial$run(stop = fixated)
+  trial <- run_trial(model, stop = fixated)
 
   obs <- trial$get_observations()
   out <- trial$get_outcomes()
@@ -30,9 +29,15 @@ test_that("Trial records observations and outcomes correctly", {
 })
 
 test_that("Trial stops after max steps and adapts outcomes", {
-  model <- AgentBasedModel$new(n_agents = 4)
-  interact <- function(learner, teacher, model) {}
-  iterate <- function(model) {}
+ 
+  lstrat <- LearningStrategy$new(
+    function(learner, model) NULL,
+    function(learner, partner, model) NULL,
+    function(model) NULL,
+    "null strategy"
+  )
+  
+  model <- AgentBasedModel$new(make_model_parameters(lstrat, n_agents = 4))
 
   model$agents[[1]]$set_behavior("Adaptive")
   model$agents[[2]]$set_behavior("Legacy")
@@ -43,140 +48,93 @@ test_that("Trial stops after max steps and adapts outcomes", {
     model$agents[[i]]$set_fitness(1.0)
   }
 
-  trial <- Trial$new(model, interaction = interact, iterate = iterate)
-  trial$run(stop = 3)
+  trial <- run_trial(model, stop = 3)
 
   out <- trial$get_outcomes()
+  
   expect_false(out$adaptation_success)
   expect_equal(out$fixation_steps, 3)
 })
 
 test_that("run_trials() returns expected number of Trial objects", {
-  gen <- function() {
+  
+  gen <- function(param_row) {
+    
     agents <- list(
       Agent$new(1, name = "1", behavior = "Legacy", fitness = 1),
       Agent$new(2, name = "2", behavior = "Adaptive", fitness = 4)
     )
+    
     net <- igraph::make_graph(~ 1-2)
-    AgentBasedModel$new(agents = agents, graph = net)
+    
+    AgentBasedModel$new(make_model_parameters(
+                          graph = net, 
+                          adoption_rate = param_row$adoption_rate
+                        ), 
+                        agents = agents)
   }
 
-  trials <- run_trials(n = 5, model_generator = gen, stop = 10)
+  # Check that there are five trials and all are Trial instances for the following.
+  trials <- run_trials(gen, n_trials_per_param = 5)
   expect_length(trials, 5)
   expect_true(all(purrr::map_lgl(trials, ~ inherits(.x, "Trial"))))
 
-  # optional: check observation structure
+  # Check that all observations are tibbles.
   obs_list <- purrr::map(trials, ~ .x$get_observations())
   expect_true(all(purrr::map_lgl(obs_list, tibble::is_tibble)))
 })
 
 
-test_that("summarise_by_label() correctly aggregates trial outcomes", {
-  gen <- function() {
-    agents <- list(
-      Agent$new(1, name = "1", behavior = "Adaptive", fitness = 4),
-      Agent$new(2, name = "2", behavior = "Legacy", fitness = 1)
-    )
-    graph <- igraph::make_graph(~ 1-2)
-    AgentBasedModel$new(agents = agents, graph = graph)
+test_that("summarise_by_parameters correctly summarizes grouped trial outcomes", {
+  
+  mock_run_one_trial <- function(ii) {
+    # Create model based on parameters...
+    trial <- make_model_parameters(
+        n_agents = 10, 
+        seed_set = ifelse(ii <= 2, "A", "B"),
+        adaptive_fitness = ifelse(ii %% 2 == 0, 1.2, 1.0), 
+      ) %>%
+      # ...make an agent-based model with these settings...
+      make_abm() %>%
+      # ...and simulate model dynamics for three time steps.
+      run_trial(stop = 3)
+    
+    trial$outcomes$adaptation_success <- (ii %% 2 == 0) # Even trials "succeed".
+    trial$outcomes$fixation_steps <- ii + 1
+    
+    return (trial)
   }
+  
+  # Create synthetic trial outcomes.
+  trials <- purrr::map(1:4, mock_run_one_trial)
 
-  trials <- append(
-    run_trials(3, gen, label = "success", stop = 5),
-    run_trials(2, gen, label = "control", stop = 5)
-  )
-
-  summary <- summarise_adoption(trials)
-  result <- summarise_by_label(summary)
-
-  # print(summary)
-  # print(result)
-
-  expect_true(is.data.frame(result))
-  expect_true(
-    all(
-      c("label", "n_trials", "success_rate", "mean_fixation", "sd_fixation") %in%
-      names(result)
-    )
-  )
-
-  expect_equal(nrow(result), 2)
-  expect_equal(sort(unique(result$label)), c("control", "success"))
-})
-
-
-test_that("summarise_by_metadata correctly summarizes grouped trial outcomes", {
-  # Create simple trials with fake metadata
-  trials <- purrr::map(1:4, function(i) {
-    model <- AgentBasedModel$new(n_agents = 10)
-    trial <- run_trial(
-      model,
-      interaction = success_bias_interact,
-      iterate = iterate_learning_model,
-      stop = 3,
-      label = paste0("Trial", i),
-      metadata = list(
-        seed_set = ifelse(i <= 2, "A", "B"),
-        adaptive_fitness = ifelse(i %% 2 == 0, 1.2, 1.0)
-      )
-    )
-    trial$outcomes$success <- (i %% 2 == 0)  # Even trials succeed
-    trial$outcomes$steps <- i + 1
-    return(trial)
-  })
-
-  # Run summary.
-  summary <- summarise_by_metadata(
-    trials, fields = c("adaptive_fitness", "seed_set")
+  # Create summary over specified outcome measures.
+  summary <- summarise_by_parameters(
+    trials, input_parameters = c("adaptive_fitness", "seed_set"),
+    outcome_measures = c("success_rate", "mean_fixation_steps")
   )
 
   # Check columns
   expect_true(
     all(
       c("adaptive_fitness", "seed_set", 
-        "success_rate", "mean_fixation_steps") %in% colnames(summary)
+        "Measure", "Value") %in% colnames(summary)
     )
   )
-
+  
   # Check group count and shape
-  expect_equal(nrow(summary), 4)  # 2 seed_sets × 2 fitness levels
-
-  # Check expected values
-  result <- summary %>% dplyr::filter(seed_set == "A", adaptive_fitness == 1.0)
-  expect_equal(result$success_rate, 0)  # Only odd i trials (i = 1)
-})
-
-
-test_that("learning functions are always included in trial metadata", {
-  make_dummy_abm <- function() {
-    agents <- list(
-      Agent$new(1, name = "a", behavior = "Legacy", fitness = 1),
-      Agent$new(2, name = "b", behavior = "Legacy", fitness = 1)
-    )
-    g <- igraph::make_ring(2)
-    AgentBasedModel$new(agents = agents, graph = g)
-  }
+  # 2 seed_sets × 2 fitness levels x 2 outcome measures measures = 8 rows
+  expect_equal(nrow(summary), 8)  
   
-  dummy_select <- function(...) NULL
-  dummy_interact <- function(...) NULL
+  # Check that the success rates are all 0.0 when the adaptive_fitness is 1.0.
+  result <- summary %>% 
+    dplyr::filter(adaptive_fitness == 1.0 & Measure == "success_rate")
   
-  trials <- run_trials_grid(
-    x = c(1, 2),
-    n = 2,
-    model_generator = function(x) {
-      function() make_dummy_abm()
-    },
-    partner_selection = dummy_select,
-    interaction = dummy_interact,
-    iterate = iterate_learning_model,
-    stop = 1
-  )
+  expect_true(all(result$Value == 0.0))
   
-  # All trials should include learning functions in metadata
-  purrr::walk(trials, function(t) {
-    md <- t$get_metadata()
-    
-    expect_type(md$partner_selection, "character")
-    expect_type(md$interaction, "character")
-  })
+  # Check that the success rates are all 1.0 when the adaptive_fitness is 1.2.
+  result <- summary %>% 
+    dplyr::filter(adaptive_fitness == 1.2 & Measure == "success_rate")
+  
+  expect_true(all(result$Value == 1.0))  # Successful even trials
 })

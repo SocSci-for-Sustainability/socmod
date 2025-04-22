@@ -5,7 +5,7 @@
 \title{Wrapper for initializing new ModelParameters instance.}
 \usage{
 make_model_parameters(
-  learning_strategy = NULL,
+  learning_strategy = success_bias_learning_strategy,
   graph = NULL,
   n_agents = NULL,
   ...

@@ -1,4 +1,4 @@
-load_all();
+devtools::load_all();
 # mps <- make_model_parameters(
 #   contagion_learning_strategy, n_agents = 10, adaptive_fitness = 2.0, 
 #   legacy_fitness = 1.0, drop_rate = 0.01, adoption_rate = 1.0
@@ -47,19 +47,26 @@ gen <- function(model_parameter_row) {
 }
 
 trials <- run_trials(
-  gen, n_trials_per_param = 10, stop = fixated,
+  gen, 
+  n_trials_per_param = 50, 
+  stop = fixated, 
+  syncfile = "sync_Lecture7_example_adoption-rate.RData",
+  # overwrite = TRUE,
   learning_strategy = c(success_bias_learning_strategy,
                         frequency_bias_learning_strategy,
                         contagion_learning_strategy),
-  adaptive_fitness = c(0.8, 1.0, 1.2, 1.5, 2.0),
+  # adaptive_fitness = c(0.8, 1.0, 1.2, 1.4, 2.0),
+  # adaptive_fitness = seq(0.8, 2.4, 0.2),
+  adaptive_fitness = 1.4,
   adoption_rate = c(0.05, 0.2, 0.4, 0.6, 0.8, 1.0),
+  # adoption_rate = 0.6,
   drop_rate = 0.2
 )
 
-tsummary <- summarise_by_parameters(
-  trials, c("learning_strategy", "adaptive_fitness")
+trials_summary <- summarise_by_parameters(
+  trials, c("learning_strategy", "adoption_rate")
 )
 
-print(
-  tsummary
-)
+# trials_summary <- summarise_by_parameters(
+#   trials, c("learning_strategy", "adaptive_fitness")
+# )

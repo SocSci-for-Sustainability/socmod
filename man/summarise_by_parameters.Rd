@@ -4,7 +4,11 @@
 \alias{summarise_by_parameters}
 \title{Summarise trials by metadata fields}
 \usage{
-summarise_by_parameters(trials, fields)
+summarise_by_parameters(
+  trials,
+  input_parameters,
+  outcome_measures = c("success_rate", "mean_fixation_steps")
+)
 }
 \arguments{
 \item{trials}{A list of Trial objects}

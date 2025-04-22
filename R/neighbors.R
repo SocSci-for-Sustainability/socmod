@@ -13,12 +13,16 @@ Neighbors <- R6::R6Class(
       self$agents <- agents
     },
     
-    map = function(f) {
-      # Just apply the function without forcing the result to be a specific type.
-      # This allows the function to return whatever is appropriate, like a string.
-      lapply(self$agents, f)
+    #' @description 
+    # Apply function .f to every neighbor.
+    #' @param .f Function to apply to each neighbor agent
+    #' @returns list of return values from applications of .f
+    map = function(.f) {
+      lapply(self$agents, .f)
     },
     
+    #' @description 
+    #' Number of neighbor agents, i.e., length of the neighbors agent list.
     length = function() {
       length(self$agents)
     },
@@ -54,7 +58,7 @@ Neighbors <- R6::R6Class(
       Neighbors$new(Filter(predicate, self$agents))
     },
     
-    #' @description
+
     #' Sample one or more neighbors
     #'
     #' @param n Number of neighbors to sample

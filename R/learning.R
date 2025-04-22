@@ -262,25 +262,28 @@ contagion_partner_selection <- function(learner, model) {
 #' @export
 contagion_interaction <- function(learner, teacher, model) {
 
-  # Extract adoption rate from the 
+  # Extract relevant parameters from the model.
   adoption_rate <- model$get_parameter("adoption_rate")
   legacy_behavior <- model$get_parameter("legacy_behavior")
   adaptive_behavior <- model$get_parameter("adaptive_behavior")
 
   assertthat::assert_that(
     !is.null(adoption_rate), 
-    msg = "Auxiliary model parameter adopt_rate must be defined for contagion interaction."
+    msg = "Auxiliary model parameter adoption_rate must be defined for contagion interaction."
   )
-  # assertthat::assert_that(
-  #   FALSE, 
-  #   msg = "Auxiliary model parameter adopt_rate must be defined for contagion interaction."
-  # )
+  if (is.null(legacy_behavior)) {
+    legacy_behavior <- "Legacy"
+  }
+  if (is.null(adaptive_behavior)) {
+    adaptive_behavior <- "Adaptive"
+  }
 
   if ((learner$get_behavior() == legacy_behavior) && 
       (teacher$get_behavior() == adaptive_behavior) && 
       (runif(1) < adoption_rate)) {
     
     learner$set_next_behavior(adaptive_behavior)
+    learner$set_next_fitness(teacher$get_fitness())
   }
 }
 
@@ -310,6 +313,8 @@ contagion_model_step <- function(model) {
   iterate_learning_model(model)
 }
 
+
+## ------Learning Strategies------
 
 #' Define success-biased learning strategy.
 #'

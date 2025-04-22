@@ -1,7 +1,7 @@
 test_that("Agent neighbor add/remove integrates with Neighbors class", {
   g <- igraph::make_ring(3)
   
-  model <- AgentBasedModel$new(graph = g)
+  model <- AgentBasedModel$new(make_model_parameters(graph = g))
   
   a1 <- model$get_agent("a1")
   a2 <- model$get_agent("a2")
@@ -26,7 +26,7 @@ test_that("Agent neighbor add/remove integrates with Neighbors class", {
 test_that("Neighbors$get() works by index and by name", {
   g <- igraph::make_ring(3)
   igraph::V(g)$name <- c("a1", "a2", "a3")
-  model <- AgentBasedModel$new(graph = g)
+  model <- AgentBasedModel$new(make_model_parameters(graph = g))
   
   a2 <- model$get_agent("a2")
   neighbors <- a2$get_neighbors()

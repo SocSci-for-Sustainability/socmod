@@ -2,9 +2,7 @@
 % Please edit documentation in R/trial.R
 \name{plot_adoption}
 \alias{plot_adoption}
-\title{Plot adoption counts of selected behaviors over time
-Plot adoption counts of selected behaviors
-(\code{tracked_behaviors}) over time.}
+\title{Plot mean adoption over time averaged across trials.}
 \usage{
 plot_adoption(trial, tracked_behaviors = c("Adaptive"))
 }
@@ -17,7 +15,5 @@ plot_adoption(trial, tracked_behaviors = c("Adaptive"))
 A ggplot object
 }
 \description{
-Plot adoption counts of selected behaviors over time
-Plot adoption counts of selected behaviors
-(\code{tracked_behaviors}) over time.
+Plot mean adoption over time averaged across trials.
 }
