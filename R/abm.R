@@ -225,6 +225,13 @@ AgentBasedModel <- R6::R6Class(
 )
 
 
+#' Helper function to create a new agent-based model
+#' 
+#' @param model_parameters ModelParameters instance specifying context
+#' @param agents List of `Agent`s
+#' @return AgentBasedModel with specified parameters and agents
+#' @examples
+#' abm <- make_abm(make_model_parameters(n_agents = 10))
 #' @export
 make_abm <- function(model_parameters = NULL, agents = NULL) {
 

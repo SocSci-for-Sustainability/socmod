@@ -45,14 +45,7 @@ test_that("Frequency bias adopts more common behavior", {
   for (i in 1:4) model$get_agent(i)$set_fitness(1.0)
 
   before <- model$get_agent(1)$get_behavior()
-# 
-#   trial <- Trial$new(
-#     model,
-#     partner_selection = frequency_bias_select_teacher,
-#     interaction = frequency_bias_interact,
-#     iterate = iterate_learning_model
-#   )
-#   trial$run(stop = 1)
+
   trial <- run_trial(model, stop = 1)
 
   after <- model$get_agent(1)$get_behavior()
@@ -82,14 +75,6 @@ test_that("Frequency bias fixates roughly equally when starting with tie", {
     model$get_agent(4)$set_behavior("Adaptive")
     model$get_agent(4)$set_fitness(1.0)
 
-    # trial <- Trial$new(
-    #   model,
-    #   partner_selection = frequency_bias_select_teacher,
-    #   interaction = frequency_bias_interact,
-    #   iterate = iterate_learning_model
-    # )
-    # trial$run(stop = fixated)
-    # 
     trial <- run_trial(model, stop = fixated)
 
     behaviors <- purrr::map_chr(model$agents, \(a) as.character(a$get_behavior()))

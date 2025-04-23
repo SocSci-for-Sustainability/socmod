@@ -58,3 +58,28 @@ test_that("Agent neighbor management works", {
   expect_equal(neighbors$length(), 1)
   expect_equal(neighbors$get(1)$get_name(), "a3")
 })
+
+test_that("Agent$set_neighbors() can only take a list of Agents or a Neighbors instance", {
+  
+  a1 <- socmod::Agent$new(
+    1, name = "Matt", behavior = "Adaptive", fitness=1e6
+  )
+  a1$set_neighbors(Neighbors$new(c(
+    socmod::Agent$new(id = 2, name = "n2"),
+    socmod::Agent$new(id = 3, name = "n3")
+  )))
+  expect_equal(a1$get_neighbors()$map(\(n) n$get_name()), 
+               list("n2", "n3"))
+  
+  a1 <- socmod::Agent$new(
+    1, name = "Matt", behavior = "Adaptive", fitness=1e6
+  )
+  a1$set_neighbors(c(
+    socmod::Agent$new(id = 2, name = "n2"),
+    socmod::Agent$new(id = 3, name = "n3")
+  ))
+  expect_equal(a1$get_neighbors()$map(\(n) n$get_name()), 
+               list("n2", "n3"))
+  
+  expect_error(a1$set_neighbors(c("a", "b")))
+})

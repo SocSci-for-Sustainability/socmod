@@ -1,10 +1,10 @@
 Package: socmod
 Title: Models of Social Behavior in R
-Version: 0.0.1.1
+Version: 0.1.0
 Authors@R: 
     person("Matt", "Turner", , "maturner01@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-7421-4552"))
-Description: Provides a conceptual framework with software tools for creating computational models of social behavior for decision making. 
+Description: Provides software tools and conceptual framework for creating computational models of social behavior for sustainability. 
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -29,7 +29,6 @@ Imports:
     R6,
     rlang,
     tibble,
-    ggraph,
     uuid
 URL: https://css4s.github.io/socmod/
 VignetteBuilder: quarto, knitr

@@ -11,9 +11,11 @@ summarise_by_parameters(
 )
 }
 \arguments{
-\item{trials}{A list of Trial objects}
+\item{trials}{A list of Trial objects to summarise}
 
-\item{fields}{Character vector of metadata fields to group by}
+\item{input_parameters}{Character vector of model parameter fields to group by}
+
+\item{outcome_measures}{A character vector of outcome measures of interest}
 }
 \value{
 A data frame with group means of success and steps

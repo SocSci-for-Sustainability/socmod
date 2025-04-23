@@ -410,8 +410,9 @@ summarise_by_parameters <- function(trials,
         mean_fixation_steps = mean(fixation_steps),
         .groups = "drop"
       ) %>%
-      tidyr::pivot_longer(outcome_measures, 
-                          names_to = "Measure", values_to = "Value")
+      tidyr::pivot_longer(all_of(outcome_measures), 
+                          names_to = "Measure", 
+                          values_to = "Value")
   )
 }
 
@@ -431,7 +432,8 @@ plot_adoption <- function(trial, tracked_behaviors = c("Adaptive")) {
   obs_filtered <- obs %>%
     dplyr::filter(Behavior %in% tracked_behaviors) %>%
     dplyr::group_by(t, Behavior) %>%
-    dplyr::summarise(count = dplyr::n(), .groups = "drop")
+    dplyr::summarise(count = dplyr::n(), .groups = "drop") %>%
+    tidyr::complete(t, Behavior, fill = list(count = 0))
   
   ggplot2::ggplot(obs_filtered, 
                   ggplot2::aes(x = t, y = count, color = Behavior)) +

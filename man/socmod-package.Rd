@@ -8,7 +8,7 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-Provides a conceptual framework with software tools for creating computational models of social behavior for decision making.
+Provides software tools and conceptual framework for creating computational models of social behavior for sustainability.
 }
 \seealso{
 Useful links:

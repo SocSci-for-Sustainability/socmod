@@ -83,6 +83,13 @@ nbrs$remove(agent2)
 \if{html}{\out{<div class="r">}}\preformatted{Neighbors$map(.f)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{.f}}{Function to apply to each neighbor agent}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Neighbors-length"></a>}}

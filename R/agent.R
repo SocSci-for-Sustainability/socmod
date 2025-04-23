@@ -154,7 +154,13 @@ Agent <- R6::R6Class(
     #' Set neighbors object
     #' @param nbrs A Neighbors instance
     set_neighbors = function(nbrs) {
-      private$neighbors <- nbrs
+      if (inherits(nbrs, "Neighbors")) {
+        private$neighbors <- nbrs
+      } else if (is.list(nbrs)) {
+        private$neighbors <- Neighbors$new(nbrs)
+      } else {
+        stop("New neighbors to set must be either a list of Agent instances or a Neighbors instance")
+      }
     },
     
     #' @description

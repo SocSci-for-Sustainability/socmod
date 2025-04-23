@@ -250,7 +250,8 @@ ggnetplot <- function(net, layout = NULL, ...) {
   if (is.null(layout)) {
     ret <- ggplot(ggnetwork(net), aes(x=x, y=y, xend=xend, yend=yend, ...))
   } else {
-    ret <- ggplot(ggnetwork(net, layout = layout(net)), aes(x=x, y=y, xend=xend, yend=yend, ...))
+    ret <- ggplot(ggnetwork(net, layout = layout(net)), 
+                  aes(x=x, y=y, xend=xend, yend=yend, ...))
   }
 
   return (ret)
