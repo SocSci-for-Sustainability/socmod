@@ -22,7 +22,7 @@ AgentBasedModel <- R6::R6Class(
       #
       # First create a short-name variable for parameters.
       if (!is.null(model_parameters)) {
-        assert_that(
+        assertthat::assert_that(
           inherits(model_parameters, "ModelParameters"),
           msg = "model_parameters must be an instance of ModelParameters"
         )
