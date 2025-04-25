@@ -179,19 +179,23 @@ purrr::imap_vec(input_vec, \(el, idx) { return (idx * el) })
 
 ## Custom objects: R6 classes in socmod
 
-Classes are ways to *encapsulate* diverse distinct, but related, processes, behaviors, data, attributes, and other types of information in a single *object*, i.e., a software representation of an *instance* of that entity. R6 is a library for creating our own custom classes that serve as an abstract template that specifies what distinguishes different types of objects/entities. Below we show first how to create a new agent, i.e., a new instance of the `Agent` class that is provided by `socmod`. After that is the example `SoccerPlayer` class that we developed together in class.
+Classes are ways to *encapsulate* diverse distinct, but related, processes, behaviors, data, attributes, and other types of information in a single *object*, i.e., a software representation of an *instance* of that entity. R6 is a library for creating our own custom classes that serve as an abstract template that specifies what distinguishes different types of objects/entities. Below we show first how to create a new agent, i.e., a new instance of the `Agent` class that is provided by `socmod`. After that is a fun example of how we can design a different social behavioral model, one of football/soccer matches. We write classes for players and teams and develop a `play_match(team1, team2)` function that pits two teams against each other.
 
-#### Example R6 class in `socmod` : `Agent`
+#### The `Agent` class in `socmod`
 
 Below we create a new instance of the `Agent` class using the class *constructor*, the function written `socmod::Agent$new()` below that creates a new instance of the class.
 
 ```{r}
-a1 <- socmod::Agent$new(1, name = "Matt", behavior = "Adaptive", fitness=1e6)
+
+a1 <- socmod::Agent$new(1, name = "Matt", 
+                        behavior = "Adaptive", 
+                        fitness=1e6)
 ```
 
 We can use the *access operator*, `$` in R, to access the *fields* (i.e., *attributes*) of agent `a1` like so:
 
 ```{r}
+
 print(a1$get_fitness())
 print(a1$get_name())
 print(a1$get_id())
@@ -202,17 +206,15 @@ We can also use `purrr::map` functions over neighbors like so:
 
 ```{r}
 # Assign neighbors to a1.
-# a1$set_neighbors(Neighbors$new(c(
-#   socmod::Agent$new(id = 2, name = "n2"),
-#   socmod::Agent$new(id = 3, name = "n3")
-# )))
+
 a1$set_neighbors(c(
   socmod::Agent$new(id = 2, name = "n2"),
   socmod::Agent$new(id = 3, name = "n3")
 ))
 
-# Get the list of neighbors back.
+# Get the list of neighbors back to check it worked.
 neighbors <- a1$get_neighbors()
+print(class(neighbors))  # should be [1] "Neighbors" "R6"
 
 # Neighbors$map() returns a list...
 neighbor_names <- neighbors$map(\(n) n$get_name())
@@ -302,9 +304,9 @@ Team <- R6Class("Team",
 ```
 
 ```{r}
-p <- Footballer$new()
-p$scored_goal()
-sum(purrr::map_vec(1:10, \(.) p$scored_goal()))
+footballer <- Footballer$new(accuracy = 0.5)
+footballer$scored_goal()
+# sum(purrr::map_vec(1:10, \(.) p$scored_goal()))
 ```
 
 We can define a function that simulates playing a football match where the team that scores more goals wins, or a tie if teams have the same score. We track penalties received but assume they don't have an effect on the match outcome. We assume each player gets ten chances to score a goal. We leave it to the reader as an exercise to make use of the `Footballer$get_penalty_on_play()` method within the game to add penalties and consequences in the game (e.g., penalty kicks or something), and to use the `Team$sign_player()` add more players to each roster, which should increase the mean total scores in each game based on the simple way we've modeled gameplay in `play_match`.
@@ -312,10 +314,6 @@ We can define a function that simulates playing a football match where the team 
 ```{r}
 # Define a function that models a football match.
 play_match <- function(team1, team2) {
-  
-  # Initialize the scoreboard as a list, i.e., key-value pair where
-  # the team is the key and the value is the number of goals scored.
-  scores = list(team1 = 0, team2 = 0)
   
   # Walk over each player to see how many scores they get, 
   # summing to get the total team score. 
@@ -362,11 +360,12 @@ play_match <- function(team1, team2) {
 First we need teams, which we create and to which we assign players using the constructor, `Team$new()` in the code below.
 
 ```{r}
+# Initialize two teams, Whales and Squirrels, each with two
+# players. All players have identical default attributes.
 whales <- Team$new(
   name = "Whales", 
   players = c(Footballer$new(), Footballer$new())
 )
-
 squirrels <- Team$new(
   name = "Squirrels", 
   players = c(Footballer$new(), Footballer$new())
@@ -374,26 +373,21 @@ squirrels <- Team$new(
 
 # Play three matches.
 play_match(whales, squirrels)
-play_match(whales, squirrels)
+play_match(squirrels, whales)
 play_match(squirrels, whales)
 
+# Print how many games each time won.
 cat("\nAfter three games...", "\nThe Whales have won", 
     whales$wins, "games and the Squirrels have won", squirrels$wins)
 ```
 
 ## Agent-based models of social behavior
 
-Here we develop our first agent-based models of social behavior. We'll start
-small, with the following four-household network of solar panel electrification
-using only success-biased learning. Then we'll do a detailed comparison of
-different social learning strategies with different parameterizations.
+Here we develop our first agent-based models of social behavior. We'll start small, with the following four-household network of solar panel electrification using only success-biased learning. Then we'll do a detailed comparison of different social learning strategies with different parameterizations.
 
-The four-household population has the following structure: . We can initialize
-the agents and their social network as follows, encapsulated in a helper
-function `make_small_abm()`:
+The four-household population has the following structure: . We can initialize the agents and their social network as follows, encapsulated in a helper function `make_small_abm()`:
 
-
-### Example 1: Time series of adaptation diffusion 
+### Example 1: Time series of adaptation diffusion
 
 ```{r}
 adoption_rate = 0.8
@@ -423,21 +417,13 @@ trial <- run_trial(cabm, stop = fixated, adaptive_behavior = "Baglowie")
 plot_adoption(trial, tracked_behaviors = c("Legacy", "Baglowie"))
 ```
 
-Now let's 
+Now let's
 
 ### Example: comparison of learning strategies and parameters
 
-Agent-based models in `socmod` are composed of sub-models of cognition and
-social behavior and social networks. One component of agent cognition is its
-*social learning strategy*. Three social learning strategies are included in
-`socmod`: success-biased, frequency-biased, and contagion learning strategies
-[see ABM course notes for more details](https://css4s.github.io/abm-notes/intro.html#social-learning-strategies). 
+Agent-based models in `socmod` are composed of sub-models of cognition and social behavior and social networks. One component of agent cognition is its *social learning strategy*. Three social learning strategies are included in `socmod`: success-biased, frequency-biased, and contagion learning strategies [see ABM course notes for more details](https://css4s.github.io/abm-notes/intro.html#social-learning-strategies).
 
-Here we show how to compare the three learning strategies across different
-learning parameters. One parameter we systematically vary affects only
-success-biased learning, and the other we systematically vary affects only
-contagion learning. We will design computational experiments to understand their
-effects, and overall differences between the three learning strategies.
+Here we show how to compare the three learning strategies across different learning parameters. One parameter we systematically vary affects only success-biased learning, and the other we systematically vary affects only contagion learning. We will design computational experiments to understand their effects, and overall differences between the three learning strategies.
 
 USE THE SHIT FROM LIXO.R!!!!!!! NOW IN ARQUIVO-DE-SOCMOD IN WORKSPACE
 
@@ -500,7 +486,6 @@ trials_summary <- summarise_by_parameters(
 # print(trials_summary, n = 50)
 ```
 
-
 ```{r}
 a <- dplyr::filter(trials_summary, Measure == "success_rate")
 p_a <- ggplot(a, 
@@ -519,7 +504,6 @@ p_a
 ```
 
 #### Experiment over adoption rate values
-
 
 ```{r}
 trials <- run_trials(
@@ -541,7 +525,6 @@ trials_summary <- summarise_by_parameters(
 )
 # print(trials_summary, n = 50)
 ```
-
 
 ```{r}
 a <- dplyr::filter(trials_summary, Measure == "success_rate")

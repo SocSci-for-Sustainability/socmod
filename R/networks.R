@@ -302,8 +302,10 @@ plot_homophilynet <- function(net, node_size = 3, line_width = 0.1, theme_base_s
 #' plot_homophilynet(hnet_5grp)
 #' @return igraph Graph
 #' @export
-make_homophily_network <- function(group_sizes = c(3, 7), mean_degree = 2,
-                                   homophily = c(0.0), group_names = NULL,
+make_homophily_network <- function(group_sizes = c(3, 7), 
+                                   mean_degree = 2,
+                                   homophily = c(0.0), 
+                                   group_names = NULL,
                                    add_to_complete = FALSE) {
   
   N <- sum(group_sizes)
@@ -322,9 +324,9 @@ make_homophily_network <- function(group_sizes = c(3, 7), mean_degree = 2,
   net <- make_empty_graph(N, directed = FALSE)
   
   if (is.null(group_names)) {
-    group_names <- 
-      map_vec(1:length(group_sizes),
-              \(ii) { as.factor(ii) })
+    group_names <- map_vec(1:length(group_sizes), as.factor)
+  } else {
+    group_names <- map_vec(group_names, as.factor)
   }
   
   a_idx = 1
@@ -343,7 +345,7 @@ make_homophily_network <- function(group_sizes = c(3, 7), mean_degree = 2,
   # adds additional degree per connected node and rounded for a whole number.
   edges_within_per_group <- round(edges_per_group * ((1 + homophily)/2) * 0.5)
 
-  # The number of between-group edges starting from each group 
+  # The number of between-group edges starting from each group.
   edges_between_per_group <- edges_per_group - edges_within_per_group
   
   # Add in-group edges.
@@ -375,6 +377,7 @@ make_homophily_network <- function(group_sizes = c(3, 7), mean_degree = 2,
   # Now add all between-group edges, selecting vertices from groups at random
   # for building the edges biased by remaining between-group edges to add.
   edges_remain <- TRUE
+
   while (edges_remain) {
     
     # Check if there's only one group lacking between-group edges.
@@ -413,7 +416,9 @@ make_homophily_network <- function(group_sizes = c(3, 7), mean_degree = 2,
             
           } else {
             
-            needing_group_verts <- V(net)[V(net)$group == last_group]
+            needing_group_verts <- 
+              V(net)[V(net)$group == last_group]
+            
             # Select a group not needing edge at random...
             # ...and select two vertices to connect to and create edges.
             outgroup <- sample(other_groups, 1)
