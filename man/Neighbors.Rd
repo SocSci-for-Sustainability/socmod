@@ -15,43 +15,6 @@ Neighbors class
 A container for an agent's neighbors, with utilities for iteration, filtering,
 sampling, and modification.
 }
-\examples{
-
-## ------------------------------------------------
-## Method `Neighbors$filter`
-## ------------------------------------------------
-
-\dontrun{
-nbrs$filter(\(a) a$get_fitness() > 1)
-}
-Sample one or more neighbors
-
-
-## ------------------------------------------------
-## Method `Neighbors$sample`
-## ------------------------------------------------
-
-\dontrun{
-nbrs$sample(2)
-nbrs$sample(weights = \(a) a$get_fitness())
-}
-
-## ------------------------------------------------
-## Method `Neighbors$add`
-## ------------------------------------------------
-
-\dontrun{
-nbrs$add(agent1, agent2)
-}
-
-## ------------------------------------------------
-## Method `Neighbors$remove`
-## ------------------------------------------------
-
-\dontrun{
-nbrs$remove(agent2)
-}
-}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
@@ -139,19 +102,8 @@ Filter neighbors using a predicate function
 }
 \subsection{Returns}{
 A new Neighbors object containing only the filtered agents
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
-nbrs$filter(\(a) a$get_fitness() > 1)
-}
 Sample one or more neighbors
-
 }
-\if{html}{\out{</div>}}
-
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Neighbors-sample"></a>}}
@@ -175,17 +127,6 @@ Sample one or more neighbors
 \subsection{Returns}{
 A Neighbors object or a single Agent depending on \code{n}
 }
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
-nbrs$sample(2)
-nbrs$sample(weights = \(a) a$get_fitness())
-}
-}
-\if{html}{\out{</div>}}
-
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Neighbors-add"></a>}}
@@ -203,16 +144,6 @@ Add one or more agents to the neighbors list
 }
 \if{html}{\out{</div>}}
 }
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
-nbrs$add(agent1, agent2)
-}
-}
-\if{html}{\out{</div>}}
-
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Neighbors-remove"></a>}}
@@ -230,16 +161,6 @@ Remove one or more agents from the neighbors list
 }
 \if{html}{\out{</div>}}
 }
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{\dontrun{
-nbrs$remove(agent2)
-}
-}
-\if{html}{\out{</div>}}
-
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-Neighbors-clone"></a>}}

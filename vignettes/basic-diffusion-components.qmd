@@ -1,11 +1,9 @@
 # Components for basic diffusion modeling with `socmod`
 
-```{r setup, include=FALSE}
-devtools::load_all()
 
+```{r setup, include=FALSE}
 library(socmod)
 library(magrittr)
-
 ```
 
 To model social behavior it helps to have intuitive software tools grounded in an empirically-motivated, self-consistent scientific theory. `socmod` provides those tools, but to put it to best use it's helpful to know how it works, especially for people used to using R in a data science context. Many of the same tools are transferable, especially declarative/functional programming, as is used and encouraged by the [tidy approach in R for Data Science](https://r4ds.hadley.nz/). This vignette introduces agent-based modeling in `socmod` starting with basic functional and object-oriented programming in R. It therefore builds on an assumed knowledge of R basics which can be built by studying, for example, [*Hands-On Programming with R*](https://rstudio-education.github.io/hopr/index.html)or other basic R tutorial introductions.
@@ -385,7 +383,7 @@ cat("\nAfter three games...", "\nThe Whales have won",
 
 Here we develop our first agent-based models of social behavior. We'll start small, with the following four-household network of solar panel electrification using only success-biased learning. Then we'll do a detailed comparison of different social learning strategies with different parameterizations.
 
-The four-household population has the following structure: . We can initialize the agents and their social network as follows, encapsulated in a helper function `make_small_abm()`:
+
 
 ### Example 1: Time series of adaptation diffusion
 
@@ -529,7 +527,7 @@ p <- ggplot(trials_success_rate,
 ggsave("vignettes/resources/adaptive_fitness_experiment.png", p, 
        width = 5, height = 3)
 ```
-![Example computational experiment testing effect of adaptive fitness on success rate across the three learning strategies.](resources/adaptive_fitness_experiment.png)
+![Example computational experiment testing effect of adaptive fitness on success rate across the three learning strategies.](adaptive_fitness_experiment.png)
 
 #### Experiment over adoption rate values
 
@@ -578,4 +576,4 @@ ggsave("vignettes/resources/adoption_rate_experiment.png",
        p, width=5, height=3)
 ```
 
-![Example computational experiment testing effect of adoption rate on success rate across the three learning strategies.](resources/adoption_rate_experiment.png)
+![Example computational experiment testing effect of adoption rate on success rate across the three learning strategies.](adoption_rate_experiment.png)

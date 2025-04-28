@@ -176,19 +176,17 @@ helper function:
 abm <- make_example_abm()
 trial <- run_trial(abm, stop = fixated)
 print(tail(trial$get_observations(), n = 10))
-#> # A tibble: 10 × 4
-#>        t agent Behavior Fitness
-#>    <dbl> <chr> <chr>      <dbl>
-#>  1     4 n_i2  Legacy         1
-#>  2     4 n_i3  Legacy         1
-#>  3     5 i     Legacy         1
-#>  4     5 n_i1  Adaptive       2
-#>  5     5 n_i2  Legacy         1
-#>  6     5 n_i3  Legacy         1
-#>  7     6 i     Legacy         1
-#>  8     6 n_i1  Legacy         1
-#>  9     6 n_i2  Legacy         1
-#> 10     6 n_i3  Legacy         1
+#> # A tibble: 8 × 4
+#>       t agent Behavior Fitness
+#>   <dbl> <chr> <chr>      <dbl>
+#> 1     0 i     Legacy         1
+#> 2     0 n_i1  Legacy         1
+#> 3     0 n_i2  Legacy         1
+#> 4     0 n_i3  Adaptive       2
+#> 5     1 i     Legacy         1
+#> 6     1 n_i1  Legacy         1
+#> 7     1 n_i2  Legacy         1
+#> 8     1 n_i3  Legacy         1
 plot_adoption(trial, tracked_behaviors = c("Legacy", "Adaptive"))
 ```
 
@@ -230,10 +228,10 @@ ggnetplot(gnm_net) +
 ``` r
 sw_net <- make_small_world(N = 10, k = 4, p=0.1)
 print(sw_net)
-#> IGRAPH 7805d83 U--- 10 20 -- 
-#> + edges from 7805d83:
-#>  [1] 1-- 2 1--10 3-- 5 1-- 9 2-- 3 2-- 4 2--10 3-- 4 3--10 4-- 5 6-- 9 5-- 6
-#> [13] 5-- 7 6-- 7 6-- 8 5-- 8 7-- 9 8-- 9 8--10 2-- 9
+#> IGRAPH 461b6a1 U--- 10 20 -- 
+#> + edges from 461b6a1:
+#>  [1] 1-- 2 1--10 1-- 3 1-- 9 2-- 3 2-- 4 2--10 3-- 4 3-- 7 4-- 5 4-- 6 5-- 6
+#> [13] 5-- 7 6-- 7 2-- 6 7-- 8 7-- 9 8-- 9 8--10 9--10
 ```
 
 ## More information and the philosophy of socmod
