@@ -448,7 +448,7 @@
 <code class="sourceCode R"><span><span class="va">footballer</span> <span class="op">&lt;-</span> <span class="va">Footballer</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>accuracy <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span>
 <span><span class="va">footballer</span><span class="op">$</span><span class="fu">scored_goal</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0</code></pre>
+<pre><code>[1] 1</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb59"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># sum(purrr::map_vec(1:10, \(.) p$scored_goal()))</span></span></code></pre></div>
@@ -517,20 +517,20 @@
 <span><span class="co"># Play three matches.</span></span>
 <span><span class="fu">play_match</span><span class="op">(</span><span class="va">whales</span>, <span class="va">squirrels</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Tie game!
-Whales :  1     Squirrels :  1 </code></pre>
+<pre><code>Whales wins!!!
+Whales :  5     Squirrels :  3 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb63"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">play_match</span><span class="op">(</span><span class="va">squirrels</span>, <span class="va">whales</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Squirrels wins!!!
-Squirrels :  3     Whales :  1 </code></pre>
+Squirrels :  4     Whales :  2 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb65"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">play_match</span><span class="op">(</span><span class="va">squirrels</span>, <span class="va">whales</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Whales wins!!!
-Squirrels :  2     Whales :  6 </code></pre>
+Squirrels :  2     Whales :  4 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb67"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Print how many games each time won.</span></span>
@@ -539,12 +539,14 @@ Squirrels :  2     Whales :  6 </code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 After three games...
-The Whales have won 1 games and the Squirrels have won 1</code></pre>
+The Whales have won 2 games and the Squirrels have won 1</code></pre>
 </div>
 </div>
 </section></section><section class="level2"><h2 id="agent-based-models-of-social-behavior">Agent-based models of social behavior<a class="anchor" aria-label="anchor" href="#agent-based-models-of-social-behavior"></a>
 </h2>
-<p>Here we develop our first agent-based models of social behavior. We’ll start small, with the following four-household network of solar panel electrification using only success-biased learning. Then we’ll do a detailed comparison of different social learning strategies with different parameterizations.</p>
+<p>Here we develop our first agent-based models of social behavior. We’ll start small, with the following four-household network of solar panel electrification using only success-biased learning <strong>?@fig-4house-example</strong>. Then we’ll do a detailed comparison of different social learning strategies with different parameterizations.</p>
+<p><img src="four-agent-example.png" width="600"></p>
+<p>In the example, agent 2 has adopted rooftop solar. It has some adaptive fitness, which can be thought of as the financial gain from adopting a sustainable, adaptive behavior. We can directly create the social network using <code><a href="https://r.igraph.org/reference/make_graph.html" class="external-link">igraph::make_graph()</a></code> then set it as the model’s social network, along with setting the learning strategy to be contagion learning. The <code>adoption_rate</code> parameter specifies how likely another agent is to adopt the adaptive behavior when exposed to it. The <code>drop_rate</code> is how likely an agent doing the adaptive behavior is to stop doing it and revert to the non-adaptive behavior.</p>
 <section class="level3"><h3 id="example-1-time-series-of-adaptation-diffusion">Example 1: Time series of adaptation diffusion<a class="anchor" aria-label="anchor" href="#example-1-time-series-of-adaptation-diffusion"></a>
 </h3>
 <div class="cell">
