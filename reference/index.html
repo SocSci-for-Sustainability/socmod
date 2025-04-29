@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">socmod</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -16,6 +16,10 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/basic-diffusion-components.html">Components for basic diffusion modeling with socmod</a></li>
+  </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
       </ul></div>
@@ -29,9 +33,9 @@
     </div>
 
     <div class="section level2">
-      <h2 id="the-agentbasedmodel-class-to-represent-the-agents-and-their-social-network">The <code>AgentBasedModel</code> class to represent the agents and their social network<a class="anchor" aria-label="anchor" href="#the-agentbasedmodel-class-to-represent-the-agents-and-their-social-network"></a></h2>
+      <h2 id="agentbasedmodel-modelparameters-and-analysis-helpers">AgentBasedModel, ModelParameters, and analysis helpers<a class="anchor" aria-label="anchor" href="#agentbasedmodel-modelparameters-and-analysis-helpers"></a></h2>
 
-      <div class="section-desc"><p>Create and run agent-based models of social behavior in socmod.</p></div>
+      <div class="section-desc"><p>Create, run, and analyze agent-based models of social behavior in socmod.</p></div>
 
 
     </div><div class="section level2">
@@ -44,11 +48,47 @@
           <code><a href="AgentBasedModel.html">AgentBasedModel</a></code>
 
         </dt>
-        <dd><code>socmod</code> implementation of an agent-based model</dd>
-      </dl></div><div class="section level2">
-      <h2 id="running-models">Running models<a class="anchor" aria-label="anchor" href="#running-models"></a></h2>
+        <dd>AgentBasedModel class for socmod</dd>
+      </dl><dl><dt>
 
-      <div class="section-desc"><p>The <code><a href="../reference/run.html">run()</a></code> function uses the specified <code>partner_selection</code>, <code>interaction</code>, and <code>iterate_model</code> functions to specify these dynamics and iterate the <code>model</code> (an instance of <code><a href="../reference/AgentBasedModel.html">socmod::AgentBasedModel</a></code>).</p></div>
+          <code><a href="make_abm.html">make_abm()</a></code>
+
+        </dt>
+        <dd>Helper function to create a new agent-based model</dd>
+      </dl><dl><dt>
+
+          <code><a href="ModelParameters.html">ModelParameters</a></code>
+
+        </dt>
+        <dd>Overwrite existing auxiliary parameters.</dd>
+      </dl><dl><dt>
+
+          <code><a href="make_model_parameters.html">make_model_parameters()</a></code>
+
+        </dt>
+        <dd>Wrapper for initializing new ModelParameters instance.</dd>
+      </dl><dl><dt>
+
+          <code><a href="DEFAULT_PARAMETERS.html">DEFAULT_PARAMETERS</a></code>
+
+        </dt>
+        <dd>Default parameters to create an agent-based model.</dd>
+      </dl><dl><dt>
+
+          <code><a href="summarise_by_parameters.html">summarise_by_parameters()</a></code>
+
+        </dt>
+        <dd>Summarise trials by metadata fields</dd>
+      </dl><dl><dt>
+
+          <code><a href="summarise_prevalence.html">summarise_prevalence()</a></code>
+
+        </dt>
+        <dd>Summarize behavior adoption over time from multiple trials</dd>
+      </dl></div><div class="section level2">
+      <h2 id="running-single-model-trial-or-trial-ensembles">Running single model trial or trial ensembles<a class="anchor" aria-label="anchor" href="#running-single-model-trial-or-trial-ensembles"></a></h2>
+
+      <div class="section-desc"><p>The <code><a href="../reference/run_trial.html">run_trial()</a></code> and <code><a href="../reference/run_trials.html">run_trials()</a></code> functions use the specified <code>partner_selection</code>, <code>interaction</code>, and <code>iterate_model</code> functions to specify these dynamics and iterate the <code>model</code> (an instance of <code><a href="../reference/AgentBasedModel.html">socmod::AgentBasedModel</a></code>). <code>fixated</code> helps us tell when all agents are performing the same behavior, i.e., the population has fixated.</p></div>
 
 
     </div><div class="section level2">
@@ -58,12 +98,30 @@
 
       <dl><dt>
 
-          <code><a href="run.html">run()</a></code>
+          <code><a href="Trial.html">Trial</a></code>
 
         </dt>
-        <dd>Run an agent-based model for either a number of iterations (<code>max_its</code>) or until some stop condition is met (e.g., fixation).</dd>
+        <dd>Trial class for running a single simulation</dd>
+      </dl><dl><dt>
+
+          <code><a href="run_trial.html">run_trial()</a></code>
+
+        </dt>
+        <dd>Trial runner helper function</dd>
+      </dl><dl><dt>
+
+          <code><a href="run_trials.html">run_trials()</a></code>
+
+        </dt>
+        <dd>Run a grid of trial ensembles with parameter metadata</dd>
+      </dl><dl><dt>
+
+          <code><a href="fixated.html">fixated()</a></code>
+
+        </dt>
+        <dd>Predicate function: has the model fixated on a single behavior?</dd>
       </dl></div><div class="section level2">
-      <h2 id="learning-strategy-functions">Learning (strategy) functions<a class="anchor" aria-label="anchor" href="#learning-strategy-functions"></a></h2>
+      <h2 id="learning-strategy-class-make-learning-strategy-and-other-tools">Learning strategy class, make_learning_strategy, and other tools<a class="anchor" aria-label="anchor" href="#learning-strategy-class-make-learning-strategy-and-other-tools"></a></h2>
 
       <div class="section-desc"><p>Functions to pass to run for model iteration in a learning model, and for either success-biased or frequency-biased adaptive learning.</p></div>
 
@@ -81,10 +139,22 @@
         <dd>A generic method for iterating a learning model, setting the current behavior and fitness to be whatever was identified as the next behavior and fitness.</dd>
       </dl><dl><dt>
 
+          <code><a href="LearningStrategy.html">LearningStrategy</a></code>
+
+        </dt>
+        <dd>LearningStrategy</dd>
+      </dl><dl><dt>
+
           <code><a href="success_bias_interact.html">success_bias_interact()</a></code>
 
         </dt>
-        <dd>Success-biased interaction to be paired with success_bias_teacher_selection that sets the learner's next behavior and fitness to be the teacher's current behavior and fitness.</dd>
+        <dd>Success-biased interaction function</dd>
+      </dl><dl><dt>
+
+          <code><a href="success_bias_learning_strategy.html">success_bias_learning_strategy</a></code>
+
+        </dt>
+        <dd>Define success-biased learning strategy.</dd>
       </dl><dl><dt>
 
           <code><a href="success_bias_select_teacher.html">success_bias_select_teacher()</a></code>
@@ -99,10 +169,58 @@
         <dd>Interaction function for frequency-biased adaptive learning.</dd>
       </dl><dl><dt>
 
+          <code><a href="frequency_bias_learning_strategy.html">frequency_bias_learning_strategy</a></code>
+
+        </dt>
+        <dd>Define frequency-biased learning strategy.</dd>
+      </dl><dl><dt>
+
           <code><a href="frequency_bias_select_teacher.html">frequency_bias_select_teacher()</a></code>
 
         </dt>
         <dd>Frequency biased teacher selection does nothing</dd>
+      </dl><dl><dt>
+
+          <code><a href="contagion_interaction.html">contagion_interaction()</a></code>
+
+        </dt>
+        <dd>Contagion-based interaction</dd>
+      </dl><dl><dt>
+
+          <code><a href="contagion_learning_strategy.html">contagion_learning_strategy</a></code>
+
+        </dt>
+        <dd>Define contagion learning "strategy".</dd>
+      </dl><dl><dt>
+
+          <code><a href="contagion_model_step.html">contagion_model_step()</a></code>
+
+        </dt>
+        <dd>Contagion model step</dd>
+      </dl><dl><dt>
+
+          <code><a href="contagion_partner_selection.html">contagion_partner_selection()</a></code>
+
+        </dt>
+        <dd>Contagion-based partner selection</dd>
+      </dl><dl><dt>
+
+          <code><a href="dummy_learning_strategy.html">dummy_learning_strategy()</a></code>
+
+        </dt>
+        <dd>Make a dummy learning strategy for mockups and testing.</dd>
+      </dl><dl><dt>
+
+          <code><a href="make_learning_strategy.html">make_learning_strategy()</a></code>
+
+        </dt>
+        <dd>Factory function for creating a LearningStrategy</dd>
+      </dl><dl><dt>
+
+          <code><a href="learning_model_step.html">learning_model_step()</a></code>
+
+        </dt>
+        <dd>More modern v0.1 alias for iterate_learning_model.</dd>
       </dl></div><div class="section level2">
       <h2 id="agents-and-their-neighbors">Agents and their neighbors<a class="anchor" aria-label="anchor" href="#agents-and-their-neighbors"></a></h2>
 
@@ -119,13 +237,13 @@
           <code><a href="Agent.html">Agent</a></code>
 
         </dt>
-        <dd>Agent for use with AgentBasedModel instances</dd>
+        <dd>Agent class for socmod</dd>
       </dl><dl><dt>
 
           <code><a href="Neighbors.html">Neighbors</a></code>
 
         </dt>
-        <dd>Encapsulation of an agent's neighbors.</dd>
+        <dd>Neighbors class</dd>
       </dl></div><div class="section level2">
       <h2 id="networks">Networks<a class="anchor" aria-label="anchor" href="#networks"></a></h2>
 
@@ -197,6 +315,82 @@
 
         </dt>
         <dd>Check two vertices are not adjacent.</dd>
+      </dl><dl><dt>
+
+          <code><a href="compare_friendship_paradox.html">compare_friendship_paradox()</a></code>
+
+        </dt>
+        <dd>Compare Friendship Paradox in a Network</dd>
+      </dl><dl><dt>
+
+          <code><a href="load_igraph_from_csv.html">load_igraph_from_csv()</a></code>
+
+        </dt>
+        <dd>Load an Undirected igraph Object from a CSV Edge List</dd>
+      </dl><dl><dt>
+
+          <code><a href="plot_friendship_paradox.html">plot_friendship_paradox()</a></code>
+
+        </dt>
+        <dd>Plot Friendship Paradox Comparison</dd>
+      </dl></div><div class="section level2">
+      <h2 id="visualizations">Visualizations<a class="anchor" aria-label="anchor" href="#visualizations"></a></h2>
+
+      <div class="section-desc"><p>Tools for visualizing networks, outcomes, and time series.</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="plot_adoption.html">plot_adoption()</a></code>
+
+        </dt>
+        <dd>Plot adoption counts of selected behaviors over time Plot adoption counts of selected behaviors (<code>tracked_behaviors</code>) over time.</dd>
+      </dl><dl><dt>
+
+          <code><a href="plot_homophilynet.html">plot_homophilynet()</a></code>
+
+        </dt>
+        <dd>Plot homophily network where groups color nodes.</dd>
+      </dl><dl><dt>
+
+          <code><a href="plot_friendship_paradox.html">plot_friendship_paradox()</a></code>
+
+        </dt>
+        <dd>Plot Friendship Paradox Comparison</dd>
+      </dl><dl><dt>
+
+          <code><a href="ggnetplot.html">ggnetplot()</a></code>
+
+        </dt>
+        <dd>Command that operates like ggplot</dd>
+      </dl></div><div class="section level2">
+      <h2 id="examples-with-real-world-data">Examples with real-world data<a class="anchor" aria-label="anchor" href="#examples-with-real-world-data"></a></h2>
+
+      <div class="section-desc"><p>Simple examples of real-world data in socmod.</p></div>
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="simulate_feld_1991.html">simulate_feld_1991()</a></code>
+
+        </dt>
+        <dd>Simulate Feld's 1991 Marketville Network</dd>
+      </dl><dl><dt>
+
+          <code><a href="get_feld_1991_network.html">get_feld_1991_network()</a></code>
+
+        </dt>
+        <dd>Load Feld's 1991 data.</dd>
       </dl></div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

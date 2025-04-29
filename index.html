@@ -17,8 +17,8 @@
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Models of Social Behavior in R">
-<meta name="description" content="Provides a conceptual framework with software tools for creating computational models of social behavior for decision making.">
-<meta property="og:description" content="Provides a conceptual framework with software tools for creating computational models of social behavior for decision making.">
+<meta name="description" content="Provides software tools and conceptual framework for creating computational models of social behavior for sustainability.">
+<meta property="og:description" content="Provides software tools and conceptual framework for creating computational models of social behavior for sustainability.">
 <meta property="og:image" content="https://css4s.github.io/socmod/logo.png">
 </head>
 <body>
@@ -29,7 +29,7 @@
 
     <a class="navbar-brand me-2" href="index.html">socmod</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,6 +39,12 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><a class="dropdown-item" href="articles/basic-diffusion-components.html">Components for basic diffusion modeling with socmod</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -56,9 +62,7 @@
 <img src="logo.png" class="logo" alt=""><h1 id="socmod">socmod<a class="anchor" aria-label="anchor" href="#socmod"></a>
 </h1>
 </div>
-<!-- badges: start -->
-
-<!-- badges: end -->
+<p><a href="https://app.codecov.io/gh/CSS4S/socmod" class="external-link"><img src="https://codecov.io/gh/CSS4S/socmod/graph/badge.svg" alt="Codecov test coverage"></a></p>
 <p><code>socmod</code> provides a framework and utilities for developing simulations of social learning and social influence structured by social networks. It is being developed to support the course <em>Computational Social Science for Sustainability</em> at the Stanford Doerr School of Sustainability. The course teaches theory and techniques for understanding cognitive and social mechanisms influencing beliefs and behaviors that can be combined in computational models to predict the relative efficacy of different candidate interventions for sustainability, e.g., to promote ecological protection, public health, economic security and justice, climate action, to name just a few <a href="https://sdgs.un.org/goals" class="external-link">sustainable development goals</a>.</p>
 <p><code>socmod</code> is flexible to encapsulate any social process that can be modeled as follows: (1) individuals are initialized with some knowledge and payoff from behaviors they do or or beliefs they hold; (2) they exchange information socially over time through teaching, observation, discourse, etc. This process is illustrated in this figure:</p>
 <p><img src="reference/figures/general_model_box_diagram.png"></p>
@@ -71,13 +75,13 @@
 <p><strong>devtools</strong></p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Install this if you don't have devtools.</span></span>
-<span><span class="co"># install.packages("devtools")</span></span>
-<span><span class="co"># devtools::install_github("CSS4S/socmod")</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"css4s/socmod"</span><span class="op">)</span></span></code></pre></div>
 <p><strong>pak</strong></p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Install this if you don't have pak.</span></span>
-<span><span class="co"># install.packages("pak")</span></span>
-<span><span class="co"># pak::pak("CSS4S/socmod")</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"pak"</span><span class="op">)</span></span>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"css4s/socmod"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="quickstart-examples">Quickstart examples<a class="anchor" aria-label="anchor" href="#quickstart-examples"></a>
@@ -87,301 +91,180 @@
 A simple network nieghborhood of individual/agent <span class="math inline"><em>i</em></span>
 </figcaption></figure><p>We can initialize these agents and their network as follows. In the next code block we first initialize four agents named “i”, “n_i1”, “n_i2”, and “n_i3” to match the illustration of focal/learner agent <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math> and its three neighbors (each one is an <em>instance</em> of the <code><a href="reference/Agent.html">socmod::Agent</a></code> class). Then we create the social network from the illustration using <code>igraph</code>. Finally, we initialize a new <code><a href="reference/AgentBasedModel.html">socmod::AgentBasedModel</a></code> using the helper function <code>make_example_abm</code>. In the next subsection we then use this helper function to initialize new models that will be run with frequency- and success-biased adaptive learning strategies, using learning functions provided with <code>socmod</code>. After that we show how to define non-adaptive contagion learning functions, adapted from compartmental epidemiological modeling.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://css4s.github.io/socmod/">socmod</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r.igraph.org/" class="external-link">igraph</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'igraph'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     decompose, spectrum</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     union</span></span>
-<span></span>
-<span></span>
-<span><span class="co"># Example ABM builder with four agents as pictured above. Can pass arbitrary</span></span>
-<span><span class="co"># named parameters in ... that will be passed to AgentBasedModel$new as params.</span></span>
-<span><span class="va">make_example_abm</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<code class="sourceCode R"><span><span class="va">make_example_abm</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">legacy_fitness</span> <span class="op">=</span> <span class="fl">1.0</span>, <span class="va">adaptive_fitness</span> <span class="op">=</span> <span class="fl">2.0</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co"># Example ABM builder with four agents as pictured above. Can pass arbitrary</span></span>
+<span>  <span class="co"># named parameters in ... that will be passed to make_abm as additional</span></span>
+<span>  <span class="co"># model parameters.</span></span>
 <span>  </span>
-<span>  <span class="va">n_agents</span> <span class="op">&lt;-</span> <span class="fl">4</span></span>
-<span>    </span>
-<span>  <span class="va">agent_behaviors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Legacy"</span>, <span class="st">"Legacy"</span>, <span class="st">"Legacy"</span>, <span class="st">"Adaptive"</span><span class="op">)</span></span>
-<span>  <span class="va">agent_fitness</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span></span>
-<span>  <span class="va">agent_names</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"i"</span>, <span class="st">"n_i1"</span>, <span class="st">"n_i2"</span>, <span class="st">"n_i3"</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="va">make_example_agents</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  </span>
-<span>    <span class="va">agents</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span></span>
-<span>      <span class="fl">1</span><span class="op">:</span><span class="va">n_agents</span>, \<span class="op">(</span><span class="va">a_idx</span><span class="op">)</span> <span class="op">{</span> </span>
-<span>        <span class="va"><a href="reference/Agent.html">Agent</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>behavior<span class="op">=</span><span class="va">agent_behaviors</span><span class="op">[</span><span class="va">a_idx</span><span class="op">]</span>, </span>
-<span>                  fitness<span class="op">=</span><span class="va">agent_fitness</span><span class="op">[</span><span class="va">a_idx</span><span class="op">]</span>, </span>
-<span>                  name<span class="op">=</span><span class="va">agent_names</span><span class="op">[</span><span class="va">a_idx</span><span class="op">]</span><span class="op">)</span> </span>
-<span>      <span class="op">}</span></span>
-<span>    <span class="op">)</span></span>
-<span>    </span>
-<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span> <span class="op">(</span><span class="va">agents</span><span class="op">)</span></span>
-<span>  <span class="op">}</span></span>
-<span>  </span>
-<span>  <span class="va">agents</span> <span class="op">&lt;-</span> <span class="fu">make_example_agents</span><span class="op">(</span><span class="op">)</span></span>
-<span>  <span class="co"># Initialize network.</span></span>
-<span>  <span class="va">socnet</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/make_empty_graph.html" class="external-link">make_empty_graph</a></span><span class="op">(</span><span class="fl">4</span>, directed <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span>  <span class="co"># Set the vertex names.</span></span>
-<span>  <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/V.html" class="external-link">V</a></span><span class="op">(</span><span class="va">socnet</span><span class="op">)</span><span class="op">$</span><span class="va">name</span> <span class="op">&lt;-</span> <span class="va">agent_names</span></span>
-<span>  </span>
-<span>  <span class="co"># Edges can be added like so where every two names specify an edge.</span></span>
-<span>  <span class="va">socnet</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/add_edges.html" class="external-link">add_edges</a></span><span class="op">(</span></span>
-<span>    <span class="va">socnet</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"i"</span>, <span class="st">"n_i1"</span>, <span class="st">"i"</span>, <span class="st">"n_i2"</span>, <span class="st">"i"</span>, <span class="st">"n_i3"</span>, <span class="st">"n_i2"</span>, <span class="st">"n_i3"</span><span class="op">)</span></span>
+<span>  <span class="va">agents</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="va"><a href="reference/Agent.html">Agent</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="fl">1</span>, name <span class="op">=</span> <span class="st">"i"</span>, behavior <span class="op">=</span> <span class="st">"Legacy"</span>, fitness <span class="op">=</span> <span class="va">legacy_fitness</span><span class="op">)</span>, </span>
+<span>    <span class="va"><a href="reference/Agent.html">Agent</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="fl">2</span>, name <span class="op">=</span> <span class="st">"n_i1"</span>, behavior <span class="op">=</span> <span class="st">"Legacy"</span>, fitness <span class="op">=</span> <span class="va">legacy_fitness</span><span class="op">)</span>, </span>
+<span>    <span class="va"><a href="reference/Agent.html">Agent</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="fl">1</span>, name <span class="op">=</span> <span class="st">"n_i2"</span>, behavior <span class="op">=</span> <span class="st">"Legacy"</span>, fitness <span class="op">=</span> <span class="va">legacy_fitness</span><span class="op">)</span>, </span>
+<span>    <span class="va"><a href="reference/Agent.html">Agent</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="fl">1</span>, name <span class="op">=</span> <span class="st">"n_i3"</span>, behavior <span class="op">=</span> <span class="st">"Adaptive"</span>, fitness <span class="op">=</span> <span class="va">adaptive_fitness</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="co"># Create the agent-based model and plot the model's network.</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span> <span class="op">(</span><span class="va"><a href="reference/AgentBasedModel.html">AgentBasedModel</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>agents <span class="op">=</span> <span class="va">agents</span>, network <span class="op">=</span> <span class="va">socnet</span>, <span class="va">...</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="co"># Initialize network.</span></span>
+<span>  <span class="va">socnet</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/make_graph.html" class="external-link">make_graph</a></span><span class="op">(</span><span class="op">~</span> <span class="fl">1</span><span class="op">-</span><span class="fl">2</span><span class="op">:</span><span class="fl">3</span><span class="op">:</span><span class="fl">4</span>, <span class="fl">3</span><span class="op">-</span><span class="fl">4</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Create the agent-based model and plot the model's network.</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span> <span class="op">(</span><span class="fu"><a href="reference/make_abm.html">make_abm</a></span><span class="op">(</span><span class="fu"><a href="reference/make_model_parameters.html">make_model_parameters</a></span><span class="op">(</span>graph <span class="op">=</span> <span class="va">socnet</span><span class="op">)</span>, agents <span class="op">=</span> <span class="va">agents</span>, <span class="va">...</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="va">abm</span> <span class="op">&lt;-</span> <span class="fu">make_example_abm</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/briatte/ggnetwork" class="external-link">ggnetwork</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Loading required package: ggplot2</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r.igraph.org/" class="external-link">igraph</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="reference/ggnetplot.html">ggnetplot</a></span><span class="op">(</span><span class="va">abm</span><span class="op">$</span><span class="va">network</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/pkg/ggnetwork/man/geom_edges.html" class="external-link">geom_edges</a></span><span class="op">(</span>linewidth<span class="op">=</span><span class="fl">0.1</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/pkg/ggnetwork/man/geom_nodes.html" class="external-link">geom_nodes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"#008566"</span>, size<span class="op">=</span><span class="fl">4</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/pkg/ggnetwork/man/geom_nodetext_repel.html" class="external-link">geom_nodelabel_repel</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>label <span class="op">=</span> <span class="va">name</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/pkg/ggnetwork/man/theme_blank.html" class="external-link">theme_blank</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># Visualize social network to ensure it was created properly.</span></span>
+<span><span class="fu"><a href="reference/ggnetplot.html">ggnetplot</a></span><span class="op">(</span><span class="va">abm</span><span class="op">$</span><span class="va">graph</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>      <span class="fu">geom_edges</span><span class="op">(</span>linewidth<span class="op">=</span><span class="fl">0.1</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>      <span class="fu">geom_nodes</span><span class="op">(</span>color <span class="op">=</span> <span class="st">"#008566"</span>, size<span class="op">=</span><span class="fl">4</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>      <span class="co"># `name` in label = name was set automagically during ABM construction.</span></span>
+<span>      <span class="fu">geom_nodelabel_repel</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>label <span class="op">=</span> <span class="va">name</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>      <span class="fu">theme_blank</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-4-1.png" width="50%" style="display: block; margin: auto;"></p>
 <div class="section level3">
 <h3 id="model-dynamics-with-different-adaptive-social-learning-strategies">Model dynamics with different adaptive social learning strategies<a class="anchor" aria-label="anchor" href="#model-dynamics-with-different-adaptive-social-learning-strategies"></a>
 </h3>
+<p>Here we set up three different models with each of the three learning strategies provided by socmod: success-biased, frequency-biased, and contagion learning.</p>
 <div class="section level4">
-<h4 id="frequency-biased-adaptive-learning">Frequency-biased adaptive learning<a class="anchor" aria-label="anchor" href="#frequency-biased-adaptive-learning"></a>
+<h4 id="success-biased-learning">Success-biased learning<a class="anchor" aria-label="anchor" href="#success-biased-learning"></a>
 </h4>
-<p>In frequency-biased transmission, the probability a learner adopts a behavior is proportional to the number of network neighbors doing a behavior. In the first time step, then, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>n</mi><mrow><mi>i</mi><mn>2</mn></mrow></msub><annotation encoding="application/x-tex">n_{i2}</annotation></semantics></math> has a 1/2 probability of adopting <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>, and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math> has a 1/3 probability of adopting <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>.</p>
-<p>Here is how to set up an agent-based model and run it with frequency-biased learning dynamics. There is a lot of stochasticity with this setup, with many model runs ending with <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo>=</mo><mn>50</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>4</mn></mrow><annotation encoding="application/x-tex">A(t=50) = 4</annotation></semantics></math>, fixating on the Adaptive behavior, and many ending with <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>t</mi><mo>=</mo><mn>50</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">A(t=50) = 0</annotation></semantics></math>, fixating on the Legacy behavior.</p>
+<p>In success-biased learning, the probability a learner adopts a behavior is proportional to the relative fitness of their neighbors. Note that in the simplest model of success-biased transmission, if there is only one agent doing <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>, then this agent always adopts <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>L</mi><annotation encoding="application/x-tex">L</annotation></semantics></math> on the first time step. There is a “stubbornness” parameter that can be passed as a model parameter that represents how frequently an individual ignores social information and continues using their current behavior.</p>
+<p>Success-biased learning is the default, so we do not have to specify it explicitly.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
-<span><span class="va">abm</span> <span class="op">&lt;-</span> <span class="fu">make_example_abm</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run.html">run</a></span><span class="op">(</span><span class="va">abm</span>, <span class="fl">50</span>, <span class="va">frequency_bias_select_teacher</span>, <span class="va">frequency_bias_interact</span>, <span class="va">iterate_learning_model</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">output</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">t</span>, y<span class="op">=</span><span class="va">A</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Time step"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"# Adaptive"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_classic</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">abm</span> <span class="op">&lt;-</span> <span class="fu">make_example_abm</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">trial</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run_trial.html">run_trial</a></span><span class="op">(</span><span class="va">abm</span>, stop <span class="op">=</span> <span class="va">fixated</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">trial</span><span class="op">$</span><span class="fu">get_observations</span><span class="op">(</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 10 × 4</span></span>
+<span><span class="co">#&gt;        t agent Behavior Fitness</span></span>
+<span><span class="co">#&gt;    &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;      &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1     6 n_i2  Adaptive       2</span></span>
+<span><span class="co">#&gt;  2     6 n_i3  Legacy         1</span></span>
+<span><span class="co">#&gt;  3     7 i     Legacy         1</span></span>
+<span><span class="co">#&gt;  4     7 n_i1  Adaptive       2</span></span>
+<span><span class="co">#&gt;  5     7 n_i2  Legacy         1</span></span>
+<span><span class="co">#&gt;  6     7 n_i3  Adaptive       2</span></span>
+<span><span class="co">#&gt;  7     8 i     Legacy         1</span></span>
+<span><span class="co">#&gt;  8     8 n_i1  Legacy         1</span></span>
+<span><span class="co">#&gt;  9     8 n_i2  Legacy         1</span></span>
+<span><span class="co">#&gt; 10     8 n_i3  Legacy         1</span></span>
+<span><span class="fu"><a href="reference/plot_adoption.html">plot_adoption</a></span><span class="op">(</span><span class="va">trial</span>, tracked_behaviors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Legacy"</span>, <span class="st">"Adaptive"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-5-1.png" width="50%" style="display: block; margin: auto;"></p>
-<p>We can check how many end in <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math> or <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>L</mi><annotation encoding="application/x-tex">L</annotation></semantics></math> being fixated like so, where fixation on <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math> counts as adaptation “success”:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">n_trials</span> <span class="op">&lt;-</span> <span class="fl">10</span></span>
-<span><span class="va">one_trial_success</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n_steps</span> <span class="op">=</span> <span class="fl">50</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">abm</span> <span class="op">&lt;-</span> <span class="fu">make_example_abm</span><span class="op">(</span><span class="op">)</span></span>
-<span>  <span class="va">A_T</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run.html">run</a></span><span class="op">(</span></span>
-<span>    <span class="va">abm</span>, <span class="va">n_steps</span>, <span class="va">frequency_bias_select_teacher</span>, </span>
-<span>    <span class="va">frequency_bias_interact</span>, <span class="va">iterate_learning_model</span></span>
-<span>  <span class="op">)</span><span class="op">$</span><span class="va">output</span><span class="op">$</span><span class="va">A</span><span class="op">[</span><span class="va">n_steps</span><span class="op">]</span></span>
-<span>  </span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">A_T</span> <span class="op">==</span> <span class="fl">4</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span></span>
-<span><span class="va">n_success</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_vec</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n_trials</span>, \<span class="op">(</span><span class="va">.</span><span class="op">)</span> <span class="op">{</span><span class="fu">one_trial_success</span><span class="op">(</span><span class="op">)</span><span class="op">}</span><span class="op">)</span><span class="op">)</span>;</span>
-<span></span>
-<span><span class="va">success_rate</span> <span class="op">&lt;-</span> <span class="va">n_success</span> <span class="op">/</span> <span class="va">n_trials</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Success rate:"</span>, <span class="va">success_rate</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "Success rate: 0.2"</span></span></code></pre></div>
 </div>
 <div class="section level4">
-<h4 id="success-biased-adaptive-learning">Success-biased adaptive learning<a class="anchor" aria-label="anchor" href="#success-biased-adaptive-learning"></a>
+<h4 id="frequency-biased-learning">Frequency-biased learning<a class="anchor" aria-label="anchor" href="#frequency-biased-learning"></a>
 </h4>
-<p>In success-biased transmission, the probability a learner adopts a behavior is proportional to the relative fitness of their neighbors. Note that in the simplest model of success-biased transmission, if there is only one agent doing <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>, then this agent always adopts <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>L</mi><annotation encoding="application/x-tex">L</annotation></semantics></math> on the first time step. This is the version currently provided by <code>socmod</code>. Adding additional adaptive logic for making this evitable is left as an exercise.</p>
-<p>Here is how one can run a model with success-biased learning:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
-<span><span class="va">abm</span> <span class="op">&lt;-</span> <span class="fu">make_example_abm</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run.html">run</a></span><span class="op">(</span><span class="va">abm</span>, <span class="fl">50</span>, <span class="va">success_bias_select_teacher</span>, <span class="va">success_bias_interact</span>, <span class="va">iterate_learning_model</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">output</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">t</span>, y<span class="op">=</span><span class="va">A</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Time step"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"# Adaptive"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_classic</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-7-1.png" width="50%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">n_trials</span> <span class="op">&lt;-</span> <span class="fl">10</span></span>
-<span><span class="va">one_trial_success</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">n_steps</span> <span class="op">=</span> <span class="fl">50</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">abm</span> <span class="op">&lt;-</span> <span class="fu">make_example_abm</span><span class="op">(</span><span class="op">)</span></span>
-<span>  <span class="va">A_T</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run.html">run</a></span><span class="op">(</span></span>
-<span>    <span class="va">abm</span>, <span class="va">n_steps</span>, <span class="va">success_bias_select_teacher</span>, </span>
-<span>    <span class="va">success_bias_interact</span>, <span class="va">iterate_learning_model</span></span>
-<span>  <span class="op">)</span><span class="op">$</span><span class="va">output</span><span class="op">$</span><span class="va">A</span><span class="op">[</span><span class="va">n_steps</span><span class="op">]</span></span>
-<span>  </span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">A_T</span> <span class="op">==</span> <span class="fl">4</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span></span>
-<span><span class="va">n_success</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_vec</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n_trials</span>, \<span class="op">(</span><span class="va">.</span><span class="op">)</span> <span class="op">{</span><span class="fu">one_trial_success</span><span class="op">(</span><span class="op">)</span><span class="op">}</span><span class="op">)</span><span class="op">)</span>;</span>
-<span></span>
-<span><span class="va">success_rate</span> <span class="op">&lt;-</span> <span class="va">n_success</span> <span class="op">/</span> <span class="va">n_trials</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Success rate:"</span>, <span class="va">success_rate</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "Success rate: 0.6"</span></span></code></pre></div>
+<p>In frequency-biased learning, the probability a learner adopts a behavior is proportional to the number of network neighbors doing a behavior. In the first time step, then, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>n</mi><mrow><mi>i</mi><mn>2</mn></mrow></msub><annotation encoding="application/x-tex">n_{i2}</annotation></semantics></math> has a 1/2 probability of adopting <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>, and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math> has a 1/3 probability of adopting <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>. Frequency-biased learning is not the default, so we need to explicilty specify its use in our model parameters by passing <code>frequency_biased_learning_strategy</code> to the <code>make_model_parameters</code> helper function:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">abm</span> <span class="op">&lt;-</span> <span class="fu">make_example_abm</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">trial</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run_trial.html">run_trial</a></span><span class="op">(</span><span class="va">abm</span>, stop <span class="op">=</span> <span class="va">fixated</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">trial</span><span class="op">$</span><span class="fu">get_observations</span><span class="op">(</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 10 × 4</span></span>
+<span><span class="co">#&gt;        t agent Behavior Fitness</span></span>
+<span><span class="co">#&gt;    &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;      &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1     4 n_i2  Adaptive       2</span></span>
+<span><span class="co">#&gt;  2     4 n_i3  Adaptive       2</span></span>
+<span><span class="co">#&gt;  3     5 i     Adaptive       2</span></span>
+<span><span class="co">#&gt;  4     5 n_i1  Legacy         1</span></span>
+<span><span class="co">#&gt;  5     5 n_i2  Adaptive       2</span></span>
+<span><span class="co">#&gt;  6     5 n_i3  Adaptive       2</span></span>
+<span><span class="co">#&gt;  7     6 i     Adaptive       2</span></span>
+<span><span class="co">#&gt;  8     6 n_i1  Adaptive       2</span></span>
+<span><span class="co">#&gt;  9     6 n_i2  Adaptive       2</span></span>
+<span><span class="co">#&gt; 10     6 n_i3  Adaptive       2</span></span>
+<span><span class="fu"><a href="reference/plot_adoption.html">plot_adoption</a></span><span class="op">(</span><span class="va">trial</span>, tracked_behaviors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Legacy"</span>, <span class="st">"Adaptive"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-6-1.png" width="50%" style="display: block; margin: auto;"></p>
 </div>
 </div>
 <div class="section level3">
-<h3 id="model-dynamics-with-non-adaptive-contagion-learning">Model dynamics with non-adaptive contagion learning<a class="anchor" aria-label="anchor" href="#model-dynamics-with-non-adaptive-contagion-learning"></a>
+<h3 id="networks">Networks<a class="anchor" aria-label="anchor" href="#networks"></a>
 </h3>
-<p>Now we show how to define custom learning functions using non-adaptive contagion learning as an example. In contagion learning, a learner adopts its interaction partner teacher’s behavior with probability <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>, called the <em>adoption rate</em>. We can also provide a <em>drop rate</em> that represents the probability an individual stops doing the adaptive behavior.</p>
-<p>We can define contagion learning functions as follows, assuming that partner selection is random.</p>
+<p>Socmod provides some helper functions to create and plot some important network types, shown below.</p>
+</div>
+<div class="section level3">
+<h3 id="regular-lattice">Regular lattice<a class="anchor" aria-label="anchor" href="#regular-lattice"></a>
+</h3>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">latnet</span> <span class="op">&lt;-</span> <span class="fu">socmod</span><span class="fu">::</span><span class="fu"><a href="reference/make_regular_lattice.html">make_regular_lattice</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">10</span>, k <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/ggnetplot.html">ggnetplot</a></span><span class="op">(</span><span class="va">latnet</span>, layout <span class="op">=</span> \<span class="op">(</span><span class="va">g</span><span class="op">)</span> <span class="fl">0.6</span><span class="op">*</span><span class="fu">layout_in_circle</span><span class="op">(</span><span class="va">g</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>      <span class="fu">geom_edges</span><span class="op">(</span>linewidth<span class="op">=</span><span class="fl">0.2</span>, color<span class="op">=</span><span class="st">"darkgray"</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>      <span class="fu">geom_nodes</span><span class="op">(</span>color <span class="op">=</span> <span class="st">"#008566"</span>, size<span class="op">=</span><span class="fl">1</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>      <span class="fu">theme_blank</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-7-1.png" width="50%" style="display: block; margin: auto;"></p>
+</div>
+<div class="section level3">
+<h3 id="random-networks">Random networks<a class="anchor" aria-label="anchor" href="#random-networks"></a>
+</h3>
+<p><strong>Erdős–Rényi <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>G</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>N</mi><mo>,</mo><mi>M</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">G(N,M)</annotation></semantics></math></strong></p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">gnm_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/G_NM.html">G_NM</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">30</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/ggnetplot.html">ggnetplot</a></span><span class="op">(</span><span class="va">gnm_net</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu">geom_edges</span><span class="op">(</span>linewidth<span class="op">=</span><span class="fl">0.2</span>, color<span class="op">=</span> <span class="st">"darkgray"</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu">geom_nodes</span><span class="op">(</span>color <span class="op">=</span> <span class="st">"#008566"</span>, size<span class="op">=</span><span class="fl">.75</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu">theme_blank</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-8-1.png" width="50%" style="display: block; margin: auto;"></p>
+</div>
+<div class="section level3">
+<h3 id="small-world-networks">Small-world networks<a class="anchor" aria-label="anchor" href="#small-world-networks"></a>
+</h3>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">contagion_partner_selection</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">learner</span>, <span class="va">model</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">learner</span><span class="op">$</span><span class="va">neighbors</span><span class="op">$</span><span class="va">agents</span>, <span class="fl">1</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span></span>
-<span><span class="va">contagion_interaction</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">learner</span>, <span class="va">teacher</span>, <span class="va">model</span><span class="op">)</span> <span class="op">{</span></span>
-<span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="op">(</span><span class="va">learner</span><span class="op">$</span><span class="va">curr_behavior</span> <span class="op">==</span> <span class="st">"Legacy"</span><span class="op">)</span> <span class="op">&amp;&amp;</span> </span>
-<span>      <span class="op">(</span><span class="va">teacher</span><span class="op">$</span><span class="va">curr_behavior</span> <span class="op">==</span> <span class="st">"Adaptive"</span><span class="op">)</span> <span class="op">&amp;&amp;</span> </span>
-<span>      <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">&lt;</span> <span class="va">model</span><span class="op">$</span><span class="va">params</span><span class="op">$</span><span class="va">adopt_rate</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span> <span class="co"># this is how we implement prob learning w/ alpha</span></span>
-<span>    <span class="va">learner</span><span class="op">$</span><span class="va">next_behavior</span> <span class="op">&lt;-</span> <span class="st">"Adaptive"</span></span>
-<span>    <span class="va">learner</span><span class="op">$</span><span class="va">next_fitness</span> <span class="op">&lt;-</span> <span class="fl">2.0</span></span>
-<span>  <span class="op">}</span></span>
-<span><span class="op">}</span></span>
-<span></span>
-<span><span class="va">contagion_model_step</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">model</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="co"># If drop rate is non-zero, get a list of agents who will drop the behavior</span></span>
-<span>  <span class="co"># if they are doing the Adaptive behavior.</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="va">params</span><span class="op">$</span><span class="va">drop_rate</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">agent_drop</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">model</span><span class="op">$</span><span class="va">n_agents</span><span class="op">)</span> <span class="op">&lt;</span> <span class="va">model</span><span class="op">$</span><span class="va">params</span><span class="op">$</span><span class="va">drop_rate</span></span>
-<span>    </span>
-<span>    <span class="kw">for</span> <span class="op">(</span><span class="va">agent</span> <span class="kw">in</span> <span class="va">abm</span><span class="op">$</span><span class="va">agents</span><span class="op">[</span><span class="va">agent_drop</span><span class="op">]</span><span class="op">)</span> <span class="op">{</span></span>
-<span>      <span class="kw">if</span> <span class="op">(</span><span class="va">agent</span><span class="op">$</span><span class="va">curr_behavior</span> <span class="op">==</span> <span class="st">"Adaptive"</span><span class="op">)</span> <span class="op">{</span></span>
-<span>        <span class="va">agent</span><span class="op">$</span><span class="va">next_behavior</span> <span class="op">&lt;-</span> <span class="st">"Legacy"</span></span>
-<span>        <span class="va">agent</span><span class="op">$</span><span class="va">next_fitness</span> <span class="op">&lt;-</span> <span class="fl">1.0</span></span>
-<span>      <span class="op">}</span></span>
-<span>    <span class="op">}</span></span>
-<span>  <span class="op">}</span></span>
-<span>  </span>
-<span>  <span class="co"># Basic learning step where the next behaviors and payoffs become current.</span></span>
-<span>  <span class="fu"><a href="reference/iterate_learning_model.html">iterate_learning_model</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<p>Initialize a new agent-based model and run contagion learning dynamics:</p>
+<code class="sourceCode R"><span><span class="va">sw_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/make_small_world.html">make_small_world</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">10</span>, k <span class="op">=</span> <span class="fl">4</span>, p<span class="op">=</span><span class="fl">0.3</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/ggnetplot.html">ggnetplot</a></span><span class="op">(</span><span class="va">sw_net</span>, layout <span class="op">=</span> \<span class="op">(</span><span class="va">net</span><span class="op">)</span> <span class="fl">0.6</span><span class="op">*</span><span class="fu">layout_in_circle</span><span class="op">(</span><span class="va">net</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>      <span class="fu">geom_edges</span><span class="op">(</span>linewidth<span class="op">=</span><span class="fl">0.2</span>, color<span class="op">=</span><span class="st">"darkgray"</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>      <span class="fu">geom_nodes</span><span class="op">(</span>color <span class="op">=</span> <span class="st">"#008566"</span>, size<span class="op">=</span><span class="fl">1</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>      <span class="fu">theme_blank</span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">12</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-9-1.png" width="50%" style="display: block; margin: auto;"></p>
+</div>
+<div class="section level3">
+<h3 id="preferential-attachment-networks">Preferential attachment networks<a class="anchor" aria-label="anchor" href="#preferential-attachment-networks"></a>
+</h3>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
-<span> </span>
-<span><span class="va">abm</span> <span class="op">&lt;-</span> <span class="fu">make_example_abm</span><span class="op">(</span>adopt_rate <span class="op">=</span> <span class="fl">0.2</span>, drop_rate <span class="op">=</span> <span class="fl">0.02</span><span class="op">)</span></span>
-<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run.html">run</a></span><span class="op">(</span><span class="va">abm</span>, <span class="fl">100</span>, <span class="va">contagion_partner_selection</span>, <span class="va">contagion_interaction</span>,</span>
-<span>              <span class="va">contagion_model_step</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">output</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">t</span>, y<span class="op">=</span><span class="va">A</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Time step"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"# Adaptive"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_classic</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">pa_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/make_preferential_attachment.html">make_preferential_attachment</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/ggnetplot.html">ggnetplot</a></span><span class="op">(</span><span class="va">pa_net</span>, layout <span class="op">=</span> \<span class="op">(</span><span class="va">net</span><span class="op">)</span> <span class="fl">0.6</span><span class="op">*</span><span class="fu">layout_with_fr</span><span class="op">(</span><span class="va">net</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>      <span class="fu">geom_edges</span><span class="op">(</span>linewidth<span class="op">=</span><span class="fl">0.2</span>, color<span class="op">=</span><span class="st">"darkgray"</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>      <span class="fu">geom_nodes</span><span class="op">(</span>color <span class="op">=</span> <span class="st">"#008566"</span>, size<span class="op">=</span><span class="fl">0.35</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>      <span class="fu">theme_blank</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-10-1.png" width="50%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
-<h3 id="social-networks">Social networks<a class="anchor" aria-label="anchor" href="#social-networks"></a>
+<h3 id="homophily-networks">Homophily networks<a class="anchor" aria-label="anchor" href="#homophily-networks"></a>
 </h3>
-<p><code>socmod</code> provides social network tools to create and analyze custom instances of <code>igraph::Graph</code>. See examples below. Create and pass these to the agent-based models constructor to create ABMs with specified network structures, e.g.,</p>
+<p>Homophily may be set globally, i.e., <em>symmetrically</em>, so each group has the same proportion of within- to between-group connections. It may also be set <em>asymmetrically</em>, so groups have different <em>group-level</em> homophily.</p>
+<p>These network models are defined by homophily levels and group size, altogether defining what we call <em>group structure</em>, or <em>metapopulation structure</em> borrowing from epidemiological use.</p>
+<div class="section level4">
+<h4 id="symmetric-homophily">Symmetric homophily<a class="anchor" aria-label="anchor" href="#symmetric-homophily"></a>
+</h4>
+<p>Positive symmetric homophily in this example makes within-group social connections 50% more likely than between-group connections. In other words, 75% of all ties are within-group and 25% are between group. The metapopulation is composed of two groups with population sizes 5 and 10.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sw_net</span> <span class="op">&lt;-</span> <span class="fu">socmod</span><span class="fu">::</span><span class="fu"><a href="reference/make_small_world.html">make_small_world</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">10</span>, k <span class="op">=</span> <span class="fl">4</span>, p<span class="op">=</span><span class="fl">0.1</span><span class="op">)</span></span>
-<span><span class="va">sw_abm</span> <span class="op">&lt;-</span> <span class="va"><a href="reference/AgentBasedModel.html">AgentBasedModel</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>network <span class="op">=</span> <span class="va">sw_net</span><span class="op">)</span></span></code></pre></div>
-<p>We can build models with real-world social networks, as well, e.g., Florentine oligarchs,</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/schochastics/netrankr/" class="external-link">netrankr</a></span><span class="op">)</span></span>
-<span> </span>
-<span><span class="co"># Remove the oligarch with no friends.</span></span>
-<span><span class="va">oligarchs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r.igraph.org/reference/delete_vertices.html" class="external-link">delete_vertices</a></span><span class="op">(</span><span class="va">florentine_m</span>, <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://r.igraph.org/reference/degree.html" class="external-link">degree</a></span><span class="op">(</span><span class="va">florentine_m</span><span class="op">)</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Initialize a new ABM with this network.</span></span>
-<span><span class="va">abm</span> <span class="op">&lt;-</span> <span class="va"><a href="reference/AgentBasedModel.html">AgentBasedModel</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>network <span class="op">=</span> <span class="va">oligarchs</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Print the name of the Medici's network neighbors.</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">abm</span><span class="op">$</span><span class="fu">get_agent</span><span class="op">(</span><span class="st">"Medici"</span><span class="op">)</span><span class="op">$</span><span class="va">neighbors</span><span class="op">$</span><span class="fu">map</span><span class="op">(</span>\<span class="op">(</span><span class="va">a</span><span class="op">)</span> <span class="op">{</span> <span class="va">a</span><span class="op">$</span><span class="va">name</span> <span class="op">}</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $Acciaiuol</span></span>
-<span><span class="co">#&gt; [1] "Acciaiuol"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $Albizzi</span></span>
-<span><span class="co">#&gt; [1] "Albizzi"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $Barbadori</span></span>
-<span><span class="co">#&gt; [1] "Barbadori"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $Ridolfi</span></span>
-<span><span class="co">#&gt; [1] "Ridolfi"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $Salviati</span></span>
-<span><span class="co">#&gt; [1] "Salviati"</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $Tornabuon</span></span>
-<span><span class="co">#&gt; [1] "Tornabuon"</span></span>
-<span><span class="co"># Plot the network.</span></span>
-<span><span class="fu"><a href="reference/ggnetplot.html">ggnetplot</a></span><span class="op">(</span><span class="va">abm</span><span class="op">$</span><span class="va">network</span>, layout <span class="op">=</span> <span class="fu"><a href="https://r.igraph.org/reference/layout_with_fr.html" class="external-link">layout_with_fr</a></span><span class="op">(</span><span class="va">abm</span><span class="op">$</span><span class="va">network</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/ggnetwork/man/geom_edges.html" class="external-link">geom_edges</a></span><span class="op">(</span>linewidth<span class="op">=</span><span class="fl">0.1</span>, color<span class="op">=</span><span class="st">"darkgray"</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/ggnetwork/man/geom_nodes.html" class="external-link">geom_nodes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"#008566"</span>, size<span class="op">=</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/ggnetwork/man/geom_nodetext_repel.html" class="external-link">geom_nodelabel_repel</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>label <span class="op">=</span> <span class="va">name</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">1.25</span>, lineheight <span class="op">=</span> <span class="fl">1.25</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/ggnetwork/man/theme_blank.html" class="external-link">theme_blank</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-12-1.png" width="60%" style="display: block; margin: auto;"></p>
-<div class="section level4">
-<h4 id="regular-lattice">Regular lattice<a class="anchor" aria-label="anchor" href="#regular-lattice"></a>
-</h4>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">latnet</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/make_regular_lattice.html">make_regular_lattice</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">10</span>, k <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/ggnetplot.html">ggnetplot</a></span><span class="op">(</span><span class="va">latnet</span>, layout <span class="op">=</span> <span class="fl">0.6</span><span class="op">*</span><span class="fu"><a href="https://r.igraph.org/reference/layout_in_circle.html" class="external-link">layout_in_circle</a></span><span class="op">(</span><span class="va">latnet</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/pkg/ggnetwork/man/geom_edges.html" class="external-link">geom_edges</a></span><span class="op">(</span>linewidth<span class="op">=</span><span class="fl">0.1</span>, color<span class="op">=</span><span class="st">"darkgray"</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/pkg/ggnetwork/man/geom_nodes.html" class="external-link">geom_nodes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"#008566"</span>, size<span class="op">=</span><span class="fl">1</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/pkg/ggnetwork/man/theme_blank.html" class="external-link">theme_blank</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-13-1.png" width="50%" style="display: block; margin: auto;"></p>
-</div>
-<div class="section level4">
-<h4 id="random-networks">Random networks<a class="anchor" aria-label="anchor" href="#random-networks"></a>
-</h4>
-<p><strong>Erdős–Rényi <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>G</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>N</mi><mo>,</mo><mi>M</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">G(N,M)</annotation></semantics></math></strong></p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">gnm_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/G_NM.html">G_NM</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">30</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/ggnetplot.html">ggnetplot</a></span><span class="op">(</span><span class="va">gnm_net</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/pkg/ggnetwork/man/geom_edges.html" class="external-link">geom_edges</a></span><span class="op">(</span>linewidth<span class="op">=</span><span class="fl">0.1</span>, color<span class="op">=</span> <span class="st">"darkgray"</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/pkg/ggnetwork/man/geom_nodes.html" class="external-link">geom_nodes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"#008566"</span>, size<span class="op">=</span><span class="fl">.75</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/pkg/ggnetwork/man/theme_blank.html" class="external-link">theme_blank</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in format_fortify(model = model, nodes = nodes, weights = "none", :</span></span>
-<span><span class="co">#&gt; duplicated edges detected</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-14-1.png" width="50%" style="display: block; margin: auto;"></p>
-<p><strong>Small-world networks</strong></p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sw_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/make_small_world.html">make_small_world</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">10</span>, k <span class="op">=</span> <span class="fl">4</span>, p<span class="op">=</span><span class="fl">0.1</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/ggnetplot.html">ggnetplot</a></span><span class="op">(</span><span class="va">sw_net</span>, layout <span class="op">=</span> <span class="fl">0.6</span><span class="op">*</span><span class="fu"><a href="https://r.igraph.org/reference/layout_in_circle.html" class="external-link">layout_in_circle</a></span><span class="op">(</span><span class="va">sw_net</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/pkg/ggnetwork/man/geom_edges.html" class="external-link">geom_edges</a></span><span class="op">(</span>linewidth<span class="op">=</span><span class="fl">0.1</span>, color<span class="op">=</span><span class="st">"darkgray"</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/pkg/ggnetwork/man/geom_nodes.html" class="external-link">geom_nodes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"#008566"</span>, size<span class="op">=</span><span class="fl">1</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/pkg/ggnetwork/man/theme_blank.html" class="external-link">theme_blank</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-15-1.png" width="50%" style="display: block; margin: auto;"></p>
-<p><strong>Preferential attachment networks</strong></p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pa_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/make_preferential_attachment.html">make_preferential_attachment</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/ggnetplot.html">ggnetplot</a></span><span class="op">(</span><span class="va">pa_net</span>, layout <span class="op">=</span> <span class="fl">0.6</span><span class="op">*</span><span class="fu"><a href="https://r.igraph.org/reference/layout_with_fr.html" class="external-link">layout_with_fr</a></span><span class="op">(</span><span class="va">pa_net</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/pkg/ggnetwork/man/geom_edges.html" class="external-link">geom_edges</a></span><span class="op">(</span>linewidth<span class="op">=</span><span class="fl">0.1</span>, color<span class="op">=</span><span class="st">"darkgray"</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/pkg/ggnetwork/man/geom_nodes.html" class="external-link">geom_nodes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"#008566"</span>, size<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/pkg/ggnetwork/man/theme_blank.html" class="external-link">theme_blank</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-16-1.png" width="70%" style="display: block; margin: auto;"></p>
-</div>
-<div class="section level4">
-<h4 id="homophily-networks">Homophily networks<a class="anchor" aria-label="anchor" href="#homophily-networks"></a>
-</h4>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Two groups size 5 and 10.</span></span>
 <span><span class="va">hnet_2grp</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/make_homophily_network.html">make_homophily_network</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">10</span><span class="op">)</span>, mean_degree <span class="op">=</span> <span class="fl">3</span>, homophily <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/ggnetplot.html">ggnetplot</a></span><span class="op">(</span><span class="va">hnet_2grp</span>, layout <span class="op">=</span> <span class="fl">0.6</span><span class="op">*</span><span class="fu"><a href="https://r.igraph.org/reference/layout_in_circle.html" class="external-link">layout_in_circle</a></span><span class="op">(</span><span class="va">hnet_2grp</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/ggnetwork/man/geom_edges.html" class="external-link">geom_edges</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.25</span>, color<span class="op">=</span><span class="st">"darkgray"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/ggnetwork/man/geom_nodes.html" class="external-link">geom_nodes</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">group</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/ggnetwork/man/theme_blank.html" class="external-link">theme_blank</a></span><span class="op">(</span>base_size<span class="op">=</span><span class="fl">12</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-17-1.png" width="65%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://nanx.me/ggsci/" class="external-link">ggsci</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/ggnetplot.html">ggnetplot</a></span><span class="op">(</span><span class="va">hnet_2grp</span>, \<span class="op">(</span><span class="va">net</span><span class="op">)</span> <span class="fl">0.6</span><span class="op">*</span><span class="fu">layout_in_circle</span><span class="op">(</span><span class="va">net</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_edges</span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.15</span>, color<span class="op">=</span><span class="st">"darkgray"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_nodes</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>color <span class="op">=</span> <span class="va">group</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">1.25</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">theme_blank</span><span class="op">(</span>base_size<span class="op">=</span><span class="fl">8</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-11-1.png" width="50%" style="display: block; margin: auto;"></p>
+<p>Now symmetric anti-homophily of -0.5 leads to 50% fewer within-group connections than between-group. Now the metapopulation is composed of five groups with five members each.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://nanx.me/ggsci/" class="external-link">ggsci</a></span><span class="op">)</span>  <span class="co"># some nice colors for science, using Amer. Assoc. for Adv. Science theme below</span></span>
+<span></span>
 <span><span class="co"># Five groups all size 5 with out-group preference (neg. homophily).</span></span>
 <span><span class="va">hnet_5grp</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/make_homophily_network.html">make_homophily_network</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span>, mean_degree <span class="op">=</span> <span class="fl">2</span>, homophily <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/ggnetplot.html">ggnetplot</a></span><span class="op">(</span><span class="va">hnet_5grp</span>, layout <span class="op">=</span> <span class="fl">0.6</span><span class="op">*</span><span class="fu"><a href="https://r.igraph.org/reference/layout_in_circle.html" class="external-link">layout_in_circle</a></span><span class="op">(</span><span class="va">hnet_5grp</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/ggnetwork/man/geom_edges.html" class="external-link">geom_edges</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.25</span>, color<span class="op">=</span><span class="st">"darkgray"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/ggnetwork/man/geom_nodes.html" class="external-link">geom_nodes</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">group</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggsci</span><span class="fu">::</span><span class="fu">scale_color_aaas</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/ggnetwork/man/theme_blank.html" class="external-link">theme_blank</a></span><span class="op">(</span>base_size<span class="op">=</span><span class="fl">12</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-18-1.png" width="65%" style="display: block; margin: auto;"></p>
+<span><span class="fu"><a href="reference/ggnetplot.html">ggnetplot</a></span><span class="op">(</span><span class="va">hnet_5grp</span>, \<span class="op">(</span><span class="va">net</span><span class="op">)</span> <span class="fl">0.6</span><span class="op">*</span><span class="fu">layout_in_circle</span><span class="op">(</span><span class="va">net</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_edges</span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.215</span>, color<span class="op">=</span><span class="st">"darkgray"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_nodes</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>color <span class="op">=</span> <span class="va">group</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggsci</span><span class="fu">::</span><span class="fu"><a href="https://nanx.me/ggsci/reference/scale_aaas.html" class="external-link">scale_color_aaas</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">theme_blank</span><span class="op">(</span>base_size<span class="op">=</span><span class="fl">12</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-12-1.png" width="50%" style="display: block; margin: auto;"></p>
+</div>
+<div class="section level4">
+<h4 id="asymmetric-homophily">Asymmetric homophily<a class="anchor" aria-label="anchor" href="#asymmetric-homophily"></a>
+</h4>
+<p>If homophily is set at the group-level instead of globally, we call this <em>asymmetric</em> homophily. Below we create an asymmetric homphily network model of the educational structure of colonialized populations, where a small, insular minority group of colonizers imposes information flow from themselves to a larger, local majority group, who have had their homophily level forcibly reduced. We model insularity among the colonizers as a high homophily of 0.9 and represent the situation for the local community as having a slightly negative homophily level, -0.2:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Two groups size 5 and 10.</span></span>
+<span><span class="va">hnet_asymm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/make_homophily_network.html">make_homophily_network</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">30</span><span class="op">)</span>, mean_degree <span class="op">=</span> <span class="fl">8</span>, homophily <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="op">-</span><span class="fl">0.2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/ggnetplot.html">ggnetplot</a></span><span class="op">(</span><span class="va">hnet_asymm</span>, \<span class="op">(</span><span class="va">net</span><span class="op">)</span> <span class="fl">0.6</span><span class="op">*</span><span class="fu">layout_in_circle</span><span class="op">(</span><span class="va">net</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_edges</span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.15</span>, color<span class="op">=</span><span class="st">"darkgray"</span>, alpha <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_nodes</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>color <span class="op">=</span> <span class="va">group</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">2.25</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">theme_blank</span><span class="op">(</span>base_size<span class="op">=</span><span class="fl">12</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-13-1.png" width="50%" style="display: block; margin: auto;"></p>
 </div>
 </div>
 </div>
@@ -415,12 +298,7 @@ A simple network nieghborhood of individual/agent <span class="math inline"><em>
 </ul>
 </div>
 
-<div class="dev-status">
-<h2 data-toc-skip>Dev status</h2>
-<ul class="list-unstyled">
-<li><a href="https://app.codecov.io/gh/CSS4S/socmod" class="external-link"><img src="https://codecov.io/gh/CSS4S/socmod/graph/badge.svg" alt="Codecov test coverage"></a></li>
-</ul>
-</div>
+
 
   </aside>
 </div>
