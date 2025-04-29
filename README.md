@@ -45,16 +45,16 @@ You can install the development version of socmod from
 
 ``` r
 # Install this if you don't have devtools.
-# install.packages("devtools")
-# devtools::install_github("CSS4S/socmod")
+install.packages("devtools")
+devtools::install_github("css4s/socmod")
 ```
 
 **pak**
 
 ``` r
 # Install this if you don't have pak.
-# install.packages("pak")
-# pak::pak("CSS4S/socmod")
+install.packages("pak")
+pak::pak("css4s/socmod")
 ```
 
 ## Quickstart examples
@@ -145,17 +145,19 @@ explicitly.
 abm <- make_example_abm()
 trial <- run_trial(abm, stop = fixated)
 print(tail(trial$get_observations(), n = 10))
-#> # A tibble: 8 × 4
-#>       t agent Behavior Fitness
-#>   <dbl> <chr> <chr>      <dbl>
-#> 1     0 i     Legacy         1
-#> 2     0 n_i1  Legacy         1
-#> 3     0 n_i2  Legacy         1
-#> 4     0 n_i3  Adaptive       2
-#> 5     1 i     Legacy         1
-#> 6     1 n_i1  Legacy         1
-#> 7     1 n_i2  Legacy         1
-#> 8     1 n_i3  Legacy         1
+#> # A tibble: 10 × 4
+#>        t agent Behavior Fitness
+#>    <dbl> <chr> <chr>      <dbl>
+#>  1     6 n_i2  Adaptive       2
+#>  2     6 n_i3  Legacy         1
+#>  3     7 i     Legacy         1
+#>  4     7 n_i1  Adaptive       2
+#>  5     7 n_i2  Legacy         1
+#>  6     7 n_i3  Adaptive       2
+#>  7     8 i     Legacy         1
+#>  8     8 n_i1  Legacy         1
+#>  9     8 n_i2  Legacy         1
+#> 10     8 n_i3  Legacy         1
 plot_adoption(trial, tracked_behaviors = c("Legacy", "Adaptive"))
 ```
 
@@ -176,17 +178,19 @@ helper function:
 abm <- make_example_abm()
 trial <- run_trial(abm, stop = fixated)
 print(tail(trial$get_observations(), n = 10))
-#> # A tibble: 8 × 4
-#>       t agent Behavior Fitness
-#>   <dbl> <chr> <chr>      <dbl>
-#> 1     0 i     Legacy         1
-#> 2     0 n_i1  Legacy         1
-#> 3     0 n_i2  Legacy         1
-#> 4     0 n_i3  Adaptive       2
-#> 5     1 i     Legacy         1
-#> 6     1 n_i1  Legacy         1
-#> 7     1 n_i2  Legacy         1
-#> 8     1 n_i3  Legacy         1
+#> # A tibble: 10 × 4
+#>        t agent Behavior Fitness
+#>    <dbl> <chr> <chr>      <dbl>
+#>  1     4 n_i2  Adaptive       2
+#>  2     4 n_i3  Adaptive       2
+#>  3     5 i     Adaptive       2
+#>  4     5 n_i1  Legacy         1
+#>  5     5 n_i2  Adaptive       2
+#>  6     5 n_i3  Adaptive       2
+#>  7     6 i     Adaptive       2
+#>  8     6 n_i1  Adaptive       2
+#>  9     6 n_i2  Adaptive       2
+#> 10     6 n_i3  Adaptive       2
 plot_adoption(trial, tracked_behaviors = c("Legacy", "Adaptive"))
 ```
 
@@ -197,42 +201,124 @@ plot_adoption(trial, tracked_behaviors = c("Legacy", "Adaptive"))
 Socmod provides some helper functions to create and plot some important
 network types, shown below.
 
-#### Regular lattice
+### Regular lattice
 
 ``` r
 latnet <- socmod::make_regular_lattice(N = 10, k = 4)
 ggnetplot(latnet, layout = \(g) 0.6*layout_in_circle(g)) + 
-      geom_edges(linewidth=0.1, color="darkgray") + 
+      geom_edges(linewidth=0.2, color="darkgray") + 
       geom_nodes(color = "#008566", size=1) + 
       theme_blank()
 ```
 
 <img src="man/figures/README-unnamed-chunk-7-1.png" width="50%" style="display: block; margin: auto;" />
 
-#### Random networks
+### Random networks
 
 **Erdős–Rényi $G(N,M)$**
 
 ``` r
 gnm_net <- G_NM(20, 30)
 ggnetplot(gnm_net) + 
-  geom_edges(linewidth=0.1, color= "darkgray") + 
+  geom_edges(linewidth=0.2, color= "darkgray") + 
   geom_nodes(color = "#008566", size=.75) + 
   theme_blank()
 ```
 
 <img src="man/figures/README-unnamed-chunk-8-1.png" width="50%" style="display: block; margin: auto;" />
 
-**Small-world networks**
+### Small-world networks
 
 ``` r
-sw_net <- make_small_world(N = 10, k = 4, p=0.1)
-print(sw_net)
-#> IGRAPH 461b6a1 U--- 10 20 -- 
-#> + edges from 461b6a1:
-#>  [1] 1-- 2 1--10 1-- 3 1-- 9 2-- 3 2-- 4 2--10 3-- 4 3-- 7 4-- 5 4-- 6 5-- 6
-#> [13] 5-- 7 6-- 7 2-- 6 7-- 8 7-- 9 8-- 9 8--10 9--10
+sw_net <- make_small_world(N = 10, k = 4, p=0.3)
+ggnetplot(sw_net, layout = \(net) 0.6*layout_in_circle(net)) + 
+      geom_edges(linewidth=0.2, color="darkgray") + 
+      geom_nodes(color = "#008566", size=1) + 
+      theme_blank(base_size = 12)
 ```
+
+<img src="man/figures/README-unnamed-chunk-9-1.png" width="50%" style="display: block; margin: auto;" />
+
+### Preferential attachment networks
+
+``` r
+pa_net <- make_preferential_attachment(N = 100)
+ggnetplot(pa_net, layout = \(net) 0.6*layout_with_fr(net)) + 
+      geom_edges(linewidth=0.2, color="darkgray") + 
+      geom_nodes(color = "#008566", size=0.35) + 
+      theme_blank()
+```
+
+<img src="man/figures/README-unnamed-chunk-10-1.png" width="50%" style="display: block; margin: auto;" />
+
+### Homophily networks
+
+Homophily may be set globally, i.e., *symmetrically*, so each group has
+the same proportion of within- to between-group connections. It may also
+be set *asymmetrically*, so groups have different *group-level*
+homophily.
+
+These network models are defined by homophily levels and group size,
+altogether defining what we call *group structure*, or *metapopulation
+structure* borrowing from epidemiological use.
+
+#### Symmetric homophily
+
+Positive symmetric homophily in this example makes within-group social
+connections 50% more likely than between-group connections. In other
+words, 75% of all ties are within-group and 25% are between group. The
+metapopulation is composed of two groups with population sizes 5 and 10.
+
+``` r
+# Two groups size 5 and 10.
+hnet_2grp <- make_homophily_network(c(5, 10), mean_degree = 3, homophily = 0.5)
+ggnetplot(hnet_2grp, \(net) 0.6*layout_in_circle(net)) +
+  geom_edges(linewidth = 0.15, color="darkgray") +
+  geom_nodes(aes(color = group), size = 1.25) +
+  theme_blank(base_size=8)
+```
+
+<img src="man/figures/README-unnamed-chunk-11-1.png" width="50%" style="display: block; margin: auto;" />
+
+Now symmetric anti-homophily of -0.5 leads to 50% fewer within-group
+connections than between-group. Now the metapopulation is composed of
+five groups with five members each.
+
+``` r
+library(ggsci)  # some nice colors for science, using Amer. Assoc. for Adv. Science theme below
+
+# Five groups all size 5 with out-group preference (neg. homophily).
+hnet_5grp <- make_homophily_network(rep(5, 5), mean_degree = 2, homophily = -0.5)
+ggnetplot(hnet_5grp, \(net) 0.6*layout_in_circle(net)) +
+  geom_edges(linewidth = 0.215, color="darkgray") +
+  geom_nodes(aes(color = group), size = 2) +
+  ggsci::scale_color_aaas() +
+  theme_blank(base_size=12)
+```
+
+<img src="man/figures/README-unnamed-chunk-12-1.png" width="50%" style="display: block; margin: auto;" />
+
+#### Asymmetric homophily
+
+If homophily is set at the group-level instead of globally, we call this
+*asymmetric* homophily. Below we create an asymmetric homphily network
+model of the educational structure of colonialized populations, where a
+small, insular minority group of colonizers imposes information flow
+from themselves to a larger, local majority group, who have had their
+homophily level forcibly reduced. We model insularity among the
+colonizers as a high homophily of 0.9 and represent the situation for
+the local community as having a slightly negative homophily level, -0.2:
+
+``` r
+# Two groups size 5 and 10.
+hnet_asymm <- make_homophily_network(c(10, 30), mean_degree = 8, homophily = c(0.9, -0.2))
+ggnetplot(hnet_asymm, \(net) 0.6*layout_in_circle(net)) +
+  geom_edges(linewidth = 0.15, color="darkgray", alpha = 0.6) +
+  geom_nodes(aes(color = group), size = 2.25) +
+  theme_blank(base_size=12)
+```
+
+<img src="man/figures/README-unnamed-chunk-13-1.png" width="50%" style="display: block; margin: auto;" />
 
 ## More information and the philosophy of socmod
 

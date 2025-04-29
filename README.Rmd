@@ -68,19 +68,20 @@ You can install the development version of socmod from
 
 **devtools**
 
-```{r}
+```{r, eval=FALSE}
 # Install this if you don't have devtools.
-# install.packages("devtools")
-# devtools::install_github("CSS4S/socmod")
+install.packages("devtools")
+devtools::install_github("css4s/socmod")
 ```
 
 **pak**
 
-```{r}
+```{r, eval=FALSE}
 # Install this if you don't have pak.
-# install.packages("pak")
-# pak::pak("CSS4S/socmod")
+install.packages("pak")
+pak::pak("css4s/socmod")
 ```
+
 
 ## Quickstart examples
 
@@ -191,35 +192,96 @@ plot_adoption(trial, tracked_behaviors = c("Legacy", "Adaptive"))
 Socmod provides some helper functions to create and plot some important 
 network types, shown below.
 
-#### Regular lattice
+### Regular lattice
 
-```{r, fig.height = 0.8, fig.width = 0.8, dpi=400}
+```{r, fig.height = 1.15, fig.width = 1.15, dpi=500}
 latnet <- socmod::make_regular_lattice(N = 10, k = 4)
 ggnetplot(latnet, layout = \(g) 0.6*layout_in_circle(g)) + 
-      geom_edges(linewidth=0.1, color="darkgray") + 
+      geom_edges(linewidth=0.2, color="darkgray") + 
       geom_nodes(color = "#008566", size=1) + 
       theme_blank()
 ```
 
-#### Random networks
+### Random networks
 
 **Erdős–Rényi $G(N,M)$**
 
-```{r, fig.height = 1, fig.width = 1, dpi=400}
+```{r, fig.height = 1.15, fig.width = 1.15, dpi=500}
 gnm_net <- G_NM(20, 30)
 ggnetplot(gnm_net) + 
-  geom_edges(linewidth=0.1, color= "darkgray") + 
+  geom_edges(linewidth=0.2, color= "darkgray") + 
   geom_nodes(color = "#008566", size=.75) + 
   theme_blank()
 ```
 
-**Small-world networks**
+### Small-world networks
 
-```{r fig.height = 1, fig.width = 1, dpi=400}
-sw_net <- make_small_world(N = 10, k = 4, p=0.1)
-print(sw_net)
+```{r fig.height = 1.15, fig.width = 1.15, dpi=500}
+sw_net <- make_small_world(N = 10, k = 4, p=0.3)
+ggnetplot(sw_net, layout = \(net) 0.6*layout_in_circle(net)) + 
+      geom_edges(linewidth=0.2, color="darkgray") + 
+      geom_nodes(color = "#008566", size=1) + 
+      theme_blank(base_size = 12)
 ```
 
+### Preferential attachment networks
+
+```{r fig.height = 1.35, fig.width = 1.55, dpi=500}
+pa_net <- make_preferential_attachment(N = 100)
+ggnetplot(pa_net, layout = \(net) 0.6*layout_with_fr(net)) + 
+      geom_edges(linewidth=0.2, color="darkgray") + 
+      geom_nodes(color = "#008566", size=0.35) + 
+      theme_blank()
+```
+
+
+### Homophily networks
+
+Homophily may be set globally, i.e., *symmetrically*, so each group has the same proportion of within- to between-group connections. It may also be set *asymmetrically*, so groups have different *group-level* homophily.
+
+These network models are defined by homophily levels and group size, altogether defining what we call *group structure*, or *metapopulation structure* borrowing from epidemiological use.
+
+#### Symmetric homophily
+
+Positive symmetric homophily in this example makes within-group social connections 50% more likely than between-group connections. In other words, 75% of all ties are within-group and 25% are between group. The metapopulation is composed of two groups with population sizes 5 and 10.
+
+```{r fig.height = 1.25, fig.width = 1.95, dpi=500}
+# Two groups size 5 and 10.
+hnet_2grp <- make_homophily_network(c(5, 10), mean_degree = 3, homophily = 0.5)
+ggnetplot(hnet_2grp, \(net) 0.6*layout_in_circle(net)) +
+  geom_edges(linewidth = 0.15, color="darkgray") +
+  geom_nodes(aes(color = group), size = 1.25) +
+  theme_blank(base_size=8)
+```
+
+
+Now symmetric anti-homophily of -0.5 leads to 50% fewer within-group connections than between-group. Now the metapopulation is composed of five groups with five members each.
+
+```{r fig.width = 2.65, fig.height = 1.95} 
+library(ggsci)  # some nice colors for science, using Amer. Assoc. for Adv. Science theme below
+
+# Five groups all size 5 with out-group preference (neg. homophily).
+hnet_5grp <- make_homophily_network(rep(5, 5), mean_degree = 2, homophily = -0.5)
+ggnetplot(hnet_5grp, \(net) 0.6*layout_in_circle(net)) +
+  geom_edges(linewidth = 0.215, color="darkgray") +
+  geom_nodes(aes(color = group), size = 2) +
+  ggsci::scale_color_aaas() +
+  theme_blank(base_size=12)
+```
+
+#### Asymmetric homophily
+
+If homophily is set at the group-level instead of globally, we call this *asymmetric* homophily. 
+Below we create an asymmetric homphily network model of the educational structure of colonialized populations, where a small, insular minority group of colonizers imposes information flow from themselves to a larger, local majority group, who have had their homophily level forcibly reduced. We model insularity among the colonizers as a high homophily of 0.9 and represent the situation for the local community as having a slightly negative homophily level, -0.2:
+
+```{r fig.height = 2.25, fig.width = 3.15, dpi=300}
+# Two groups size 5 and 10.
+hnet_asymm <- make_homophily_network(c(10, 30), mean_degree = 8, homophily = c(0.9, -0.2))
+ggnetplot(hnet_asymm, \(net) 0.6*layout_in_circle(net)) +
+  geom_edges(linewidth = 0.15, color="darkgray", alpha = 0.6) +
+  geom_nodes(aes(color = group), size = 2.25) +
+  theme_blank(base_size=12)
+```
 
 
 ## More information and the philosophy of socmod

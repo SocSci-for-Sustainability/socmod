@@ -1,5 +1,5 @@
 ---
-title: Components for basic diffusion modeling with `socmod`
+title: Components for basic diffusion modeling with socmod
 author: Matt Turner
 ---
 
@@ -9,7 +9,9 @@ library(socmod)
 library(magrittr)
 ```
 
-This vignette introduces agent-based modeling in `socmod` starting with basic functional and object-oriented programming in R. It therefore builds on an assumed knowledge of R basics which can be gained by studying, for example, [*Hands-On Programming with R*](https://rstudio-education.github.io/hopr/index.html)or other basic R tutorial introductions. To model social behavior it helps to have intuitive software tools grounded in an empirically-motivated, self-consistent scientific theory. `socmod` provides those tools, but to put it to best use it's helpful to know how it works, especially for people used to using R in a data science context. Many of the same tools are transferable, especially declarative/functional programming, as is used and encouraged by the [tidy approach in R for Data Science](https://r4ds.hadley.nz/). 
+This vignette introduces agent-based modeling in `socmod` starting with basic functional and object-oriented programming in R. It therefore builds on an assumed knowledge of R basics which can be gained by studying, for example, [*Hands-On Programming with R*](https://rstudio-education.github.io/hopr/index.html) or other basic R tutorial introductions. 
+
+To model social behavior it helps to have intuitive software tools grounded in an empirically-motivated, self-consistent scientific theory. `socmod` provides those tools, but to put it to best use it's helpful to know how it works, especially for people used to using R in a data science context. Many of the same tools are transferable, especially declarative/functional programming, as is used and encouraged by the [tidy approach in R for Data Science](https://r4ds.hadley.nz/). 
 
 To create simulations that *generate* social behavior we have to go beyond tabular representations of the world to more complex representations of people and their interactions that can be measured. These measurements are recorded in a standard tabular format, e.g., CSV, which can then be analyzed using tidy/R for Data Science strategies. 
 
@@ -20,7 +22,7 @@ To summarize, objects are a way to track and modify the state of different softw
 
 In `socmod`, we define custom R objects for agent-based models of social behavior using the `R6Class` method that creates a new object type, i.e., a new *class*. We use tidy-style functional programming where helpful to represent model features and dynamics.
 
-In the remainder of this vignette, I will review of variables and their possible values in R, focusing on the hierarchy of vectors, lists, data.frames, and tibbles. We review relevant topics in functional programming, then demonstrate how to create custom classes in R with the library [R6](https://r6.r-lib.org/). This tutorial will close with a demonstration of a simple four-agent agent-based model of social behavior, kept simple to highlight the functional and object-oriented design patterns in `socmod`, representing `Agent`, an `AgentBasedModel`, and `Trial`classes defined using the [`R6Class` function](https://r6.r-lib.org/reference/is.R6.html?q=r6class#ref-usage).
+In the remainder of this vignette, I will first review variable assignment and data structures in R including vectors, lists, data.frames, and tibbles. We then review relevant topics in functional programming, then demonstrate how to create custom classes in R with the library [R6](https://r6.r-lib.org/). This tutorial then closes with a demonstration of a simple four-agent agent-based model of social behavior, kept simple to highlight the functional and object-oriented design patterns in `socmod`, representing `Agent`, an `AgentBasedModel`, and `Trial`classes defined using the [`R6Class` function](https://r6.r-lib.org/reference/is.R6.html?q=r6class#ref-usage).
 
 ## Data collection types in R
 
@@ -157,11 +159,15 @@ c(4, 4)
 
 ### `map`: a common, useful higher-order function used often in `socmod`
 
-One of the most useful and common higher-order functions is the map function. This function *maps* a function, denoted `.f` below, onto every element in a collection, denoted `.x`. This notation is from the `map` family of functions in the [`purrr` library](https://purrr.tidyverse.org/) for tidy functional programming. Here is an example of mapping an anonymous function that multiplies its input by 3 onto a vector with entries 2 and 8:
+One of the most useful and common higher-order functions is the map function. This function *maps* a function, denoted `.f` below, onto every element in a collection, denoted `.x`. This notation is from the `map` family of functions in the [`purrr` library](https://purrr.tidyverse.org/) for tidy functional programming.
 
-```{r}
+```{r eval=FALSE}
 library(purrr)
+```
 
+ Here is an example of mapping an anonymous function that multiplies its input by 3 onto a vector with entries 2 and 8:
+ 
+```{r}
 # Now get we use map_vec that applies .f to every element of .x,
 # expecting the following to return a vector with elements 3*2 
 # and 3*8, i.e., c(6, 24).
@@ -179,7 +185,7 @@ purrr::imap_vec(input_vec, \(el, idx) { return (idx * el) })
 
 Classes are ways to *encapsulate* diverse distinct, but related, processes, behaviors, data, attributes, and other types of information in a single *object*, i.e., a software representation of an *instance* of that entity. R6 is a library for creating our own custom classes that serve as an abstract template that specifies what distinguishes different types of objects/entities. Below we show first how to create a new agent, i.e., a new instance of the `Agent` class that is provided by `socmod`. After that is a fun example of how we can design a different social behavioral model, one of football/soccer matches. We write classes for players and teams and develop a `play_match(team1, team2)` function that pits two teams against each other.
 
-#### The `Agent` class in `socmod`
+### The `Agent` class in `socmod`
 
 Below we create a new instance of the `Agent` class using the class *constructor*, the function written `socmod::Agent$new()` below that creates a new instance of the class.
 
@@ -221,7 +227,7 @@ print(neighbor_names)
 print(unlist(neighbor_names))
 ```
 
-#### Exercise: design and define classes from scratch
+### Exercise: design and define classes from scratch
 
 In class we started creating our model of a soccer player agent called `Footballer`, defined below. We ran out of time at the end of class to write *methods* for `Footballer`, i.e., ways that a football player could interact with the world, or that the world could act upon a soccer player. However we only had time to create a *stub* for two methods. A stub is a minimal chunk of code that does very little to nothing, but doesn't get in the way by causing errors or anything like that. It enables us to document our plans for future development in the exact place where it would happen in the code.
 
