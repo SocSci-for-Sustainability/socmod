@@ -3,20 +3,18 @@ title: Components for basic diffusion modeling with socmod
 author: Matt Turner
 ---
 
-
 ```{r setup, include=FALSE}
 library(socmod)
 library(magrittr)
 ```
 
-This vignette introduces agent-based modeling in `socmod` starting with basic functional and object-oriented programming in R. It therefore builds on an assumed knowledge of R basics which can be gained by studying, for example, [*Hands-On Programming with R*](https://rstudio-education.github.io/hopr/index.html) or other basic R tutorial introductions. 
+This vignette introduces agent-based modeling in `socmod` starting with basic functional and object-oriented programming in R. It therefore builds on an assumed knowledge of R basics which can be gained by studying, for example, [*Hands-On Programming with R*](https://rstudio-education.github.io/hopr/index.html) or other basic R tutorial introductions.
 
-To model social behavior it helps to have intuitive software tools grounded in an empirically-motivated, self-consistent scientific theory. `socmod` provides those tools, but to put it to best use it's helpful to know how it works, especially for people used to using R in a data science context. Many of the same tools are transferable, especially declarative/functional programming, as is used and encouraged by the [tidy approach in R for Data Science](https://r4ds.hadley.nz/). 
+To model social behavior it helps to have intuitive software tools grounded in an empirically-motivated, self-consistent scientific theory. `socmod` provides those tools, but to put it to best use it's helpful to know how it works, especially for people used to using R in a data science context. Many of the same tools are transferable, especially declarative/functional programming, as is used and encouraged by the [tidy approach in R for Data Science](https://r4ds.hadley.nz/).
 
-To create simulations that *generate* social behavior we have to go beyond tabular representations of the world to more complex representations of people and their interactions that can be measured. These measurements are recorded in a standard tabular format, e.g., CSV, which can then be analyzed using tidy/R for Data Science strategies. 
+To create simulations that *generate* social behavior we have to go beyond tabular representations of the world to more complex representations of people and their interactions that can be measured. These measurements are recorded in a standard tabular format, e.g., CSV, which can then be analyzed using tidy/R for Data Science strategies.
 
 In agent-based modeling, we create software representations of simulated people, i.e. *agents*, or other interacting entities, including the agents' environment. *Object-oriented programming* is the natural choice for software design in this case because it provides a structure for defining custom *objects* like socially interacting agents. An *object* is one bit of data that could be a number or character type, but could also be something more complicated. In object-oriented programming we define custom *classes* that specify various data *fields* and function *methods* for maintaining and modifying the state of objects. The fields and methods of a class therefore are sets of related data and functions to represent things in the world.
-
 
 To summarize, objects are a way to track and modify the state of different software entities. We can create simulations of real-world systems by defining custom object types called classes whose state and behaviors are modeled on relevant real-world features and behaviors.
 
@@ -165,8 +163,8 @@ One of the most useful and common higher-order functions is the map function. Th
 library(purrr)
 ```
 
- Here is an example of mapping an anonymous function that multiplies its input by 3 onto a vector with entries 2 and 8:
- 
+Here is an example of mapping an anonymous function that multiplies its input by 3 onto a vector with entries 2 and 8:
+
 ```{r}
 # Now get we use map_vec that applies .f to every element of .x,
 # expecting the following to return a vector with elements 3*2 
@@ -387,9 +385,11 @@ cat("\nAfter three games...", "\nThe Whales have won",
 
 ## Agent-based models of social behavior
 
-Here we develop our first agent-based models of social behavior. We'll start small, with the following four-household network of solar panel electrification using only success-biased learning. Then we'll do a detailed comparison of different social learning strategies with different parameterizations.
+Here we develop our first agent-based models of social behavior. We'll start small, with the following four-household network of solar panel electrification using only success-biased learning @fig-4house-example. Then we'll do a detailed comparison of different social learning strategies with different parameterizations.
 
+![](four-agent-example.png){width="600"}
 
+In the example, agent 2 has adopted rooftop solar. It has some adaptive fitness, which can be thought of as the financial gain from adopting a sustainable, adaptive behavior. We can directly create the social network using `igraph::make_graph()` then set it as the model's social network, along with setting the learning strategy to be contagion learning. The `adoption_rate` parameter specifies how likely another agent is to adopt the adaptive behavior when exposed to it. The `drop_rate` is how likely an agent doing the adaptive behavior is to stop doing it and revert to the non-adaptive behavior.
 
 ### Example 1: Time series of adaptation diffusion
 
@@ -431,8 +431,6 @@ plot_adoption(trial, tracked_behaviors = c("Legacy", "Baglowie"))
 Agent-based models in `socmod` are composed of sub-models of cognition and social behavior and social networks. One component of agent cognition is its *social learning strategy*. Three social learning strategies are included in `socmod`: success-biased, frequency-biased, and contagion learning strategies [see ABM course notes for more details](https://css4s.github.io/abm-notes/intro.html#social-learning-strategies).
 
 Here we show how to compare the three learning strategies across different learning parameters. One parameter we systematically vary affects only success-biased learning, and the other we systematically vary affects only contagion learning. We will design computational experiments to understand their effects, and overall differences between the three learning strategies.
-
-
 
 ```{r}
 #| eval: false
@@ -477,9 +475,7 @@ gen <- function(model_parameter_row) {
 }
 ```
 
-
 #### Experiment over adaptive fitness values
-
 
 ```{r}
 #| eval: false
@@ -533,6 +529,7 @@ p <- ggplot(trials_success_rate,
 ggsave("vignettes/resources/adaptive_fitness_experiment.png", p, 
        width = 5, height = 3)
 ```
+
 ![Example computational experiment testing effect of adaptive fitness on success rate across the three learning strategies.](adaptive_fitness_experiment.png)
 
 #### Experiment over adoption rate values
