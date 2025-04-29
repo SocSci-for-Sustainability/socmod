@@ -3,7 +3,7 @@ pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   basic-diffusion-components: basic-diffusion-components.html
-last_built: 2025-04-29T05:15Z
+last_built: 2025-04-29T15:00Z
 urls:
   reference: https://css4s.github.io/socmod/reference
   article: https://css4s.github.io/socmod/articles
