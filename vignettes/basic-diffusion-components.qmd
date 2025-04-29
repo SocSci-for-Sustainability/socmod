@@ -385,9 +385,9 @@ cat("\nAfter three games...", "\nThe Whales have won",
 
 ## Agent-based models of social behavior
 
-Here we develop our first agent-based models of social behavior. We'll start small, with the following four-household network of solar panel electrification using only success-biased learning @fig-4house-example. Then we'll do a detailed comparison of different social learning strategies with different parameterizations.
+Here we develop our first agent-based models of social behavior. We'll start small, with the following four-household network of solar panel electrification using only success-biased learning (@fig-four-agent-example). Then we'll do a detailed comparison of different social learning strategies with different parameterizations.
 
-![](four-agent-example.png){width="600"}
+![Example social network and sustainable adaptation diffusion problem.](four-agent-example.png){#fig-four-agent-example width="600"}
 
 In the example, agent 2 has adopted rooftop solar. It has some adaptive fitness, which can be thought of as the financial gain from adopting a sustainable, adaptive behavior. We can directly create the social network using `igraph::make_graph()` then set it as the model's social network, along with setting the learning strategy to be contagion learning. The `adoption_rate` parameter specifies how likely another agent is to adopt the adaptive behavior when exposed to it. The `drop_rate` is how likely an agent doing the adaptive behavior is to stop doing it and revert to the non-adaptive behavior.
 
