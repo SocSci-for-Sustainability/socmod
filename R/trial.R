@@ -35,42 +35,14 @@ Trial <- R6::R6Class(
     #' @param legacy_behavior The maladaptive behavior treated as "adaptation failure"
     #' @param adaptive_behavior The behavior treated as "adaptation success"
     run = function(
-        stop = 50, legacy_behavior = "Legacy", adaptive_behavior = "Adaptive") {
+        stop = 50, legacy_behavior = "Legacy", 
+        adaptive_behavior = "Adaptive", aggregation_function = NULL) {
       
       step <- 0
 
       self$model$set_parameter("legacy_behavior", legacy_behavior)
       self$model$set_parameter("adaptive_behavior", adaptive_behavior)
-      
-      # Record t = 0 before any updates.
-      self$observations <- dplyr::bind_rows(
-        self$observations,
-        tibble::tibble(
-          t = 0,
-          agent = unlist(
-            purrr::map(
-              self$model$agents, 
-              \(a) a$get_name()
-            ), 
-            use.names = FALSE
-          ),
-          Behavior = unlist(
-            purrr::map(
-              self$model$agents, 
-              \(a) as.character(a$get_behavior())
-            ), 
-            use.names = FALSE
-          ),
-          Fitness = unlist(
-            purrr::map(
-              self$model$agents, 
-              \(a) a$get_fitness()
-            ), 
-            use.names = FALSE
-          ),
-          label = self$label
-        )
-      )
+      self$observations <- update_observations(self, aggregation_function)
       
       # Get learning and iteration functions from the model's learning strategy.
       lstrat <- self$model$get_parameter("learning_strategy")
@@ -141,14 +113,15 @@ Trial <- R6::R6Class(
       
       behaviors <- unlist(
         purrr::map(
-          self$model$agents, \(a) as.character(a$get_behavior())
+          self$model$agents, 
+          \(a) as.character(a$get_behavior())
         ), 
         use.names = FALSE
       )
       
       self$outcomes$adaptation_success <- 
-        length(unique(behaviors)) == 1 && 
-          unique(behaviors) == adaptive_behavior
+        (length(unique(behaviors)) == 1 && 
+         unique(behaviors) == adaptive_behavior)
       
       self$outcomes$fixation_steps <- step
 
@@ -184,6 +157,56 @@ Trial <- R6::R6Class(
     #' @description Return the label for this trial (if set)
     get_label = function() {
       return (self$label)
+    }
+  ),
+  private = list(
+    update_observations = function(summarise_prevalence) {
+
+      if (summarise_prevalence) {
+        
+      }
+    },
+    initialize_observations = function(summarise_prevalence) {
+
+      # If we will summarise across agents, only init one row.
+      if (summarise_prevalence) {
+
+        self$observations <- tibble::tibble(
+          t = 0,   
+        )
+          
+      } else {
+
+        # Record t = 0 before any updates.
+        self$observations <- dplyr::bind_rows(
+          self$observations,
+          tibble::tibble(
+            t = 0,
+            agent = unlist(
+              purrr::map(
+                self$model$agents, 
+                \(a) a$get_name()
+              ), 
+              use.names = FALSE
+            ),
+            Behavior = unlist(
+              purrr::map(
+                self$model$agents, 
+                \(a) as.character(a$get_behavior())
+              ), 
+              use.names = FALSE
+            ),
+            Fitness = unlist(
+              purrr::map(
+                self$model$agents, 
+                \(a) a$get_fitness()
+              ), 
+              use.names = FALSE
+            ),
+            label = self$label
+          )
+        )
+      }
     }
   )
 )
@@ -353,14 +376,16 @@ summarise_prevalence <- function(trials, tracked_behaviors = NULL) {
     # Count number of agents doing tracked behaviors.
     return (
       dplyr::group_by(observations, t, Behavior) %>%
-        dplyr::summarise(count = dplyr::n(), .groups = "drop") 
+        dplyr::summarise(count = dplyr::n()) %>%
+        dplyr::summarise(prevalence = count / trial$model$get_n_agents(), 
+                         .groups = "drop")
     )
   })
   
   # Now calculate and return the mean prevalence series of tracked behaviors.
   # 
   # First get n_agents model param.
-  trial$model$get_parameter("n_agents")
+  n_agents <- trial$model$get_parameter("n_agents")
   
   # Return mean prevalence from count observations grouped by time and behavior.
   return (
@@ -427,6 +452,7 @@ summarise_by_parameters <- function(trials,
 #' @export
 #' @examples
 plot_adoption <- function(trial, tracked_behaviors = c("Adaptive")) {
+  
   obs <- trial$get_observations()
   
   obs_filtered <- obs %>%

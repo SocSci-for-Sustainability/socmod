@@ -314,7 +314,7 @@ contagion_model_step <- function(model) {
 }
 
 
-## ------Learning Strategies------
+## ------LEARNING STRATEGIES------
 
 #' Define success-biased learning strategy.
 #'
