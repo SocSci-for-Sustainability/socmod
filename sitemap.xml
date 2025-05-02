@@ -3,6 +3,8 @@
 <url><loc>https://css4s.github.io/socmod/LICENSE-text.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/LICENSE.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/articles/basic-diffusion-components.html</loc></url>
+<url><loc>https://css4s.github.io/socmod/articles/example.html</loc></url>
+<url><loc>https://css4s.github.io/socmod/articles/florentine_network.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/articles/index.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/authors.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/index.html</loc></url>
@@ -14,6 +16,7 @@
 <url><loc>https://css4s.github.io/socmod/reference/ModelParameters.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/Neighbors.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/Trial.html</loc></url>
+<url><loc>https://css4s.github.io/socmod/reference/abm_ensemble.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/add_unique_edge.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/compare_friendship_paradox.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/contagion_interaction.html</loc></url>
@@ -39,6 +42,7 @@
 <url><loc>https://css4s.github.io/socmod/reference/make_preferential_attachment.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/make_regular_lattice.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/make_small_world.html</loc></url>
+<url><loc>https://css4s.github.io/socmod/reference/model_parameters.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/not_adjacent.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/plot_adoption.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/plot_friendship_paradox.html</loc></url>
@@ -48,12 +52,14 @@
 <url><loc>https://css4s.github.io/socmod/reference/run.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/run_trial.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/run_trials.html</loc></url>
+<url><loc>https://css4s.github.io/socmod/reference/run_trials_grid.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/simulate_feld_1991.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/socmod-package.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/success_bias_interact.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/success_bias_learning_strategy.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/success_bias_select_teacher.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/summarise_adoption.html</loc></url>
+<url><loc>https://css4s.github.io/socmod/reference/summarise_by_metadata.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/summarise_by_parameters.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/summarise_prevalence.html</loc></url>
 </urlset>
