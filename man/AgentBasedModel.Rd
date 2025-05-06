@@ -2,16 +2,29 @@
 % Please edit documentation in R/abm.R
 \name{AgentBasedModel}
 \alias{AgentBasedModel}
-\title{AgentBasedModel class for socmod}
+\title{Agent-based model class}
 \description{
-AgentBasedModel class for socmod
+Agent-based model class
 
-AgentBasedModel class for socmod
+Agent-based model class
 }
 \details{
-This class represents the main simulation container, holding agents and a social network.
-It ensures synchronization between the agent states and the underlying igraph network.
+Represents an agent-based model with specified parameters and agents.
 }
+\section{Methods}{
+
+\describe{
+\item{initialize(parameters = DEFAULT_PARAMETERS, agents)}{
+Creates a new AgentBasedModel with the given parameters and agents.
+\describe{
+\item{parameters}{A \code{ModelParameters} object specifying the model parameters. Defaults to \code{DEFAULT_PARAMETERS}.}
+\item{agents}{A list of agent instances for the model.}
+}
+}
+\item{get_parameters()}{Returns the \code{ModelParameters} instance for this model.}
+}
+}
+
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
@@ -30,19 +43,18 @@ It ensures synchronization between the agent states and the underlying igraph ne
 \if{html}{\out{<a id="method-AgentBasedModel-new"></a>}}
 \if{latex}{\out{\hypertarget{method-AgentBasedModel-new}{}}}
 \subsection{Method \code{new()}}{
-Initialize a model with either a graph, agents, or n_agents
+Create a new AgentBasedModel instance.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{AgentBasedModel$new(model_parameters = DEFAULT_PARAMETERS, agents = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{AgentBasedModel$new(parameters = DEFAULT_PARAMETERS, agents = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{agents}}{A list of Agent objects (optional)}
+\item{\code{parameters}}{A \code{ModelParameters} object specifying the model parameters.
+Defaults to \code{DEFAULT_PARAMETERS}.}
 
-\item{\code{graph}}{An igraph object (optional)}
-
-\item{\code{n_agents}}{Integer number of agents to create (optional)}
+\item{\code{agents}}{A list of agent instances for the model.}
 }
 \if{html}{\out{</div>}}
 }

@@ -85,7 +85,7 @@ test_that("run_trials() returns expected number of Trial objects", {
 })
 
 
-test_that("summarise_by_parameters correctly summarizes grouped trial outcomes", {
+test_that("summarise_outcomes correctly summarizes grouped trial outcomes", {
   
   mock_run_one_trial <- function(ii) {
     # Create model based on parameters...
@@ -109,7 +109,7 @@ test_that("summarise_by_parameters correctly summarizes grouped trial outcomes",
   trials <- purrr::map(1:4, mock_run_one_trial)
 
   # Create summary over specified outcome measures.
-  summary <- summarise_by_parameters(
+  summary <- summarise_outcomes(
     trials, input_parameters = c("adaptive_fitness", "seed_set"),
     outcome_measures = c("success_rate", "mean_fixation_steps")
   )

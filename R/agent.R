@@ -91,6 +91,7 @@ Agent <- R6::R6Class(
     #' @param value New current behavior
     set_behavior = function(value) {
       private$behavior_current <- as.character(value)
+      invisible (self)
     },
     
     #' @description
@@ -117,6 +118,7 @@ Agent <- R6::R6Class(
     #' @param value Numeric value to assign
     set_fitness = function(value) {
       private$fitness_current <- value
+      invisible (self)
     },
     
     #' @description

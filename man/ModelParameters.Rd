@@ -3,14 +3,6 @@
 \name{ModelParameters}
 \alias{ModelParameters}
 \title{Overwrite existing auxiliary parameters.}
-\value{
-NULL
-Add a key-value pair to the auxiliary
-variables.
-
-NULL
-Add a list of key-value pairs to aux params.
-}
 \description{
 Overwrite existing auxiliary parameters.
 
@@ -21,6 +13,7 @@ Overwrite existing auxiliary parameters.
 \itemize{
 \item \href{#method-ModelParameters-new}{\code{ModelParameters$new()}}
 \item \href{#method-ModelParameters-get_learning_strategy}{\code{ModelParameters$get_learning_strategy()}}
+\item \href{#method-ModelParameters-set_learning_strategy}{\code{ModelParameters$set_learning_strategy()}}
 \item \href{#method-ModelParameters-get_graph}{\code{ModelParameters$get_graph()}}
 \item \href{#method-ModelParameters-set_graph}{\code{ModelParameters$set_graph()}}
 \item \href{#method-ModelParameters-get_n_agents}{\code{ModelParameters$get_n_agents()}}
@@ -52,6 +45,15 @@ Overwrite existing auxiliary parameters.
 \subsection{Method \code{get_learning_strategy()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModelParameters$get_learning_strategy()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-ModelParameters-set_learning_strategy"></a>}}
+\if{latex}{\out{\hypertarget{method-ModelParameters-set_learning_strategy}{}}}
+\subsection{Method \code{set_learning_strategy()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{ModelParameters$set_learning_strategy(learning_strategy)}\if{html}{\out{</div>}}
 }
 
 }
@@ -108,6 +110,11 @@ Overwrite existing auxiliary parameters.
 \if{html}{\out{<div class="r">}}\preformatted{ModelParameters$set_auxiliary(params)}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+self silently
+Add a key-value pair to the auxiliary
+variables.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ModelParameters-add_auxiliary"></a>}}
@@ -117,6 +124,10 @@ Overwrite existing auxiliary parameters.
 \if{html}{\out{<div class="r">}}\preformatted{ModelParameters$add_auxiliary(key, value)}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+self silently
+Get all parameter values as list
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ModelParameters-as_list"></a>}}
@@ -126,6 +137,9 @@ Overwrite existing auxiliary parameters.
 \if{html}{\out{<div class="r">}}\preformatted{ModelParameters$as_list()}\if{html}{\out{</div>}}
 }
 
+\subsection{Returns}{
+list of parameters
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-ModelParameters-clone"></a>}}

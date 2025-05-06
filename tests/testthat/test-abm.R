@@ -83,9 +83,9 @@ test_that("Model parameters can be set and retrieved individually and in bulk", 
   expect_equal(model$get_parameter("learning_prob"), 0.5)
   expect_equal(model$get_parameter("intervention"), TRUE)
 
-  all_params <- model$get_parameters()
-  expect_true("seed_strategy" %in% names(all_params))
-  expect_equal(all_params$seed_strategy, "friendship")
+  params_list <- model$get_parameters()$as_list()
+  expect_true("seed_strategy" %in% names(params_list))
+  expect_equal(params_list$seed_strategy, "friendship")
 })
 
 

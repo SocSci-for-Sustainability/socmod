@@ -16,6 +16,13 @@ ModelParameters <- R6::R6Class(
     get_learning_strategy = function() {
       return (private$.learning_strategy)
     },
+
+    set_learning_strategy = function(learning_strategy) {
+      stopifnot(inherits(learning_strategy, "LearningStrategy"))
+      private$.learning_strategy <- learning_strategy
+
+      return (invisible(self))
+    },
     
     get_graph = function() {
       return (private$.graph)
@@ -23,6 +30,8 @@ ModelParameters <- R6::R6Class(
 
     set_graph = function(graph) {
       private$.graph <- graph
+
+      return (invisible(self))
     },
     
     get_n_agents = function() {
@@ -31,6 +40,8 @@ ModelParameters <- R6::R6Class(
 
     set_n_agents = function(n_agents) {
       private$.n_agents <- n_agents
+
+      return (invisible(self))
     },
     
     get_auxiliary = function() {
@@ -39,31 +50,32 @@ ModelParameters <- R6::R6Class(
     
     #' Overwrite existing auxiliary parameters.
     #' 
-    #' @returns NULL
+    #' @return self silently
     set_auxiliary = function(params) {
       private$.auxiliary <- params
+
+      return (invisible(self))
     },
     
     #' Add a key-value pair to the auxiliary 
     #' variables.
     #' 
-    #' @returns NULL
+    #' @return self silently
     add_auxiliary = function(key, value) {
-      private$.auxiliary <- modifyList(
-        private$.auxiliary,
-        list(key = value)
-      )
+      private$.auxiliary[[key]] <- value
+      return (invisible(self))
     },
     
-    #' Add a list of key-value pairs to aux params.
+    #' Get all parameter values as list
     #'
-    #' @returns NULL
+    #' @return list of parameters
     as_list = function() {
+
       return (
         modifyList(
           list(
             learning_strategy = self$get_learning_strategy(),
-            graph = self$get_graph(),
+            graph = private$.graph,
             n_agents = self$get_n_agents()
           ),
           self$get_auxiliary() 

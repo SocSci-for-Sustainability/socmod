@@ -6,7 +6,7 @@
 \usage{
 run_trial(
   model,
-  stop = 50,
+  stop = socmod::fixated,
   legacy_behavior = "Legacy",
   adaptive_behavior = "Adaptive",
   metadata = list()

@@ -35,14 +35,42 @@ Trial <- R6::R6Class(
     #' @param legacy_behavior The maladaptive behavior treated as "adaptation failure"
     #' @param adaptive_behavior The behavior treated as "adaptation success"
     run = function(
-        stop = 50, legacy_behavior = "Legacy", 
-        adaptive_behavior = "Adaptive", aggregation_function = NULL) {
+        stop = 50, legacy_behavior = "Legacy", adaptive_behavior = "Adaptive") {
       
       step <- 0
 
       self$model$set_parameter("legacy_behavior", legacy_behavior)
       self$model$set_parameter("adaptive_behavior", adaptive_behavior)
-      self$observations <- update_observations(self, aggregation_function)
+      
+      # Record t = 0 before any updates.
+      self$observations <- dplyr::bind_rows(
+        self$observations,
+        tibble::tibble(
+          Step = 0,
+          agent = unlist(
+            purrr::map(
+              self$model$agents, 
+              \(a) a$get_name()
+            ), 
+            use.names = FALSE
+          ),
+          Behavior = unlist(
+            purrr::map(
+              self$model$agents, 
+              \(a) as.character(a$get_behavior())
+            ), 
+            use.names = FALSE
+          ),
+          Fitness = unlist(
+            purrr::map(
+              self$model$agents, 
+              \(a) a$get_fitness()
+            ), 
+            use.names = FALSE
+          ),
+          label = self$label
+        )
+      )
       
       # Get learning and iteration functions from the model's learning strategy.
       lstrat <- self$model$get_parameter("learning_strategy")
@@ -75,7 +103,7 @@ Trial <- R6::R6Class(
           self$observations,
           
           tibble::tibble(
-            t = step,
+            Step = step,
             agent = unlist(
               purrr::map(
                 self$model$agents, 
@@ -113,15 +141,14 @@ Trial <- R6::R6Class(
       
       behaviors <- unlist(
         purrr::map(
-          self$model$agents, 
-          \(a) as.character(a$get_behavior())
+          self$model$agents, \(a) as.character(a$get_behavior())
         ), 
         use.names = FALSE
       )
       
       self$outcomes$adaptation_success <- 
-        (length(unique(behaviors)) == 1 && 
-         unique(behaviors) == adaptive_behavior)
+        length(unique(behaviors)) == 1 && 
+          unique(behaviors) == adaptive_behavior
       
       self$outcomes$fixation_steps <- step
 
@@ -157,56 +184,6 @@ Trial <- R6::R6Class(
     #' @description Return the label for this trial (if set)
     get_label = function() {
       return (self$label)
-    }
-  ),
-  private = list(
-    update_observations = function(summarise_prevalence) {
-
-      if (summarise_prevalence) {
-        
-      }
-    },
-    initialize_observations = function(summarise_prevalence) {
-
-      # If we will summarise across agents, only init one row.
-      if (summarise_prevalence) {
-
-        self$observations <- tibble::tibble(
-          t = 0,   
-        )
-          
-      } else {
-
-        # Record t = 0 before any updates.
-        self$observations <- dplyr::bind_rows(
-          self$observations,
-          tibble::tibble(
-            t = 0,
-            agent = unlist(
-              purrr::map(
-                self$model$agents, 
-                \(a) a$get_name()
-              ), 
-              use.names = FALSE
-            ),
-            Behavior = unlist(
-              purrr::map(
-                self$model$agents, 
-                \(a) as.character(a$get_behavior())
-              ), 
-              use.names = FALSE
-            ),
-            Fitness = unlist(
-              purrr::map(
-                self$model$agents, 
-                \(a) a$get_fitness()
-              ), 
-              use.names = FALSE
-            ),
-            label = self$label
-          )
-        )
-      }
     }
   )
 )
@@ -252,7 +229,7 @@ fixated <- function(model) {
 #' trial <- run_trial(model, stop = 10)
 #' @export
 run_trial <- function(model,
-                      stop = 50,
+                      stop = socmod::fixated,
                       legacy_behavior = "Legacy",
                       adaptive_behavior = "Adaptive",
                       metadata = list()) {
@@ -260,7 +237,7 @@ run_trial <- function(model,
   # Initialize, run, and return a new Trial object.
   return (
     Trial$new(model = model, metadata = metadata)$run(
-        stop = stop, legacy_behavior = legacy_behavior, 
+        stop = stop, legacy_behavior = legacy_behavior,
         adaptive_behavior = adaptive_behavior
       )
   )
@@ -305,7 +282,7 @@ run_trials <- function(model_generator, n_trials_per_param = 10,
   
   # Check if syncfile is given...
   if (!is.null(syncfile)) {
-    # ...and load it if it exists and we aren't overwriting existing.
+    # ...and load it if it exists and we aren't overwriting existing
     if (file.exists(syncfile) && !overwrite) {
       cat("\nLoading trials from syncfile:", syncfile, "\n\n")
       load(syncfile)
@@ -313,7 +290,7 @@ run_trials <- function(model_generator, n_trials_per_param = 10,
     }
   }
 
-  # Initialize dataframe where each row is a set of model parameters.
+  # Initialize dataframe where each row is a set of model parameters
   model_parameters <- c(list(...), 
                         list(replication_id = 1:(n_trials_per_param)))
   
@@ -328,7 +305,7 @@ run_trials <- function(model_generator, n_trials_per_param = 10,
     adaptive_behavior <- model_parameters$adaptive_behavior
   }
 
-  # Create a list of trials, each trial initialized with a param list from the grid. 
+  # Create a list of trials, each trial initialized with a param list from the grid 
   trials <- purrr::pmap(
     parameter_grid, function(...) {
       param_row <- list(...)
@@ -343,7 +320,7 @@ run_trials <- function(model_generator, n_trials_per_param = 10,
 
   # Check if syncfile is given...
   if (!is.null(syncfile)) {
-    # ...and write if it hasn't been synced or overite is TRUE.
+    # ...and write if it hasn't been synced or overite is TRUE
     if (!file.exists(syncfile) || overwrite) {
       save(trials, file = syncfile)
     }
@@ -353,135 +330,3 @@ run_trials <- function(model_generator, n_trials_per_param = 10,
 }
 
 
-#' Summarize behavior adoption over time from multiple trials
-#'
-#' @param trials A list of Trial objects
-#' @param tracked_behaviors Optional vector of behaviors to include
-#' @return A tibble with columns: trial, t, behavior, count, label, adaptation_success, fixation_steps
-#' @export
-summarise_prevalence <- function(trials, tracked_behaviors = NULL) {
-  
-  # Calculate the behavior counts for each trial's observations:
-  count_observations <- purrr::map_dfr(trials, function(trial) {
-    
-    # Extract observations. 
-    observations <- trial$get_observations()
-    
-    # If tracked_behaviors is provided, select 
-    # observations for only those behaviors.
-    if (!is.null(tracked_behaviors)) {
-      observations <- dplyr::filter(observations, Behavior %in% tracked_behaviors)
-    }
-    
-    # Count number of agents doing tracked behaviors.
-    return (
-      dplyr::group_by(observations, t, Behavior) %>%
-        dplyr::summarise(count = dplyr::n()) %>%
-        dplyr::summarise(prevalence = count / trial$model$get_n_agents(), 
-                         .groups = "drop")
-    )
-  })
-  
-  # Now calculate and return the mean prevalence series of tracked behaviors.
-  # 
-  # First get n_agents model param.
-  n_agents <- trial$model$get_parameter("n_agents")
-  
-  # Return mean prevalence from count observations grouped by time and behavior.
-  return (
-    count_observations %>%
-      dplyr::group_by(t, Behavior) %>%
-      dplyr::summarise(`Mean prevalence` = mean(count) / n_agents)
-  )
-}
-
-
-#' Summarise trials by metadata fields
-#'
-#' @param trials A list of Trial objects to summarise
-#' @param input_parameters Character vector of model parameter fields to group by
-#' @param outcome_measures A character vector of outcome measures of interest
-#' @return A data frame with group means of success and steps
-#' @export
-summarise_by_parameters <- function(trials, 
-                                    input_parameters, 
-                                    outcome_measures = 
-                                      c("success_rate", 
-                                        "mean_fixation_steps")) {
-  
-  df <- purrr::map_dfr(trials, function(trial) {
-    
-    # Initialize "row" (actually a list for now) of desired input model params.
-    row <- as.list(trial$model$get_parameters()[input_parameters])
-    
-    # Convert learning_strategy parameter to its label and add to the "row".
-    if ("learning_strategy" %in% names(row)) {
-      row$learning_strategy <- row$learning_strategy$get_label()
-    }
-    
-    # Add the adaptation success for this row from the trial outcomes.
-    row$adaptation_success <- trial$get_outcomes()$adaptation_success
-    
-    # Add the fixation steps for this row from the trial outcomes
-    row$fixation_steps <- trial$get_outcomes()$fixation_steps
-    tibble::as_tibble(row)
-  })
-  
-  return (
-    df %>%
-      dplyr::group_by(across(all_of(input_parameters))) %>%
-      dplyr::summarise(
-        success_rate = mean(adaptation_success),
-        mean_fixation_steps = mean(fixation_steps),
-        .groups = "drop"
-      ) %>%
-      tidyr::pivot_longer(all_of(outcome_measures), 
-                          names_to = "Measure", 
-                          values_to = "Value")
-  )
-}
-
-
-#' Plot adoption counts of selected behaviors over time
-#' Plot adoption counts of selected behaviors 
-#' (`tracked_behaviors`) over time.
-#'
-#' @param trial A Trial object
-#' @param tracked_behaviors Character vector of behaviors to track (e.g., c("Adaptive", "Legacy"))
-#' @return A ggplot object
-#' @export
-#' @examples
-plot_adoption <- function(trial, tracked_behaviors = c("Adaptive")) {
-  
-  obs <- trial$get_observations()
-  
-  obs_filtered <- obs %>%
-    dplyr::filter(Behavior %in% tracked_behaviors) %>%
-    dplyr::group_by(t, Behavior) %>%
-    dplyr::summarise(count = dplyr::n(), .groups = "drop") %>%
-    tidyr::complete(t, Behavior, fill = list(count = 0))
-  
-  ggplot2::ggplot(obs_filtered, 
-                  ggplot2::aes(x = t, y = count, color = Behavior)) +
-    ggplot2::geom_line(linewidth = 1) +
-    ggplot2::xlab("Time step") +
-    ggplot2::ylab("Agent count") +
-    ggplot2::theme_classic() +
-    ggplot2::scale_color_brewer(palette = "Set1")
-}
-
-
-# ' Plot a summary of behavior adoption over time across trials
-# '
-# ' @param summary_df A tibble from summarise_adoption()
-# ' @return A ggplot object
-# ' @export
-# plot_summary <- function(summary_df) {
-#   ggplot2::ggplot(summary_df, ggplot2::aes(x = t, y = count, color = Behavior)) +
-#     ggplot2::geom_line(ggplot2::aes(group = interaction(trial, Behavior)), alpha = 0.3) +
-#     ggplot2::facet_wrap(~ label) +
-#     ggplot2::xlab("Time step") +
-#     ggplot2::ylab("Agent count") +
-#     ggplot2::theme_minimal() +
-#     ggplot2::scale_color_brewer(palette = "Set1")
-# }

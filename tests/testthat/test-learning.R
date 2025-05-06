@@ -160,7 +160,7 @@ test_that("If drop rate is 0 an agent doing Adaptive will never revert to Legacy
     stubbornness = 0.0
   )
   
-  model <- make_abm(model_parameters = mps)
+  model <- make_abm(parameters = mps)
   
   learner <- model$get_agent(1)
   teacher <- model$get_agent(2)

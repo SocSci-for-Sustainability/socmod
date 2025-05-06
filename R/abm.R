@@ -1,7 +1,18 @@
-#' AgentBasedModel class for socmod
+#' Agent-based model class
 #'
-#' This class represents the main simulation container, holding agents and a social network.
-#' It ensures synchronization between the agent states and the underlying igraph network.
+#' Represents an agent-based model with specified parameters and agents.
+#'
+#' @section Methods:
+#' \describe{
+#'   \item{initialize(parameters = DEFAULT_PARAMETERS, agents)}{
+#'     Creates a new AgentBasedModel with the given parameters and agents.
+#'     \describe{
+#'       \item{parameters}{A `ModelParameters` object specifying the model parameters. Defaults to `DEFAULT_PARAMETERS`.}
+#'       \item{agents}{A list of agent instances for the model.}
+#'     }
+#'   }
+#'   \item{get_parameters()}{Returns the `ModelParameters` instance for this model.}
+#' }
 #'
 #' @export
 AgentBasedModel <- R6::R6Class(
@@ -9,28 +20,24 @@ AgentBasedModel <- R6::R6Class(
   public = list(
     agents = NULL,
     graph = NULL,
-    
-    #' @description Initialize a model with either a graph, agents, or n_agents
-    #' @param graph An igraph object (optional)
-    #' @param agents A list of Agent objects (optional)
-    #' @param n_agents Integer number of agents to create (optional)
-    initialize = function(model_parameters = DEFAULT_PARAMETERS, 
-                          agents = NULL) {
-      
-      # Handle logic of setting ABM graph to user-provided, or create 
-      # a fully-connected one with `n_agents` vertices.
-      #
-      # First create a short-name variable for parameters.
-      if (!is.null(model_parameters)) {
-        assertthat::assert_that(
-          inherits(model_parameters, "ModelParameters"),
-          msg = "model_parameters must be an instance of ModelParameters"
-        )
-      }
 
+
+    #' @description Create a new AgentBasedModel instance.
+    #' @param parameters A `ModelParameters` object specifying the model parameters.
+    #'   Defaults to `DEFAULT_PARAMETERS`.
+    #' @param agents A list of agent instances for the model.
+    initialize = function(parameters = DEFAULT_PARAMETERS, agents = NULL) {
+      if (!inherits(parameters, "ModelParameters")) {
+        stop("parameters must be a ModelParameters instance")
+      }
+      
+      self$agents <- agents
+      
+      private$.parameters_instance <- parameters
+      
       # If the graph is defined, check it's an igraph and read it in.
-      graph <- model_parameters$get_graph()
-      n_agents <- model_parameters$get_n_agents()
+      graph <- parameters$get_graph()
+      n_agents <- parameters$get_n_agents()
       if (!is.null(graph)) {
         stopifnot(igraph::is_igraph(graph))
         self$graph <- graph
@@ -41,14 +48,13 @@ AgentBasedModel <- R6::R6Class(
         self$graph <- igraph::make_full_graph(n_agents, directed = FALSE)
 
         # Update model parameters with newly-created graph.
-        model_parameters$set_graph(self$graph)
+        parameters$set_graph(self$graph)
 
       } else {
         stop("Either 'graph' or 'n_agents' must be provided.")
       }
       
       # Initialize model parameters, stored as key-value list.
-      # private$.parameters <- model_parameters
       if (is.null(igraph::V(self$graph)$name)) {
         igraph::V(self$graph)$name <- 
           paste0("a", seq_len(igraph::vcount(self$graph)))
@@ -69,11 +75,11 @@ AgentBasedModel <- R6::R6Class(
         
         self$sync_network("neighbors_only")
 
-        model_parameters$set_n_agents(length(agents))
+        parameters$set_n_agents(length(agents))
 
       } else {
 
-        legacy_fitness <- model_parameters$as_list()$legacy_fitness
+        legacy_fitness <- parameters$as_list()$legacy_fitness
 
         # Set default legacy_fitness (seems like this should be in DEFAULT_PARAMETERS).
         if (is.null(legacy_fitness)) {
@@ -95,10 +101,18 @@ AgentBasedModel <- R6::R6Class(
         self$sync_network("from_graph")
       }
 
-      # Set the ABM parameters once it contains all parameters.
-      self$set_parameters(model_parameters)
+      # Ensure a graph label exists, make up one if not: g(n_nodes,n_edges)
+      graph_label <- igraph::graph_attr(self$graph, "label")
+      if (is.null(graph_label)) {
+        graph_label <- sprintf("g(%d,%d)", igraph::gorder(self$graph), igraph::gsize(self$graph))
+      }
+      self$graph <- igraph::set_graph_attr(self$graph, "label", graph_label)
+      parameters$set_graph(self$graph)
       
-      return (self)
+      # Set the ABM parameters once it contains all parameters.
+      self$set_parameters(parameters)
+      
+      return (invisible(self))
     },
     
     #' @description Synchronize agent and network fields
@@ -183,7 +197,7 @@ AgentBasedModel <- R6::R6Class(
 
     #' @description Get the of model parameters
     get_parameters = function() {
-      return(private$.parameters)
+      return (private$.parameters_instance)
     },
     
     #' @description Set multiple model parameters
@@ -192,62 +206,76 @@ AgentBasedModel <- R6::R6Class(
       
       # If params is a ModelParameter instance, convert to list.
       if(inherits(params, "ModelParameters")) {
-        params <- params$as_list()        
+
+        private$.parameters_instance <- params
       
         # If it isn't ModelParameter nor a list, throw error.
       } else if (!is.list(params)) {
         stop(
           "Only ModelParameter instances and lists may be passed to Agent$set_parameters()."
         )
+      } else {
+        for (key in names(params)) {
+          self$set_parameter(key, params[[key]])
+        }
       }
-      
-      # Update model parameters list with `params` guaranteed in list format.
-      private$.parameters <- modifyList(private$.parameters, params)
     },
     
     #' @description Set a single model parameter
     #' @param key Parameter name
     #' @param value Parameter value
     set_parameter = function(key, value) {
-      private$.parameters[[key]] <- value
+      if (key == "learning_strategy") {
+        private$.parameters_instance$set_learning_strategy(value)
+      } else if (key == "graph") {
+        private$.parameters_instance$set_graph(value)
+      } else if (key == "n_agents") {
+        private$.parameters_instance$set_n_agents(value)
+      } else {
+        private$.parameters_instance$add_auxiliary(key, value)      
+      }
+
+      return (invisible(self))
     },
     
     #' @description Get a single model parameter
     #' @param key Parameter name
     get_parameter = function(key) {
-      return(private$.parameters[[key]])
+      return (private$.parameters_instance$as_list()[[key]])
     }
   ),
   
   private = list(
-    .parameters = list()
+    .parameters = NULL,
+    .parameters_instance = NULL
   )
+  
 )
 
 
 #' Helper function to create a new agent-based model
 #' 
-#' @param model_parameters ModelParameters instance specifying context
+#' @param parameters ModelParameters instance specifying context
 #' @param agents List of `Agent`s
 #' @return AgentBasedModel with specified parameters and agents
 #' @examples
 #' abm <- make_abm(make_model_parameters(n_agents = 10))
 #' @export
-make_abm <- function(model_parameters = NULL, agents = NULL) {
+make_abm <- function(parameters = NULL, agents = NULL) {
 
   assertthat::assert_that(
-    inherits(model_parameters, "ModelParameters"),
-    msg = "Argument model_parameters must be an instance of class ModelParameters."
+    inherits(parameters, "ModelParameters"),
+    msg = "Argument parameters must be an instance of class ModelParameters."
   )
 
   assertthat::assert_that(
-    inherits(model_parameters$get_learning_strategy(), "LearningStrategy"),
+    inherits(parameters$get_learning_strategy(), "LearningStrategy"),
     msg = "Learning strategy must be an instance of class LearningStrategy."
   )
   
   return (
     AgentBasedModel$new(
-      model_parameters = model_parameters,
+      parameters = parameters,
       agents = agents
     )
   )

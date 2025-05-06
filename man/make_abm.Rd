@@ -4,10 +4,10 @@
 \alias{make_abm}
 \title{Helper function to create a new agent-based model}
 \usage{
-make_abm(model_parameters = NULL, agents = NULL)
+make_abm(parameters = NULL, agents = NULL)
 }
 \arguments{
-\item{model_parameters}{ModelParameters instance specifying context}
+\item{parameters}{ModelParameters instance specifying context}
 
 \item{agents}{List of \code{Agent}s}
 }

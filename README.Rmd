@@ -23,43 +23,9 @@ library(igraph)
 library(magrittr)
 ```
 
-# socmod
+# Introduction 
 
-
-[![Codecov test
-coverage](https://codecov.io/gh/CSS4S/socmod/graph/badge.svg)](https://app.codecov.io/gh/CSS4S/socmod)
-
-
-`socmod` provides a framework and utilities for developing simulations
-of social learning and social influence structured by social networks.
-It is being developed to support the course *Computational Social
-Science for Sustainability* at the Stanford Doerr School of
-Sustainability. The course teaches theory and techniques for
-understanding cognitive and social mechanisms influencing beliefs and
-behaviors that can be combined in computational models to predict the
-relative efficacy of different candidate interventions for
-sustainability, e.g., to promote ecological protection, public health,
-economic security and justice, climate action, to name just a few
-[sustainable development goals](https://sdgs.un.org/goals).
-
-`socmod` is flexible to encapsulate any social process that can be
-modeled as follows: (1) individuals are initialized with some knowledge
-and payoff from behaviors they do or or beliefs they hold; (2) they
-exchange information socially over time through teaching, observation,
-discourse, etc. This process is illustrated in this figure:
-
-![](man/figures/general_model_box_diagram.png)
-
-Currently the focus of socmod is developing models of informational and
-behavioral interventions to promote sustainable behaviors that we call
-*adaptations*, $A$. Those not yet doing $A$ are said to be doing a
-legacy behavior, $L$. Each agent can be assigned or gain fitness that is
-tracked over time, which can be linked to whether they do $A$ or $L$.
-
-`socmod` provides tools for initializing simulated individuals (i.e.,
-*agents*), their social networks, and their behaviors. These
-capabilities are introduced in a simple example below.
-
+The goal of `socmod` is to simplify development of models of social behavior for beginners and experts alike. `socmod` focuses on agent-based models for now, but the framework is flexible to be extended to other iterative or non-iterative models of behavior diffusion, opinion dynamics, and other social behaviors. 
 
 ### Installation
 
@@ -83,7 +49,18 @@ pak::pak("css4s/socmod")
 ```
 
 
-## Quickstart examples
+## Quickstart example
+
+Someone who has developed agent-based models of social behavior may be able to guess at some things going on behind the scene in the following code block that creates, runs, and visualizes the dynamics of an agent-based model of adaptive behavior diffusion. 
+
+```{r}
+
+```
+
+Read on to learn 
+
+
+## Tutorial introduction with more details  
 
 To understand what socmod does to help organize and develop models of
 social behavior, let's consider a simple example with just four
@@ -163,10 +140,14 @@ and continues using their current behavior.
 Success-biased learning is the default, so we do not have to specify it explicitly.
 
 ```{r}
+load_all()
+```
+
+```{r}
 abm <- make_example_abm()
 trial <- run_trial(abm, stop = fixated)
 print(tail(trial$get_observations(), n = 10))
-plot_adoption(trial, tracked_behaviors = c("Legacy", "Adaptive"))
+plot_prevalence(trial, tracked_behaviors = c("Legacy", "Adaptive"))
 ```
 
 #### Frequency-biased learning
