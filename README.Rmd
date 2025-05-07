@@ -51,11 +51,26 @@ pak::pak("css4s/socmod")
 
 ## Quickstart example
 
-Someone who has developed agent-based models of social behavior may be able to guess at some things going on behind the scene in the following code block that creates, runs, and visualizes the dynamics of an agent-based model of adaptive behavior diffusion. 
+We can succinctly write a single pipeline to do the following three analyses outlined below, 1, 2A, and 2B.
+
+1. Initialize, run, and visualize prevalence time series for a single trial
+2. Define a computational experiment that runs a number of trials to be analyzed in two ways: (i) success rates and mean times to fixation over model parameter values
+and (ii) average prevalence time series over model parameter values.
 
 ```{r}
+#| fig-width: 5
+#| fig-height: 2.875
 
+make_abm(n_agents = 100) %>%
+  # Initialize 20% of agents w/ Adaptive w/ fitness 0.125 times > than Legacy
+  initialize_agents(initial_prevalence = 0.1, adaptive_fitness = 1.125) %>%
+  run_trial %>%
+  plot_prevalence %>%
+  print
 ```
+
+4B. summarized across input variables (second example), or...
+4C. analyze & visualize the outcomes (third example)
 
 Read on to learn 
 
@@ -139,15 +154,12 @@ and continues using their current behavior.
 
 Success-biased learning is the default, so we do not have to specify it explicitly.
 
-```{r}
-load_all()
-```
 
 ```{r}
 abm <- make_example_abm()
 trial <- run_trial(abm, stop = fixated)
 print(tail(trial$get_observations(), n = 10))
-plot_prevalence(trial, tracked_behaviors = c("Legacy", "Adaptive"))
+plot_prevalence(trial)
 ```
 
 #### Frequency-biased learning
@@ -164,7 +176,7 @@ model parameters by passing `frequency_biased_learning_strategy` to the
 abm <- make_example_abm()
 trial <- run_trial(abm, stop = fixated)
 print(tail(trial$get_observations(), n = 10))
-plot_adoption(trial, tracked_behaviors = c("Legacy", "Adaptive"))
+plot_prevalence(trial)
 ```
 
 

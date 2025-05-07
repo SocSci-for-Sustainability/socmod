@@ -108,8 +108,9 @@ AgentBasedModel <- R6::R6Class(
       }
       self$graph <- igraph::set_graph_attr(self$graph, "label", graph_label)
       parameters$set_graph(self$graph)
-      
-      # Set the ABM parameters once it contains all parameters.
+      # Ensure the n_agents parameter is set
+      parameters$set_n_agents(length(self$agents))
+      # Set the ABM parameters once it contains all parameters
       self$set_parameters(parameters)
       
       return (invisible(self))
@@ -253,25 +254,32 @@ AgentBasedModel <- R6::R6Class(
 )
 
 
-#' Helper function to create a new agent-based model
-#' 
-#' @param parameters ModelParameters instance specifying context
-#' @param agents List of `Agent`s
-#' @return AgentBasedModel with specified parameters and agents
+#' Create an AgentBasedModel instance
+#'
+#' Initializes an `AgentBasedModel` with specified `parameters` and `agents`.
+#' If `parameters` is `NULL`, the function constructs a `ModelParameters` object
+#' using any additional arguments (`...`) passed to `make_model_parameters()`.
+#'
+#' @param parameters A `ModelParameters` instance specifying model context. If `NULL`, parameters are created using `make_model_parameters(...)`.
+#' @param agents A list of `Agent` objects, typically created separately. Optional.
+#' @param ... Additional arguments passed to `make_model_parameters()` if `parameters` is `NULL`.
+#'
+#' @return An `AgentBasedModel` instance.
+#'
 #' @examples
-#' abm <- make_abm(make_model_parameters(n_agents = 10))
+#' abm <- make_abm(n_agents = 10)
+#' abm2 <- make_abm(parameters = make_model_parameters(n_agents = 10))
+#' abm_g <- make_abm(graph = socmod::make_small_world(N = 20, k = 6, p = 0.2))
+#' abm_g2 <- make_model_parameters(
+#'   graph = socmod::make_small_world(N = 20, k = 6, p = 0.2)
+#' ) %>% make_abm
 #' @export
-make_abm <- function(parameters = NULL, agents = NULL) {
+make_abm <- function(parameters = NULL, agents = NULL, ...) {
 
-  assertthat::assert_that(
-    inherits(parameters, "ModelParameters"),
-    msg = "Argument parameters must be an instance of class ModelParameters."
-  )
-
-  assertthat::assert_that(
-    inherits(parameters$get_learning_strategy(), "LearningStrategy"),
-    msg = "Learning strategy must be an instance of class LearningStrategy."
-  )
+  if (is.null(parameters)) {
+    dots <- list(...)
+    parameters <- do.call(make_model_parameters, dots)
+  }
   
   return (
     AgentBasedModel$new(

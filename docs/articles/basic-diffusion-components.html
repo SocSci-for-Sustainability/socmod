@@ -6,12 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Components for basic diffusion modeling with socmod • socmod</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
-<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
-<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
-<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -29,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">socmod</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -448,7 +447,7 @@
 <code class="sourceCode R"><span><span class="va">footballer</span> <span class="op">&lt;-</span> <span class="va">Footballer</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>accuracy <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span>
 <span><span class="va">footballer</span><span class="op">$</span><span class="fu">scored_goal</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 1</code></pre>
+<pre><code>[1] 0</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb59"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># sum(purrr::map_vec(1:10, \(.) p$scored_goal()))</span></span></code></pre></div>
@@ -517,20 +516,20 @@
 <span><span class="co"># Play three matches.</span></span>
 <span><span class="fu">play_match</span><span class="op">(</span><span class="va">whales</span>, <span class="va">squirrels</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Whales wins!!!
-Whales :  5     Squirrels :  3 </code></pre>
+<pre><code>Tie game!
+Whales :  5     Squirrels :  5 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb63"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">play_match</span><span class="op">(</span><span class="va">squirrels</span>, <span class="va">whales</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Tie game!
-Squirrels :  5     Whales :  5 </code></pre>
+<pre><code>Whales wins!!!
+Squirrels :  0     Whales :  6 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb65"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">play_match</span><span class="op">(</span><span class="va">squirrels</span>, <span class="va">whales</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Tie game!
-Squirrels :  4     Whales :  4 </code></pre>
+<pre><code>Squirrels wins!!!
+Squirrels :  4     Whales :  3 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb67"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Print how many games each time won.</span></span>
@@ -539,7 +538,7 @@ Squirrels :  4     Whales :  4 </code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 After three games...
-The Whales have won 1 games and the Squirrels have won 0</code></pre>
+The Whales have won 1 games and the Squirrels have won 1</code></pre>
 </div>
 </div>
 </section></section><section class="level2"><h2 id="agent-based-models-of-social-behavior">Agent-based models of social behavior<a class="anchor" aria-label="anchor" href="#agent-based-models-of-social-behavior"></a>
@@ -558,24 +557,18 @@ Figure 1: Example social network and sustainable adaptation diffusion problem.
 </h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb69"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">adoption_rate</span> <span class="op">=</span> <span class="fl">0.8</span></span>
-<span> </span>
-<span><span class="co"># Run model with </span></span>
+<code class="sourceCode R"><span><span class="co"># Run model and save figure</span></span>
 <span><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/make_graph.html" class="external-link">make_graph</a></span><span class="op">(</span><span class="op">~</span> <span class="fl">1</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">1</span><span class="op">-</span><span class="fl">4</span>, <span class="fl">3</span><span class="op">-</span><span class="fl">2</span><span class="op">)</span></span>
 <span><span class="va">mps</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_model_parameters.html">make_model_parameters</a></span><span class="op">(</span></span>
 <span>  <span class="va">contagion_learning_strategy</span>, graph <span class="op">=</span> <span class="va">g</span>, adoption_rate <span class="op">=</span> <span class="fl">0.8</span>, drop_rate <span class="op">=</span> <span class="fl">0.1</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">cabm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_abm.html">make_abm</a></span><span class="op">(</span><span class="va">mps</span><span class="op">)</span>; </span>
-<span><span class="va">cabm</span><span class="op">$</span><span class="fu">get_agent</span><span class="op">(</span><span class="fl">2</span><span class="op">)</span><span class="op">$</span><span class="fu">set_behavior</span><span class="op">(</span><span class="st">"Adaptive"</span><span class="op">)</span>; </span>
+<span><span class="va">cabm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_abm.html">make_abm</a></span><span class="op">(</span><span class="va">mps</span><span class="op">)</span></span>
+<span><span class="va">cabm</span><span class="op">$</span><span class="fu">get_agent</span><span class="op">(</span><span class="fl">2</span><span class="op">)</span><span class="op">$</span><span class="fu">set_behavior</span><span class="op">(</span><span class="st">"Adaptive"</span><span class="op">)</span></span>
 <span><span class="va">trial</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_trial.html">run_trial</a></span><span class="op">(</span><span class="va">cabm</span>, stop <span class="op">=</span> <span class="va">fixated</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/plot_adoption.html">plot_adoption</a></span><span class="op">(</span><span class="va">trial</span>, tracked_behaviors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Legacy"</span>, <span class="st">"Adaptive"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="cell-output-display">
-<div>
-<figure><p><img src="basic-diffusion-components_files/figure-html/unnamed-chunk-24-1.png" width="552"></p>
-</figure>
+<span></span>
+<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_prevalence.html">plot_prevalence</a></span><span class="op">(</span><span class="va">trial</span><span class="op">)</span></span></code></pre></div>
 </div>
-</div>
-</div>
+<p><img src="example1.png"></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb70"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Same, but now call the adaptive behavior "Baglowie" instead of "Adaptive".</span></span>
@@ -585,17 +578,13 @@ Figure 1: Example social network and sustainable adaptation diffusion problem.
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">cabm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_abm.html">make_abm</a></span><span class="op">(</span><span class="va">mps</span><span class="op">)</span></span>
-<span><span class="va">cabm</span><span class="op">$</span><span class="fu">get_agent</span><span class="op">(</span><span class="fl">2</span><span class="op">)</span><span class="op">$</span><span class="fu">set_behavior</span><span class="op">(</span><span class="st">"Baglowie"</span><span class="op">)</span>; </span>
+<span><span class="va">cabm</span><span class="op">$</span><span class="fu">get_agent</span><span class="op">(</span><span class="fl">2</span><span class="op">)</span><span class="op">$</span><span class="fu">set_behavior</span><span class="op">(</span><span class="st">"Baglowie"</span><span class="op">)</span>;</span>
 <span></span>
 <span><span class="va">trial</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/run_trial.html">run_trial</a></span><span class="op">(</span><span class="va">cabm</span>, stop <span class="op">=</span> <span class="va">fixated</span>, adaptive_behavior <span class="op">=</span> <span class="st">"Baglowie"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/plot_adoption.html">plot_adoption</a></span><span class="op">(</span><span class="va">trial</span>, tracked_behaviors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Legacy"</span>, <span class="st">"Baglowie"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="cell-output-display">
-<div>
-<figure><p><img src="basic-diffusion-components_files/figure-html/unnamed-chunk-25-1.png" width="552"></p>
-</figure>
+<span></span>
+<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_prevalence.html">plot_prevalence</a></span><span class="op">(</span><span class="va">trial</span>, behavior_order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Legacy"</span>, <span class="st">"Baglowie"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
-</div>
-</div>
+<p><img src="example2.png"></p>
 </section><section class="level3"><h3 id="example-comparison-of-learning-strategies-and-parameters">Example: comparison of learning strategies and parameters<a class="anchor" aria-label="anchor" href="#example-comparison-of-learning-strategies-and-parameters"></a>
 </h3>
 <p>Agent-based models in <code>socmod</code> are composed of sub-models of cognition and social behavior and social networks. One component of agent cognition is its <em>social learning strategy</em>. Three social learning strategies are included in <code>socmod</code>: success-biased, frequency-biased, and contagion learning strategies <a href="https://css4s.github.io/abm-notes/intro.html#social-learning-strategies" class="external-link">see ABM course notes for more details</a>.</p>
@@ -664,7 +653,7 @@ Figure 1: Example social network and sustainable adaptation diffusion problem.
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="va">trials_summary</span> <span class="op">&lt;-</span> <span class="fu">socmod</span><span class="fu">::</span><span class="fu"><a href="../reference/summarise_by_parameters.html">summarise_by_parameters</a></span><span class="op">(</span></span>
+<span><span class="va">trials_summary</span> <span class="op">&lt;-</span> <span class="fu">socmod</span><span class="fu">::</span><span class="fu">summarise_by_parameters</span><span class="op">(</span></span>
 <span>  <span class="va">trials_adaptive_fitness</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"learning_strategy"</span>, <span class="st">"adaptive_fitness"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -714,7 +703,7 @@ Figure 1: Example social network and sustainable adaptation diffusion problem.
 <span>    drop_rate <span class="op">=</span> <span class="fl">0.2</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="va">trials_summary</span> <span class="op">&lt;-</span> <span class="fu">socmod</span><span class="fu">::</span><span class="fu"><a href="../reference/summarise_by_parameters.html">summarise_by_parameters</a></span><span class="op">(</span></span>
+<span><span class="va">trials_summary</span> <span class="op">&lt;-</span> <span class="fu">socmod</span><span class="fu">::</span><span class="fu">summarise_by_parameters</span><span class="op">(</span></span>
 <span>  <span class="va">trials_adoption</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"learning_strategy"</span>, <span class="st">"adoption_rate"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -835,7 +824,7 @@ Figure 1: Example social network and sustainable adaptation diffusion problem.
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
     </footer>

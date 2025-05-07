@@ -6,12 +6,16 @@
 Plot adoption counts of selected behaviors
 (\code{tracked_behaviors}) over time.}
 \usage{
-plot_prevalence(trials_or_tibble, tracked_behaviors = c("Adaptive"))
+plot_prevalence(
+  trials_or_tibble,
+  behavior_order = c("Legacy", "Adaptive"),
+  theme_size = 16
+)
 }
 \arguments{
-\item{tracked_behaviors}{Character vector of behaviors to track (e.g., c("Adaptive", "Legacy"))}
-
 \item{trial}{A Trial object}
+
+\item{tracked_behaviors}{Character vector of behaviors to track (e.g., c("Adaptive", "Legacy"))}
 }
 \value{
 A ggplot object

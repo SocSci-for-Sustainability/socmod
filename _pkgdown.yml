@@ -22,6 +22,7 @@ reference:
   - plot_homophilynet
   - plot_friendship_paradox
   - ggnetplot
+  - SOCMOD_PLOT_PALETTE
 - title: Examples with real-world data
   desc: Simple examples of real-world data in socmod.
   contents:
@@ -30,10 +31,12 @@ reference:
 - title: AgentBasedModel and ModelParameters
   desc: |
     Create agent-based models and specify model configuration parameters
-  - AgentBasedModel
+  contents:
   - make_abm
-  - ModelParameters
+  - initialize_agents
   - make_model_parameters
+  - AgentBasedModel
+  - ModelParameters
   - DEFAULT_PARAMETERS
 - title: Learning strategy class, make_learning_strategy, and other tools
   desc: |

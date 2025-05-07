@@ -28,3 +28,22 @@ test_that("summarise_prevalence summarizes prevalence across trials", {
   expect_false("trial_id" %in% names(prevalence_summary))
 })
 
+test_that("initialize_agents sets correct number of adaptive and legacy agents", {
+  model <- make_abm(n_agents = 20)
+  initialize_agents(model, initial_prevalence = 0.25, adaptive_fitness = 2.0, legacy_fitness = 1.0)
+  
+  behaviors <- vapply(model$agents, \(a) a$get_behavior(), character(1))
+  fitnesses <- vapply(model$agents, \(a) a$get_fitness(), numeric(1))
+  
+  expect_equal(sum(behaviors == "Adaptive"), 5)
+  expect_equal(sum(behaviors == "Legacy"), 15)
+  expect_true(all(fitnesses[behaviors == "Adaptive"] == 2.0))
+  expect_true(all(fitnesses[behaviors == "Legacy"] == 1.0))
+})
+
+test_that("make_abm(...) passes args to make_model_parameters", {
+  model <- make_abm(n_agents = 10)
+  expect_s3_class(model, "AgentBasedModel")
+  expect_equal(model$get_parameter("n_agents"), 10)
+})
+

@@ -1,40 +1,13 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# socmod
+# Introduction
 
-[![Codecov test
-coverage](https://codecov.io/gh/CSS4S/socmod/graph/badge.svg)](https://app.codecov.io/gh/CSS4S/socmod)
-
-`socmod` provides a framework and utilities for developing simulations
-of social learning and social influence structured by social networks.
-It is being developed to support the course *Computational Social
-Science for Sustainability* at the Stanford Doerr School of
-Sustainability. The course teaches theory and techniques for
-understanding cognitive and social mechanisms influencing beliefs and
-behaviors that can be combined in computational models to predict the
-relative efficacy of different candidate interventions for
-sustainability, e.g., to promote ecological protection, public health,
-economic security and justice, climate action, to name just a few
-[sustainable development goals](https://sdgs.un.org/goals).
-
-`socmod` is flexible to encapsulate any social process that can be
-modeled as follows: (1) individuals are initialized with some knowledge
-and payoff from behaviors they do or or beliefs they hold; (2) they
-exchange information socially over time through teaching, observation,
-discourse, etc. This process is illustrated in this figure:
-
-![](man/figures/general_model_box_diagram.png)
-
-Currently the focus of socmod is developing models of informational and
-behavioral interventions to promote sustainable behaviors that we call
-*adaptations*, $A$. Those not yet doing $A$ are said to be doing a
-legacy behavior, $L$. Each agent can be assigned or gain fitness that is
-tracked over time, which can be linked to whether they do $A$ or $L$.
-
-`socmod` provides tools for initializing simulated individuals (i.e.,
-*agents*), their social networks, and their behaviors. These
-capabilities are introduced in a simple example below.
+The goal of `socmod` is to simplify development of models of social
+behavior for beginners and experts alike. `socmod` focuses on
+agent-based models for now, but the framework is flexible to be extended
+to other iterative or non-iterative models of behavior diffusion,
+opinion dynamics, and other social behaviors.
 
 ### Installation
 
@@ -57,7 +30,35 @@ install.packages("pak")
 pak::pak("css4s/socmod")
 ```
 
-## Quickstart examples
+## Quickstart example
+
+We can succinctly write a single pipeline to do the following three
+analyses outlined below, 1, 2A, and 2B.
+
+1.  Initialize, run, and visualize prevalence time series for a single
+    trial
+2.  Define a computational experiment that runs a number of trials to be
+    analyzed in two ways: (i) success rates and mean times to fixation
+    over model parameter values and (ii) average prevalence time series
+    over model parameter values.
+
+``` r
+make_abm(n_agents = 100) %>%
+  # Initialize 20% of agents w/ Adaptive w/ fitness 0.125 times > than Legacy
+  initialize_agents(initial_prevalence = 0.1, adaptive_fitness = 1.125) %>%
+  run_trial %>%
+  plot_prevalence %>%
+  print
+```
+
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="50%" style="display: block; margin: auto;" />
+
+4B. summarized across input variables (second example), or… 4C. analyze
+& visualize the outcomes (third example)
+
+Read on to learn
+
+## Tutorial introduction with more details
 
 To understand what socmod does to help organize and develop models of
 social behavior, let’s consider a simple example with just four
@@ -120,7 +121,7 @@ ggnetplot(abm$graph) +
       theme_blank()
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="50%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="50%" style="display: block; margin: auto;" />
 
 ### Model dynamics with different adaptive social learning strategies
 
@@ -146,22 +147,22 @@ abm <- make_example_abm()
 trial <- run_trial(abm, stop = fixated)
 print(tail(trial$get_observations(), n = 10))
 #> # A tibble: 10 × 4
-#>        t agent Behavior Fitness
+#>     Step agent Behavior Fitness
 #>    <dbl> <chr> <chr>      <dbl>
-#>  1     6 n_i2  Adaptive       2
-#>  2     6 n_i3  Legacy         1
-#>  3     7 i     Legacy         1
-#>  4     7 n_i1  Adaptive       2
-#>  5     7 n_i2  Legacy         1
-#>  6     7 n_i3  Adaptive       2
-#>  7     8 i     Legacy         1
-#>  8     8 n_i1  Legacy         1
-#>  9     8 n_i2  Legacy         1
-#> 10     8 n_i3  Legacy         1
-plot_adoption(trial, tracked_behaviors = c("Legacy", "Adaptive"))
+#>  1     1 n_i2  Adaptive       2
+#>  2     1 n_i3  Legacy         1
+#>  3     2 i     Adaptive       2
+#>  4     2 n_i1  Legacy         1
+#>  5     2 n_i2  Legacy         1
+#>  6     2 n_i3  Adaptive       2
+#>  7     3 i     Adaptive       2
+#>  8     3 n_i1  Adaptive       2
+#>  9     3 n_i2  Adaptive       2
+#> 10     3 n_i3  Adaptive       2
+plot_prevalence(trial)
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-1.png" width="50%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="50%" style="display: block; margin: auto;" />
 
 #### Frequency-biased learning
 
@@ -179,22 +180,22 @@ abm <- make_example_abm()
 trial <- run_trial(abm, stop = fixated)
 print(tail(trial$get_observations(), n = 10))
 #> # A tibble: 10 × 4
-#>        t agent Behavior Fitness
+#>     Step agent Behavior Fitness
 #>    <dbl> <chr> <chr>      <dbl>
-#>  1     4 n_i2  Adaptive       2
-#>  2     4 n_i3  Adaptive       2
-#>  3     5 i     Adaptive       2
-#>  4     5 n_i1  Legacy         1
-#>  5     5 n_i2  Adaptive       2
-#>  6     5 n_i3  Adaptive       2
-#>  7     6 i     Adaptive       2
-#>  8     6 n_i1  Adaptive       2
-#>  9     6 n_i2  Adaptive       2
-#> 10     6 n_i3  Adaptive       2
-plot_adoption(trial, tracked_behaviors = c("Legacy", "Adaptive"))
+#>  1     8 n_i2  Adaptive       2
+#>  2     8 n_i3  Adaptive       2
+#>  3     9 i     Adaptive       2
+#>  4     9 n_i1  Legacy         1
+#>  5     9 n_i2  Adaptive       2
+#>  6     9 n_i3  Adaptive       2
+#>  7    10 i     Adaptive       2
+#>  8    10 n_i1  Adaptive       2
+#>  9    10 n_i2  Adaptive       2
+#> 10    10 n_i3  Adaptive       2
+plot_prevalence(trial)
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-1.png" width="50%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="50%" style="display: block; margin: auto;" />
 
 ### Networks
 
@@ -211,7 +212,7 @@ ggnetplot(latnet, layout = \(g) 0.6*layout_in_circle(g)) +
       theme_blank()
 ```
 
-<img src="man/figures/README-unnamed-chunk-7-1.png" width="50%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-8-1.png" width="50%" style="display: block; margin: auto;" />
 
 ### Random networks
 
@@ -225,7 +226,7 @@ ggnetplot(gnm_net) +
   theme_blank()
 ```
 
-<img src="man/figures/README-unnamed-chunk-8-1.png" width="50%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-9-1.png" width="50%" style="display: block; margin: auto;" />
 
 ### Small-world networks
 
@@ -237,7 +238,7 @@ ggnetplot(sw_net, layout = \(net) 0.6*layout_in_circle(net)) +
       theme_blank(base_size = 12)
 ```
 
-<img src="man/figures/README-unnamed-chunk-9-1.png" width="50%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-10-1.png" width="50%" style="display: block; margin: auto;" />
 
 ### Preferential attachment networks
 
@@ -249,7 +250,7 @@ ggnetplot(pa_net, layout = \(net) 0.6*layout_with_fr(net)) +
       theme_blank()
 ```
 
-<img src="man/figures/README-unnamed-chunk-10-1.png" width="50%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-11-1.png" width="50%" style="display: block; margin: auto;" />
 
 ### Homophily networks
 
@@ -278,7 +279,7 @@ ggnetplot(hnet_2grp, \(net) 0.6*layout_in_circle(net)) +
   theme_blank(base_size=8)
 ```
 
-<img src="man/figures/README-unnamed-chunk-11-1.png" width="50%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-12-1.png" width="50%" style="display: block; margin: auto;" />
 
 Now symmetric anti-homophily of -0.5 leads to 50% fewer within-group
 connections than between-group. Now the metapopulation is composed of
@@ -296,7 +297,7 @@ ggnetplot(hnet_5grp, \(net) 0.6*layout_in_circle(net)) +
   theme_blank(base_size=12)
 ```
 
-<img src="man/figures/README-unnamed-chunk-12-1.png" width="50%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-13-1.png" width="50%" style="display: block; margin: auto;" />
 
 #### Asymmetric homophily
 
@@ -318,7 +319,7 @@ ggnetplot(hnet_asymm, \(net) 0.6*layout_in_circle(net)) +
   theme_blank(base_size=12)
 ```
 
-<img src="man/figures/README-unnamed-chunk-13-1.png" width="50%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-14-1.png" width="50%" style="display: block; margin: auto;" />
 
 ## More information and the philosophy of socmod
 

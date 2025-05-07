@@ -2,21 +2,30 @@
 % Please edit documentation in R/abm.R
 \name{make_abm}
 \alias{make_abm}
-\title{Helper function to create a new agent-based model}
+\title{Create an AgentBasedModel instance}
 \usage{
-make_abm(parameters = NULL, agents = NULL)
+make_abm(parameters = NULL, agents = NULL, ...)
 }
 \arguments{
-\item{parameters}{ModelParameters instance specifying context}
+\item{parameters}{A \code{ModelParameters} instance specifying model context. If \code{NULL}, parameters are created using \code{make_model_parameters(...)}.}
 
-\item{agents}{List of \code{Agent}s}
+\item{agents}{A list of \code{Agent} objects, typically created separately. Optional.}
+
+\item{...}{Additional arguments passed to \code{make_model_parameters()} if \code{parameters} is \code{NULL}.}
 }
 \value{
-AgentBasedModel with specified parameters and agents
+An \code{AgentBasedModel} instance.
 }
 \description{
-Helper function to create a new agent-based model
+Initializes an \code{AgentBasedModel} with specified \code{parameters} and \code{agents}.
+If \code{parameters} is \code{NULL}, the function constructs a \code{ModelParameters} object
+using any additional arguments (\code{...}) passed to \code{make_model_parameters()}.
 }
 \examples{
-abm <- make_abm(make_model_parameters(n_agents = 10))
+abm <- make_abm(n_agents = 10)
+abm2 <- make_abm(parameters = make_model_parameters(n_agents = 10))
+abm_g <- make_abm(graph = socmod::make_small_world(N = 20, k = 6, p = 0.2))
+abm_g2 <- make_model_parameters(
+  graph = socmod::make_small_world(N = 20, k = 6, p = 0.2)
+) \%>\% make_abm
 }

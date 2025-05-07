@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="index.html">socmod</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,7 +42,6 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="articles/basic-diffusion-components.html">Components for basic diffusion modeling with socmod</a></li>
-    <li><a class="dropdown-item" href="articles/model-parameter-flow.html">Model parameter flow</a></li>
   </ul>
 </li>
       </ul>
@@ -59,15 +58,10 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header">
-<img src="logo.png" class="logo" alt=""><h1 id="socmod">socmod<a class="anchor" aria-label="anchor" href="#socmod"></a>
+<img src="logo.png" class="logo" alt=""><h1 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h1>
 </div>
-<p><a href="https://app.codecov.io/gh/CSS4S/socmod" class="external-link"><img src="https://codecov.io/gh/CSS4S/socmod/graph/badge.svg" alt="Codecov test coverage"></a></p>
-<p><code>socmod</code> provides a framework and utilities for developing simulations of social learning and social influence structured by social networks. It is being developed to support the course <em>Computational Social Science for Sustainability</em> at the Stanford Doerr School of Sustainability. The course teaches theory and techniques for understanding cognitive and social mechanisms influencing beliefs and behaviors that can be combined in computational models to predict the relative efficacy of different candidate interventions for sustainability, e.g., to promote ecological protection, public health, economic security and justice, climate action, to name just a few <a href="https://sdgs.un.org/goals" class="external-link">sustainable development goals</a>.</p>
-<p><code>socmod</code> is flexible to encapsulate any social process that can be modeled as follows: (1) individuals are initialized with some knowledge and payoff from behaviors they do or or beliefs they hold; (2) they exchange information socially over time through teaching, observation, discourse, etc. This process is illustrated in this figure:</p>
-<p><img src="reference/figures/general_model_box_diagram.png"></p>
-<p>Currently the focus of socmod is developing models of informational and behavioral interventions to promote sustainable behaviors that we call <em>adaptations</em>, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>. Those not yet doing <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math> are said to be doing a legacy behavior, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>L</mi><annotation encoding="application/x-tex">L</annotation></semantics></math>. Each agent can be assigned or gain fitness that is tracked over time, which can be linked to whether they do <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math> or <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>L</mi><annotation encoding="application/x-tex">L</annotation></semantics></math>.</p>
-<p><code>socmod</code> provides tools for initializing simulated individuals (i.e., <em>agents</em>), their social networks, and their behaviors. These capabilities are introduced in a simple example below.</p>
+<p>The goal of <code>socmod</code> is to simplify development of models of social behavior for beginners and experts alike. <code>socmod</code> focuses on agent-based models for now, but the framework is flexible to be extended to other iterative or non-iterative models of behavior diffusion, opinion dynamics, and other social behaviors.</p>
 <div class="section level3">
 <h3 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h3>
@@ -84,13 +78,32 @@
 <span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"css4s/socmod"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="quickstart-examples">Quickstart examples<a class="anchor" aria-label="anchor" href="#quickstart-examples"></a>
+<h2 id="quickstart-example">Quickstart example<a class="anchor" aria-label="anchor" href="#quickstart-example"></a>
+</h2>
+<p>We can succinctly write a single pipeline to do the following three analyses outlined below, 1, 2A, and 2B.</p>
+<ol style="list-style-type: decimal">
+<li>Initialize, run, and visualize prevalence time series for a single trial</li>
+<li>Define a computational experiment that runs a number of trials to be analyzed in two ways: (i) success rates and mean times to fixation over model parameter values and (ii) average prevalence time series over model parameter values.</li>
+</ol>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/make_abm.html">make_abm</a></span><span class="op">(</span>n_agents <span class="op">=</span> <span class="fl">100</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="co"># Initialize 20% of agents w/ Adaptive w/ fitness 0.125 times &gt; than Legacy</span></span>
+<span>  <span class="fu"><a href="reference/initialize_agents.html">initialize_agents</a></span><span class="op">(</span>initial_prevalence <span class="op">=</span> <span class="fl">0.1</span>, adaptive_fitness <span class="op">=</span> <span class="fl">1.125</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="va">run_trial</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="va">plot_prevalence</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="va">print</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-4-1.png" width="50%" style="display: block; margin: auto;"></p>
+<p>4B. summarized across input variables (second example), or… 4C. analyze &amp; visualize the outcomes (third example)</p>
+<p>Read on to learn</p>
+</div>
+<div class="section level2">
+<h2 id="tutorial-introduction-with-more-details">Tutorial introduction with more details<a class="anchor" aria-label="anchor" href="#tutorial-introduction-with-more-details"></a>
 </h2>
 <p>To understand what socmod does to help organize and develop models of social behavior, let’s consider a simple example with just four individuals illustrated in the figure below. We will initialize our agents with behaviors and payoffs as shown here, then explain how to use different social learning strategies to simulate the diffusion of the adaptation, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>. <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math> yields a payoff of 2 while the legacy <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>L</mi><annotation encoding="application/x-tex">L</annotation></semantics></math> behavior yields a payoff of 1. This matters only for the success-biased social learning strategy, not for the frequency-biased strategy or unbiased contagion learning.</p>
 <figure><img src="reference/figures/small_example_network.png" data-fig-align="center" width="350" alt="A simple network nieghborhood of individual/agent i"><figcaption aria-hidden="true">
 A simple network nieghborhood of individual/agent <span class="math inline"><em>i</em></span>
 </figcaption></figure><p>We can initialize these agents and their network as follows. In the next code block we first initialize four agents named “i”, “n_i1”, “n_i2”, and “n_i3” to match the illustration of focal/learner agent <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math> and its three neighbors (each one is an <em>instance</em> of the <code><a href="reference/Agent.html">socmod::Agent</a></code> class). Then we create the social network from the illustration using <code>igraph</code>. Finally, we initialize a new <code><a href="reference/AgentBasedModel.html">socmod::AgentBasedModel</a></code> using the helper function <code>make_example_abm</code>. In the next subsection we then use this helper function to initialize new models that will be run with frequency- and success-biased adaptive learning strategies, using learning functions provided with <code>socmod</code>. After that we show how to define non-adaptive contagion learning functions, adapted from compartmental epidemiological modeling.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">make_example_abm</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">legacy_fitness</span> <span class="op">=</span> <span class="fl">1.0</span>, <span class="va">adaptive_fitness</span> <span class="op">=</span> <span class="fl">2.0</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># Example ABM builder with four agents as pictured above. Can pass arbitrary</span></span>
 <span>  <span class="co"># named parameters in ... that will be passed to make_abm as additional</span></span>
@@ -118,7 +131,7 @@ A simple network nieghborhood of individual/agent <span class="math inline"><em>
 <span>      <span class="co"># `name` in label = name was set automagically during ABM construction.</span></span>
 <span>      <span class="fu">geom_nodelabel_repel</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>label <span class="op">=</span> <span class="va">name</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>      <span class="fu">theme_blank</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-4-1.png" width="50%" style="display: block; margin: auto;"></p>
+<p><img src="reference/figures/README-unnamed-chunk-5-1.png" width="50%" style="display: block; margin: auto;"></p>
 <div class="section level3">
 <h3 id="model-dynamics-with-different-adaptive-social-learning-strategies">Model dynamics with different adaptive social learning strategies<a class="anchor" aria-label="anchor" href="#model-dynamics-with-different-adaptive-social-learning-strategies"></a>
 </h3>
@@ -128,49 +141,49 @@ A simple network nieghborhood of individual/agent <span class="math inline"><em>
 </h4>
 <p>In success-biased learning, the probability a learner adopts a behavior is proportional to the relative fitness of their neighbors. Note that in the simplest model of success-biased transmission, if there is only one agent doing <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>, then this agent always adopts <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>L</mi><annotation encoding="application/x-tex">L</annotation></semantics></math> on the first time step. There is a “stubbornness” parameter that can be passed as a model parameter that represents how frequently an individual ignores social information and continues using their current behavior.</p>
 <p>Success-biased learning is the default, so we do not have to specify it explicitly.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">abm</span> <span class="op">&lt;-</span> <span class="fu">make_example_abm</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">trial</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run_trial.html">run_trial</a></span><span class="op">(</span><span class="va">abm</span>, stop <span class="op">=</span> <span class="va">fixated</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">trial</span><span class="op">$</span><span class="fu">get_observations</span><span class="op">(</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 10 × 4</span></span>
-<span><span class="co">#&gt;        t agent Behavior Fitness</span></span>
-<span><span class="co">#&gt;    &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;      &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt;  1     6 n_i2  Adaptive       2</span></span>
-<span><span class="co">#&gt;  2     6 n_i3  Legacy         1</span></span>
-<span><span class="co">#&gt;  3     7 i     Legacy         1</span></span>
-<span><span class="co">#&gt;  4     7 n_i1  Adaptive       2</span></span>
-<span><span class="co">#&gt;  5     7 n_i2  Legacy         1</span></span>
-<span><span class="co">#&gt;  6     7 n_i3  Adaptive       2</span></span>
-<span><span class="co">#&gt;  7     8 i     Legacy         1</span></span>
-<span><span class="co">#&gt;  8     8 n_i1  Legacy         1</span></span>
-<span><span class="co">#&gt;  9     8 n_i2  Legacy         1</span></span>
-<span><span class="co">#&gt; 10     8 n_i3  Legacy         1</span></span>
-<span><span class="fu">plot_adoption</span><span class="op">(</span><span class="va">trial</span>, tracked_behaviors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Legacy"</span>, <span class="st">"Adaptive"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-5-1.png" width="50%" style="display: block; margin: auto;"></p>
-</div>
-<div class="section level4">
-<h4 id="frequency-biased-learning">Frequency-biased learning<a class="anchor" aria-label="anchor" href="#frequency-biased-learning"></a>
-</h4>
-<p>In frequency-biased learning, the probability a learner adopts a behavior is proportional to the number of network neighbors doing a behavior. In the first time step, then, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>n</mi><mrow><mi>i</mi><mn>2</mn></mrow></msub><annotation encoding="application/x-tex">n_{i2}</annotation></semantics></math> has a 1/2 probability of adopting <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>, and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math> has a 1/3 probability of adopting <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>. Frequency-biased learning is not the default, so we need to explicilty specify its use in our model parameters by passing <code>frequency_biased_learning_strategy</code> to the <code>make_model_parameters</code> helper function:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">abm</span> <span class="op">&lt;-</span> <span class="fu">make_example_abm</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">trial</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run_trial.html">run_trial</a></span><span class="op">(</span><span class="va">abm</span>, stop <span class="op">=</span> <span class="va">fixated</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">trial</span><span class="op">$</span><span class="fu">get_observations</span><span class="op">(</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 10 × 4</span></span>
-<span><span class="co">#&gt;        t agent Behavior Fitness</span></span>
+<span><span class="co">#&gt;     Step agent Behavior Fitness</span></span>
 <span><span class="co">#&gt;    &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;      &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt;  1     4 n_i2  Adaptive       2</span></span>
-<span><span class="co">#&gt;  2     4 n_i3  Adaptive       2</span></span>
-<span><span class="co">#&gt;  3     5 i     Adaptive       2</span></span>
-<span><span class="co">#&gt;  4     5 n_i1  Legacy         1</span></span>
-<span><span class="co">#&gt;  5     5 n_i2  Adaptive       2</span></span>
-<span><span class="co">#&gt;  6     5 n_i3  Adaptive       2</span></span>
-<span><span class="co">#&gt;  7     6 i     Adaptive       2</span></span>
-<span><span class="co">#&gt;  8     6 n_i1  Adaptive       2</span></span>
-<span><span class="co">#&gt;  9     6 n_i2  Adaptive       2</span></span>
-<span><span class="co">#&gt; 10     6 n_i3  Adaptive       2</span></span>
-<span><span class="fu">plot_adoption</span><span class="op">(</span><span class="va">trial</span>, tracked_behaviors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Legacy"</span>, <span class="st">"Adaptive"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co">#&gt;  1     1 n_i2  Adaptive       2</span></span>
+<span><span class="co">#&gt;  2     1 n_i3  Legacy         1</span></span>
+<span><span class="co">#&gt;  3     2 i     Adaptive       2</span></span>
+<span><span class="co">#&gt;  4     2 n_i1  Legacy         1</span></span>
+<span><span class="co">#&gt;  5     2 n_i2  Legacy         1</span></span>
+<span><span class="co">#&gt;  6     2 n_i3  Adaptive       2</span></span>
+<span><span class="co">#&gt;  7     3 i     Adaptive       2</span></span>
+<span><span class="co">#&gt;  8     3 n_i1  Adaptive       2</span></span>
+<span><span class="co">#&gt;  9     3 n_i2  Adaptive       2</span></span>
+<span><span class="co">#&gt; 10     3 n_i3  Adaptive       2</span></span>
+<span><span class="fu"><a href="reference/plot_prevalence.html">plot_prevalence</a></span><span class="op">(</span><span class="va">trial</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-6-1.png" width="50%" style="display: block; margin: auto;"></p>
+</div>
+<div class="section level4">
+<h4 id="frequency-biased-learning">Frequency-biased learning<a class="anchor" aria-label="anchor" href="#frequency-biased-learning"></a>
+</h4>
+<p>In frequency-biased learning, the probability a learner adopts a behavior is proportional to the number of network neighbors doing a behavior. In the first time step, then, <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>n</mi><mrow><mi>i</mi><mn>2</mn></mrow></msub><annotation encoding="application/x-tex">n_{i2}</annotation></semantics></math> has a 1/2 probability of adopting <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>, and <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math> has a 1/3 probability of adopting <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>. Frequency-biased learning is not the default, so we need to explicilty specify its use in our model parameters by passing <code>frequency_biased_learning_strategy</code> to the <code>make_model_parameters</code> helper function:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">abm</span> <span class="op">&lt;-</span> <span class="fu">make_example_abm</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">trial</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/run_trial.html">run_trial</a></span><span class="op">(</span><span class="va">abm</span>, stop <span class="op">=</span> <span class="va">fixated</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">trial</span><span class="op">$</span><span class="fu">get_observations</span><span class="op">(</span><span class="op">)</span>, n <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 10 × 4</span></span>
+<span><span class="co">#&gt;     Step agent Behavior Fitness</span></span>
+<span><span class="co">#&gt;    &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;      &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1     8 n_i2  Adaptive       2</span></span>
+<span><span class="co">#&gt;  2     8 n_i3  Adaptive       2</span></span>
+<span><span class="co">#&gt;  3     9 i     Adaptive       2</span></span>
+<span><span class="co">#&gt;  4     9 n_i1  Legacy         1</span></span>
+<span><span class="co">#&gt;  5     9 n_i2  Adaptive       2</span></span>
+<span><span class="co">#&gt;  6     9 n_i3  Adaptive       2</span></span>
+<span><span class="co">#&gt;  7    10 i     Adaptive       2</span></span>
+<span><span class="co">#&gt;  8    10 n_i1  Adaptive       2</span></span>
+<span><span class="co">#&gt;  9    10 n_i2  Adaptive       2</span></span>
+<span><span class="co">#&gt; 10    10 n_i3  Adaptive       2</span></span>
+<span><span class="fu"><a href="reference/plot_prevalence.html">plot_prevalence</a></span><span class="op">(</span><span class="va">trial</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-7-1.png" width="50%" style="display: block; margin: auto;"></p>
 </div>
 </div>
 <div class="section level3">
@@ -181,47 +194,47 @@ A simple network nieghborhood of individual/agent <span class="math inline"><em>
 <div class="section level3">
 <h3 id="regular-lattice">Regular lattice<a class="anchor" aria-label="anchor" href="#regular-lattice"></a>
 </h3>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">latnet</span> <span class="op">&lt;-</span> <span class="fu">socmod</span><span class="fu">::</span><span class="fu"><a href="reference/make_regular_lattice.html">make_regular_lattice</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">10</span>, k <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/ggnetplot.html">ggnetplot</a></span><span class="op">(</span><span class="va">latnet</span>, layout <span class="op">=</span> \<span class="op">(</span><span class="va">g</span><span class="op">)</span> <span class="fl">0.6</span><span class="op">*</span><span class="fu">layout_in_circle</span><span class="op">(</span><span class="va">g</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>      <span class="fu">geom_edges</span><span class="op">(</span>linewidth<span class="op">=</span><span class="fl">0.2</span>, color<span class="op">=</span><span class="st">"darkgray"</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>      <span class="fu">geom_nodes</span><span class="op">(</span>color <span class="op">=</span> <span class="st">"#008566"</span>, size<span class="op">=</span><span class="fl">1</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>      <span class="fu">theme_blank</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-7-1.png" width="50%" style="display: block; margin: auto;"></p>
+<p><img src="reference/figures/README-unnamed-chunk-8-1.png" width="50%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="random-networks">Random networks<a class="anchor" aria-label="anchor" href="#random-networks"></a>
 </h3>
 <p><strong>Erdős–Rényi <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>G</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>N</mi><mo>,</mo><mi>M</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">G(N,M)</annotation></semantics></math></strong></p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gnm_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/G_NM.html">G_NM</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">30</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/ggnetplot.html">ggnetplot</a></span><span class="op">(</span><span class="va">gnm_net</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu">geom_edges</span><span class="op">(</span>linewidth<span class="op">=</span><span class="fl">0.2</span>, color<span class="op">=</span> <span class="st">"darkgray"</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu">geom_nodes</span><span class="op">(</span>color <span class="op">=</span> <span class="st">"#008566"</span>, size<span class="op">=</span><span class="fl">.75</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu">theme_blank</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-8-1.png" width="50%" style="display: block; margin: auto;"></p>
+<p><img src="reference/figures/README-unnamed-chunk-9-1.png" width="50%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="small-world-networks">Small-world networks<a class="anchor" aria-label="anchor" href="#small-world-networks"></a>
 </h3>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sw_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/make_small_world.html">make_small_world</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">10</span>, k <span class="op">=</span> <span class="fl">4</span>, p<span class="op">=</span><span class="fl">0.3</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/ggnetplot.html">ggnetplot</a></span><span class="op">(</span><span class="va">sw_net</span>, layout <span class="op">=</span> \<span class="op">(</span><span class="va">net</span><span class="op">)</span> <span class="fl">0.6</span><span class="op">*</span><span class="fu">layout_in_circle</span><span class="op">(</span><span class="va">net</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>      <span class="fu">geom_edges</span><span class="op">(</span>linewidth<span class="op">=</span><span class="fl">0.2</span>, color<span class="op">=</span><span class="st">"darkgray"</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>      <span class="fu">geom_nodes</span><span class="op">(</span>color <span class="op">=</span> <span class="st">"#008566"</span>, size<span class="op">=</span><span class="fl">1</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>      <span class="fu">theme_blank</span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">12</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-9-1.png" width="50%" style="display: block; margin: auto;"></p>
+<p><img src="reference/figures/README-unnamed-chunk-10-1.png" width="50%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="preferential-attachment-networks">Preferential attachment networks<a class="anchor" aria-label="anchor" href="#preferential-attachment-networks"></a>
 </h3>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pa_net</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/make_preferential_attachment.html">make_preferential_attachment</a></span><span class="op">(</span>N <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/ggnetplot.html">ggnetplot</a></span><span class="op">(</span><span class="va">pa_net</span>, layout <span class="op">=</span> \<span class="op">(</span><span class="va">net</span><span class="op">)</span> <span class="fl">0.6</span><span class="op">*</span><span class="fu">layout_with_fr</span><span class="op">(</span><span class="va">net</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>      <span class="fu">geom_edges</span><span class="op">(</span>linewidth<span class="op">=</span><span class="fl">0.2</span>, color<span class="op">=</span><span class="st">"darkgray"</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>      <span class="fu">geom_nodes</span><span class="op">(</span>color <span class="op">=</span> <span class="st">"#008566"</span>, size<span class="op">=</span><span class="fl">0.35</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>      <span class="fu">theme_blank</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-10-1.png" width="50%" style="display: block; margin: auto;"></p>
+<p><img src="reference/figures/README-unnamed-chunk-11-1.png" width="50%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="homophily-networks">Homophily networks<a class="anchor" aria-label="anchor" href="#homophily-networks"></a>
@@ -232,16 +245,16 @@ A simple network nieghborhood of individual/agent <span class="math inline"><em>
 <h4 id="symmetric-homophily">Symmetric homophily<a class="anchor" aria-label="anchor" href="#symmetric-homophily"></a>
 </h4>
 <p>Positive symmetric homophily in this example makes within-group social connections 50% more likely than between-group connections. In other words, 75% of all ties are within-group and 25% are between group. The metapopulation is composed of two groups with population sizes 5 and 10.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Two groups size 5 and 10.</span></span>
 <span><span class="va">hnet_2grp</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/make_homophily_network.html">make_homophily_network</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">10</span><span class="op">)</span>, mean_degree <span class="op">=</span> <span class="fl">3</span>, homophily <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/ggnetplot.html">ggnetplot</a></span><span class="op">(</span><span class="va">hnet_2grp</span>, \<span class="op">(</span><span class="va">net</span><span class="op">)</span> <span class="fl">0.6</span><span class="op">*</span><span class="fu">layout_in_circle</span><span class="op">(</span><span class="va">net</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_edges</span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.15</span>, color<span class="op">=</span><span class="st">"darkgray"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_nodes</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>color <span class="op">=</span> <span class="va">group</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">1.25</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">theme_blank</span><span class="op">(</span>base_size<span class="op">=</span><span class="fl">8</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-11-1.png" width="50%" style="display: block; margin: auto;"></p>
+<p><img src="reference/figures/README-unnamed-chunk-12-1.png" width="50%" style="display: block; margin: auto;"></p>
 <p>Now symmetric anti-homophily of -0.5 leads to 50% fewer within-group connections than between-group. Now the metapopulation is composed of five groups with five members each.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://nanx.me/ggsci/" class="external-link">ggsci</a></span><span class="op">)</span>  <span class="co"># some nice colors for science, using Amer. Assoc. for Adv. Science theme below</span></span>
 <span></span>
 <span><span class="co"># Five groups all size 5 with out-group preference (neg. homophily).</span></span>
@@ -251,20 +264,20 @@ A simple network nieghborhood of individual/agent <span class="math inline"><em>
 <span>  <span class="fu">geom_nodes</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>color <span class="op">=</span> <span class="va">group</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggsci</span><span class="fu">::</span><span class="fu"><a href="https://nanx.me/ggsci/reference/scale_aaas.html" class="external-link">scale_color_aaas</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">theme_blank</span><span class="op">(</span>base_size<span class="op">=</span><span class="fl">12</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-12-1.png" width="50%" style="display: block; margin: auto;"></p>
+<p><img src="reference/figures/README-unnamed-chunk-13-1.png" width="50%" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level4">
 <h4 id="asymmetric-homophily">Asymmetric homophily<a class="anchor" aria-label="anchor" href="#asymmetric-homophily"></a>
 </h4>
 <p>If homophily is set at the group-level instead of globally, we call this <em>asymmetric</em> homophily. Below we create an asymmetric homphily network model of the educational structure of colonialized populations, where a small, insular minority group of colonizers imposes information flow from themselves to a larger, local majority group, who have had their homophily level forcibly reduced. We model insularity among the colonizers as a high homophily of 0.9 and represent the situation for the local community as having a slightly negative homophily level, -0.2:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Two groups size 5 and 10.</span></span>
 <span><span class="va">hnet_asymm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/make_homophily_network.html">make_homophily_network</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">30</span><span class="op">)</span>, mean_degree <span class="op">=</span> <span class="fl">8</span>, homophily <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="op">-</span><span class="fl">0.2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/ggnetplot.html">ggnetplot</a></span><span class="op">(</span><span class="va">hnet_asymm</span>, \<span class="op">(</span><span class="va">net</span><span class="op">)</span> <span class="fl">0.6</span><span class="op">*</span><span class="fu">layout_in_circle</span><span class="op">(</span><span class="va">net</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_edges</span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.15</span>, color<span class="op">=</span><span class="st">"darkgray"</span>, alpha <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">geom_nodes</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>color <span class="op">=</span> <span class="va">group</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">2.25</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">theme_blank</span><span class="op">(</span>base_size<span class="op">=</span><span class="fl">12</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-13-1.png" width="50%" style="display: block; margin: auto;"></p>
+<p><img src="reference/figures/README-unnamed-chunk-14-1.png" width="50%" style="display: block; margin: auto;"></p>
 </div>
 </div>
 </div>

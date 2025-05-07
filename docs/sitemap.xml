@@ -13,6 +13,7 @@
 <url><loc>https://css4s.github.io/socmod/reference/LearningStrategy.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/ModelParameters.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/Neighbors.html</loc></url>
+<url><loc>https://css4s.github.io/socmod/reference/SOCMOD_PLOT_PALETTE.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/Trial.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/add_unique_edge.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/compare_friendship_paradox.html</loc></url>
@@ -29,6 +30,7 @@
 <url><loc>https://css4s.github.io/socmod/reference/get_feld_1991_network.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/ggnetplot.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/index.html</loc></url>
+<url><loc>https://css4s.github.io/socmod/reference/initialize_agents.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/iterate_learning_model.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/learning_model_step.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/load_igraph_from_csv.html</loc></url>
@@ -43,6 +45,7 @@
 <url><loc>https://css4s.github.io/socmod/reference/plot_adoption.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/plot_friendship_paradox.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/plot_homophilynet.html</loc></url>
+<url><loc>https://css4s.github.io/socmod/reference/plot_prevalence.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/plot_summary.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/regular_lattice.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/run.html</loc></url>
@@ -55,6 +58,7 @@
 <url><loc>https://css4s.github.io/socmod/reference/success_bias_select_teacher.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/summarise_adoption.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/summarise_by_parameters.html</loc></url>
+<url><loc>https://css4s.github.io/socmod/reference/summarise_outcomes.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/summarise_prevalence.html</loc></url>
 </urlset>
 

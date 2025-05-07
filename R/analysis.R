@@ -27,24 +27,30 @@ SOCMOD_PLOT_PALETTE <- c(
 #' @return A ggplot object
 #' @export
 #' @examples
-plot_prevalence <- function(trials_or_tibble, tracked_behaviors = c("Adaptive")) {
+plot_prevalence <- function(trials_or_tibble, 
+                            behavior_order = c("Legacy", "Adaptive"),
+                            theme_size = 16) {
   
   prevalence_tbl <- trials_or_tibble
   if (!inherits(trials_or_tibble, "tbl_df")) {
-    prevalence_tbl <- summarise_prevalence(trials_or_tibble)
+    prevalence_tbl <- summarise_prevalence(trials_or_tibble, 
+                                           tracked_behaviors = behavior_order)
   }
-  
-  p <- 
-    # If first arg not a tibble, assume trials and hand off to summarize...
-    ifelse(inherits(trials_or_tibble, "tbl_df"), 
-           trials_or_tibble, 
-           summarise_prevalence(trials_or_tibble)) %>%  
-      # Plot dynamics with 
-      ggplot2::ggplot(ggplot2::aes(x = Step, y = Prevalence, color = Behavior)) +
-      ggplot2::geom_line(linewidth = 1) +
-      ggplot2::theme_classic() +
-      ggplot2::scale_color_manual(values = SOCMOD_PLOT_PALETTE)
+  # Put factors in order for plotting
+  prevalence_tbl <- dplyr::mutate(
+    prevalence_tbl, Behavior = factor(Behavior, levels =  behavior_order)
+  ) %>% dplyr::arrange(Behavior)
       
+  # Plot dynamics
+  p <- 
+    prevalence_tbl %>%
+      ggplot2::ggplot(ggplot2::aes(x = Step, y = Prevalence, color = Behavior)) +
+      ggplot2::geom_line(linewidth = 1.15) +
+      ggplot2::theme_classic(base_size = theme_size) +
+      ggplot2::scale_color_manual(values = SOCMOD_PLOT_PALETTE) +
+      ggplot2::guides(color = guide_legend(reverse = TRUE))
+  
+  return (p)
 }
 
 
@@ -101,18 +107,18 @@ summarise_prevalence <- function(trials_or_trial,
   }
   
   obs1 <- trials[[1]]$get_observations()
+  
   all_behaviors <- unique(c(tracked_behaviors, obs1$Behavior))
   prevalence_tbl <- purrr::imap_dfr(trials, \(trial, trial_index) {
     
-    # Extract observations 
-    obs <- 
-      trial$get_observations() %>% 
+    # Extract observations
+    obs <-
+      trial$get_observations() %>%
       dplyr::mutate(Behavior = factor(Behavior, all_behaviors))
     
     # Build parameters list, replacing the graph and learning strategy
     # instances with their labels.
     params_list <- trial$model$get_parameters()$as_list()
-    # print(c(igraph::graph_attr(params_list$graph, "label")))
     params_list$graph <- c(igraph::graph_attr(params_list$graph, "label"))
     params_list$learning_strategy <- c(params_list$learning_strategy$get_label())
     
@@ -121,8 +127,6 @@ summarise_prevalence <- function(trials_or_trial,
     params_list$n_agents <- n_agents
     
     params_row <- tibble::as_tibble(params_list)
-    # print(params_row)
-    # print(obs)
     
     # Create a within-trial summary for each trial.
     prevalence_summary <- obs %>%
@@ -235,3 +239,84 @@ summarise_outcomes <- function(trials, input_parameters, outcome_measures) {
 }
 
 
+#' Initialize agents with adaptive and legacy behaviors
+#'
+#' Assigns behaviors and fitness values to agents in an AgentBasedModel.
+#' Can initialize by proportion or fixed count of adaptive agents.
+#'
+#' @param model An `AgentBasedModel` instance.
+#' @param initial_prevalence A proportion (0–1) or count of agents starting with the adaptive behavior.
+#' @param adaptive_behavior Name of the adaptive behavior (default: "Adaptive").
+#' @param adaptive_fitness Fitness value for adaptive behavior (default: 1.2).
+#' @param legacy_behavior Name of the legacy behavior (default: "Legacy").
+#' @param legacy_fitness Fitness value for legacy behavior (default: 1.0).
+#'
+#' @return Invisibly returns the model with updated agents.
+#' 
+#' @examples
+#' # Create a model with 20 agents, 25% with adaptive behavior
+#' abm <- 
+#'   make_abm(n_agents = 20) |> initialize_agents(initial_prevalence = 0.25)
+#'
+#' # Count how many agents do each behavior
+#' table(purrr::map_chr(abm$agents, ~ .x$get_behavior()))
+#'
+#' # Summarize fitness values by behavior
+#' tibble::tibble(
+#'   behavior = purrr::map_chr(abm$agents, ~ .x$get_behavior()),
+#'   fitness = purrr::map_dbl(abm$agents, ~ .x$get_fitness())
+#' ) |>
+#'   dplyr::group_by(behavior) |>
+#'   dplyr::summarise(count = dplyr::n(), 
+#'                    mean_fitness = mean(fitness), 
+#'                    .groups = "drop")
+#'   
+#' @export
+initialize_agents <- function(model,
+                              initial_prevalence = 0.1, 
+                              adaptive_behavior = "Adaptive",
+                              adaptive_fitness = 1.2,
+                              legacy_behavior = "Legacy",
+                              legacy_fitness = 1.0) {
+  # Get number of each type of agent
+  n_agents <- model$get_parameter("n_agents")
+  
+  # Handle either double- or integer-valued (i.e. % or count) initial_prevalence
+  if (is.numeric(initial_prevalence)) {
+    if (initial_prevalence <= 1) {
+      n_adaptive <- round(n_agents * initial_prevalence)
+    } else {
+      n_adaptive <- as.integer(initial_prevalence)
+    }
+  } else {
+    stop("initial_prevalence must be a numeric proportion (<=1) or integer count")
+  }
+  
+  if (n_adaptive > n_agents) {
+    stop("Number of adaptive agents exceeds total agents")
+  }
+  
+  # Number of legacy agents is the difference between total and adaptive counts
+  n_legacy <- n_agents - n_adaptive
+  
+  # Specify agent behaviors and fitnesses, assigned to agents below
+  ids <- 1:n_agents
+  adaptive_ids <- sample(ids, n_adaptive)
+  legacy_ids <- setdiff(ids, adaptive_ids)
+  # Each row here specifies one agent's attributes
+  agent_spec <- tibble::tibble(
+    id = c(adaptive_ids, legacy_ids),
+    behavior = c(rep(adaptive_behavior, n_adaptive), 
+                 rep(legacy_behavior, n_legacy)),
+    fitness = c(rep(adaptive_fitness, n_adaptive), 
+                rep(legacy_fitness, n_legacy))
+  )
+  
+  # Set agent attributes using purrr::pwalk
+  purrr::pwalk(agent_spec, \(id, behavior, fitness) {
+    model$get_agent(id)$set_behavior(behavior)$set_fitness(fitness)
+  })
+  
+  # Return the model to continue down the pipeline.
+  return (invisible(model))
+}
