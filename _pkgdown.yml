@@ -2,24 +2,39 @@ url: https://css4s.github.io/socmod/
 template:
   bootstrap: 5
 reference:
-- title: AgentBasedModel, ModelParameters, and analysis helpers
+- title: The `Trial` class and run helpers
   desc: |
-    Create, run, and analyze agent-based models of social behavior in socmod.
+    The `run_trial()` and `run_trials()` functions use the specified `partner_selection`, `interaction`,  and `iterate_model` functions to specify these dynamics and iterate the `model` (an instance of `socmod::AgentBasedModel`). `fixated` helps us tell when all agents are performing the same behavior, i.e., the population has fixated.
   contents: 
+  - starts_with("run_trial")
+  - Trial
+  - fixated
+- title: 
+  desc: |
+    Summarise a collection of trial outcomes or prevalence dynamics over model parameters
+  contents: 
+  - summarise_prevalence
+  - summarise_outcomes
+- title: Visualizations
+  desc: Tools to plot networks, outcomes, and time series
+  contents:
+  - plot_prevalence
+  - plot_homophilynet
+  - plot_friendship_paradox
+  - ggnetplot
+- title: Examples with real-world data
+  desc: Simple examples of real-world data in socmod.
+  contents:
+  - simulate_feld_1991
+  - get_feld_1991_network
+- title: AgentBasedModel and ModelParameters
+  desc: |
+    Create agent-based models and specify model configuration parameters
   - AgentBasedModel
   - make_abm
   - ModelParameters
   - make_model_parameters
   - DEFAULT_PARAMETERS
-  - summarise_by_parameters
-  - summarise_prevalence
-- title: Running single model trial or trial ensembles
-  desc: |
-    The `run_trial()` and `run_trials()` functions use the specified `partner_selection`, `interaction`,  and `iterate_model` functions to specify these dynamics and iterate the `model` (an instance of `socmod::AgentBasedModel`). `fixated` helps us tell when all agents are performing the same behavior, i.e., the population has fixated.
-  contents: 
-  - Trial
-  - starts_with("run_trial")
-  - fixated
 - title: Learning strategy class, make_learning_strategy, and other tools
   desc: |
     Functions to pass to run for model iteration in a learning model,  and for either success-biased or frequency-biased adaptive learning.
@@ -54,17 +69,5 @@ reference:
   - compare_friendship_paradox
   - load_igraph_from_csv
   - plot_friendship_paradox
-- title: Visualizations
-  desc: Tools for visualizing networks, outcomes, and time series.
-  contents:
-  - plot_adoption
-  - plot_homophilynet
-  - plot_friendship_paradox
-  - ggnetplot
-- title: Examples with real-world data
-  desc: Simple examples of real-world data in socmod.
-  contents:
-  - simulate_feld_1991
-  - get_feld_1991_network
 
 

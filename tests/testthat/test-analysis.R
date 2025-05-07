@@ -6,9 +6,6 @@ test_that("summarise_prevalence summarizes prevalence across trials", {
     return (trial)
   })
   
-  # Call summarise_prevalence
-  # print(trials[[1]]$model$get_parameters()$as_list())
-  
   # Summarize within each trial's series indexed by trial_id
   prevalence_summary_keeptrials <- summarise_prevalence(trials, across_trials = FALSE)
   
