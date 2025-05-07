@@ -9,7 +9,7 @@ Overwrite existing auxiliary parameters."><meta property="og:image" content="htt
 
     <a class="navbar-brand me-2" href="../index.html">socmod</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -22,6 +22,7 @@ Overwrite existing auxiliary parameters."><meta property="og:image" content="htt
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/basic-diffusion-components.html">Components for basic diffusion modeling with socmod</a></li>
   </ul></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
       </ul></div>
@@ -43,14 +44,6 @@ Overwrite existing auxiliary parameters."><meta property="og:image" content="htt
 
 
     <div class="section level2">
-    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>NULL
-Add a key-value pair to the auxiliary
-variables.</p>
-<p>NULL
-Add a list of key-value pairs to aux params.</p>
-    </div>
-    <div class="section level2">
     <h2 id="methods">Methods<a class="anchor" aria-label="anchor" href="#methods"></a></h2>
 
 <div class="section">
@@ -58,6 +51,7 @@ Add a list of key-value pairs to aux params.</p>
 
 <ul><li><p><a href="#method-ModelParameters-new"><code>ModelParameters$new()</code></a></p></li>
 <li><p><a href="#method-ModelParameters-get_learning_strategy"><code>ModelParameters$get_learning_strategy()</code></a></p></li>
+<li><p><a href="#method-ModelParameters-set_learning_strategy"><code>ModelParameters$set_learning_strategy()</code></a></p></li>
 <li><p><a href="#method-ModelParameters-get_graph"><code>ModelParameters$get_graph()</code></a></p></li>
 <li><p><a href="#method-ModelParameters-set_graph"><code>ModelParameters$set_graph()</code></a></p></li>
 <li><p><a href="#method-ModelParameters-get_n_agents"><code>ModelParameters$get_n_agents()</code></a></p></li>
@@ -90,11 +84,20 @@ Add a list of key-value pairs to aux params.</p>
 </div>
 
 
+</div><p></p><hr><a id="method-ModelParameters-set_learning_strategy"></a><div class="section">
+<h3 id="method-set-learning-strategy-">Method <code>set_learning_strategy()</code><a class="anchor" aria-label="anchor" href="#method-set-learning-strategy-"></a></h3>
+
+<div class="section">
+<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ModelParameters</span><span class="op">$</span><span class="fu">set_learning_strategy</span><span class="op">(</span><span class="va">learning_strategy</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+
 </div><p></p><hr><a id="method-ModelParameters-get_graph"></a><div class="section">
 <h3 id="method-get-graph-">Method <code>get_graph()</code><a class="anchor" aria-label="anchor" href="#method-get-graph-"></a></h3>
 
 <div class="section">
-<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ModelParameters</span><span class="op">$</span><span class="fu">get_graph</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -103,7 +106,7 @@ Add a list of key-value pairs to aux params.</p>
 <h3 id="method-set-graph-">Method <code>set_graph()</code><a class="anchor" aria-label="anchor" href="#method-set-graph-"></a></h3>
 
 <div class="section">
-<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ModelParameters</span><span class="op">$</span><span class="fu">set_graph</span><span class="op">(</span><span class="va">graph</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -112,7 +115,7 @@ Add a list of key-value pairs to aux params.</p>
 <h3 id="method-get-n-agents-">Method <code>get_n_agents()</code><a class="anchor" aria-label="anchor" href="#method-get-n-agents-"></a></h3>
 
 <div class="section">
-<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
+<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ModelParameters</span><span class="op">$</span><span class="fu">get_n_agents</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -121,7 +124,7 @@ Add a list of key-value pairs to aux params.</p>
 <h3 id="method-set-n-agents-">Method <code>set_n_agents()</code><a class="anchor" aria-label="anchor" href="#method-set-n-agents-"></a></h3>
 
 <div class="section">
-<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
+<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ModelParameters</span><span class="op">$</span><span class="fu">set_n_agents</span><span class="op">(</span><span class="va">n_agents</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -130,7 +133,7 @@ Add a list of key-value pairs to aux params.</p>
 <h3 id="method-get-auxiliary-">Method <code>get_auxiliary()</code><a class="anchor" aria-label="anchor" href="#method-get-auxiliary-"></a></h3>
 
 <div class="section">
-<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
+<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ModelParameters</span><span class="op">$</span><span class="fu">get_auxiliary</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -139,33 +142,48 @@ Add a list of key-value pairs to aux params.</p>
 <h3 id="method-set-auxiliary-">Method <code>set_auxiliary()</code><a class="anchor" aria-label="anchor" href="#method-set-auxiliary-"></a></h3>
 
 <div class="section">
-<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
+<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ModelParameters</span><span class="op">$</span><span class="fu">set_auxiliary</span><span class="op">(</span><span class="va">params</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+<div class="section">
+<h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
+<p>self silently
+Add a key-value pair to the auxiliary
+variables.</p>
+</div>
 
 </div><p></p><hr><a id="method-ModelParameters-add_auxiliary"></a><div class="section">
 <h3 id="method-add-auxiliary-">Method <code>add_auxiliary()</code><a class="anchor" aria-label="anchor" href="#method-add-auxiliary-"></a></h3>
 
 <div class="section">
-<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
+<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ModelParameters</span><span class="op">$</span><span class="fu">add_auxiliary</span><span class="op">(</span><span class="va">key</span>, <span class="va">value</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+<div class="section">
+<h4 id="returns-1">Returns<a class="anchor" aria-label="anchor" href="#returns-1"></a></h4>
+<p>self silently
+Get all parameter values as list</p>
+</div>
 
 </div><p></p><hr><a id="method-ModelParameters-as_list"></a><div class="section">
 <h3 id="method-as-list-">Method <code>as_list()</code><a class="anchor" aria-label="anchor" href="#method-as-list-"></a></h3>
 
 <div class="section">
-<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
+<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ModelParameters</span><span class="op">$</span><span class="fu">as_list</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
+<div class="section">
+<h4 id="returns-2">Returns<a class="anchor" aria-label="anchor" href="#returns-2"></a></h4>
+<p>list of parameters</p>
+</div>
 
 </div><p></p><hr><a id="method-ModelParameters-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
+<h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">ModelParameters</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
