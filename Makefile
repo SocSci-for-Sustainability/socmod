@@ -7,12 +7,17 @@ all: docs
 
 # Build vignettes and pkgdown site
 docs:
-	Rscript -e "quarto::quarto_render('vignettes/florentine_network.qmd')"
 	Rscript -e "pkgdown::build_site()"
 
 # Build just the pkgdown site (skip vignette rendering)
 site:
 	Rscript -e "pkgdown::build_site()"
+
+# Rebuild README.md and associated docs/index.html, opening in new window
+readme:
+	Rscript -e "devtools::build_readme()" \
+	  && Rscript -e "pkgdown::build_home()" \
+	  && open docs/index.html
 
 # Run R CMD check
 check:
