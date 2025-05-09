@@ -221,43 +221,6 @@ make_preferential_attachment <- function(N) {
 }
 
 
-#' Command that operates like ggplot
-#'
-#' @param net Network to plot
-#' @param layout Optional igraph-style plotting layout 
-#' @param ... Additional key-value aesthetics to pass to aes() in ggplot call
-#'
-#' @returns ggplot()-like command for initiating ggplot2 network plots
-#' 
-#' @export
-#'
-#' @examples
-#' library(ggnetwork)
-#' socnet <- igraph::make_graph(~ 1-2:3:4,2:4)
-#' igraph::V(socnet)$name <- c("Mateus", "Marcos", "Lucas", "João")
-#' ggnetplot(socnet) + 
-#'   geom_edges(linewidth=0.1) + 
-#'   geom_nodes(color = "#008566", size=3) + 
-#'   geom_nodelabel_repel(aes(label = name), size = 1.5) + 
-#'   theme_blank()
-ggnetplot <- function(net, layout = NULL, ...) {
-  
-  assert_that(
-    inherits(net, "igraph"),
-    msg = "net must be an igraph object"
-  )
-  
-  if (is.null(layout)) {
-    ret <- ggplot(ggnetwork(net), aes(x=x, y=y, xend=xend, yend=yend, ...))
-  } else {
-    ret <- ggplot(ggnetwork(net, layout = layout(net)), 
-                  aes(x=x, y=y, xend=xend, yend=yend, ...))
-  }
-
-  return (ret)
-}
-
-
 #' Plot homophily network where groups color nodes.
 #'
 #' @param net Homophily network to plot.

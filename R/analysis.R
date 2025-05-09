@@ -17,6 +17,113 @@ SOCMOD_PLOT_PALETTE <- c(
   "#7D766F"   # neutral gray
 )
 
+#' Plot behavior adoption on a network
+#'
+#' Visualizes agent behaviors in a network using ggnetwork. Accepts a Trial
+#' or AgentBasedModel and colors nodes by behavior.
+#'
+#' @param x A `Trial` or `AgentBasedModel`.
+#' @param behaviors Behavior levels. Default: `c("Adaptive", "Legacy")`.
+#' @param behavior_colors Color palette. Default: first 2 of `SOCMOD_PLOT_PALETTE`.
+#' @param node_size Single number or named list (e.g. `list(Degree = igraph::degree)`).
+#' @param label Whether to show node labels. Default: TRUE.
+#' @param plot_mod A function to modify the ggplot object. Default: `identity`.
+#'
+#' @return A `ggplot` object.
+#'
+#' @examples
+#' trial <- example_trial()
+#' plot_network_adoption(trial)
+#'
+#' # Use degree centrality to size nodes
+#' plot_network_adoption(trial, node_size = list(Degree = igraph::degree))
+#'
+#' # Add a title and modify legend position
+#' plot_network_adoption(
+#'   trial,
+#'   plot_mod = . %>%
+#'     ggtitle("Adoption at t = 0") %>%
+#'     theme(legend.position = "bottom")
+#' )
+#' 
+#' # Specify a circular layout
+#' plot_network_adoption(make_abm(graph = make_small_world(10, 4, 0.2)), layout = "circle")
+#' @export
+plot_network_adoption <- function(
+    x, layout = NULL, behaviors = c("Adaptive", "Legacy"),
+    behavior_colors = SOCMOD_PLOT_PALETTE[c(2,1)], node_size = 6,
+    label = FALSE, plot_mod = identity
+  ) {
+  
+  if (inherits(x, "Trial")) {
+    model <- x$model
+  } else if (inherits(x, "AgentBasedModel")) {
+    model <- x
+  } else {
+    stop("Input must be a Trial or AgentBasedModel.")
+  }
+
+  net <- model$get_network()
+  behavior_vec <- vapply(model$agents, function(a) a$get_behavior(), character(1))
+  net <- igraph::set_vertex_attr(net, "Behavior", value = behavior_vec)
+
+  use_size_aes <- FALSE
+  if (is.list(node_size)) {
+    stopifnot(length(node_size) == 1, !is.null(names(node_size)))
+    result <- .compute_node_size_measure(net, node_size)
+    net <- result$net
+    measure_name <- result$measure_name
+    use_size_aes <- TRUE
+  } else {
+    stopifnot(is.numeric(node_size), length(node_size) == 1)
+  }
+
+  df <- ggnetwork::ggnetwork(net, layout = layout)
+  aes_base <- ggplot2::aes(x = x, y = y, xend = xend, yend = yend)
+  if (use_size_aes) {
+    aes_base$size <- rlang::sym(measure_name)
+  }
+
+  p <- 
+    ggplot2::ggplot(df, mapping = aes_base) +
+      ggnetwork::geom_edges(color="lightgrey", linewidth = 0.2) +
+    (if (use_size_aes) ggnetwork::geom_nodes(aes(color = Behavior)) 
+     else ggnetwork::geom_nodes(aes(color = Behavior), size = node_size)) +
+
+    ggplot2::scale_color_manual(values = setNames(behavior_colors, behaviors), 
+                                limits = behaviors, na.value = "gray80") +
+    ggnetwork::theme_blank()
+
+  if (label) {
+    p <- 
+      p + 
+        ggnetwork::geom_nodelabel_repel(ggplot2::aes(label = name), size = 1.5)
+  }
+
+  return (plot_mod(p))
+}
+
+
+# Internal helper
+.compute_node_size_measure <- function(net, node_size) {
+  measure_name <- names(node_size)[1]
+  measure_fun <- node_size[[1]]
+
+  assertthat::assert_that(
+    is.function(measure_fun),
+    msg = "node_size value must be a function (e.g. list(Degree = igraph::degree))"
+  )
+
+  measure_vec <- measure_fun(net)
+  assertthat::assert_that(
+    length(measure_vec) == igraph::vcount(net),
+    msg = "node_size function must return one value per vertex"
+  )
+
+  net <- igraph::set_vertex_attr(net, measure_name, value = measure_vec)
+  return (list(net = net, measure_name = measure_name))
+}
+
 
 #' Plot adoption counts of selected behaviors over time
 #' Plot adoption counts of selected behaviors 
@@ -30,11 +137,12 @@ SOCMOD_PLOT_PALETTE <- c(
 plot_prevalence <- function(trials_or_tibble, 
                             behavior_order = c("Legacy", "Adaptive"),
                             theme_size = 16) {
-  
+  # Initialize the prevalence table, summarising if necessary 
   prevalence_tbl <- trials_or_tibble
   if (!inherits(trials_or_tibble, "tbl_df")) {
-    prevalence_tbl <- summarise_prevalence(trials_or_tibble, 
-                                           tracked_behaviors = behavior_order)
+    prevalence_tbl <- summarise_prevalence(
+      trials_or_tibble, tracked_behaviors = behavior_order
+    )
   }
   # Put factors in order for plotting
   prevalence_tbl <- dplyr::mutate(
