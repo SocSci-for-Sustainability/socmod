@@ -56,17 +56,22 @@ make_abm(graph = make_regular_lattice(10, 4)) %>%
   initialize_agents(
     initial_prevalence = 0.2,  
     adaptive_fitness = 1.125
-  ) %T>% (
-    \(m) plot_network_adoption(m, layout = igraph::in_circle()
-  ) %>% print()) %>%
+  ) %>%
   run_trial %>%
   plot_prevalence %>%
   print
 ```
 
 ```{r}
-
-df <- plot_network_adoption(make_abm(n_agents = 10))
+#| fig-width: 5.8
+#| fig-height: 4
+make_abm(graph = make_regular_lattice(10, 4)) %>%
+  # Initialize 10% w/ Adaptive: fitness 12.5% greater than Legacy
+  initialize_agents(
+    initial_prevalence = 0.3,  
+    adaptive_fitness = 1.125
+  ) %>%
+  plot_network_adoption(layout = igraph::in_circle())
 ```
 
 ### Example 2: computational experiment over adaptive fitness
@@ -102,6 +107,7 @@ Now pass this function to run_trials:
 
 ```{r}
 #| results: hide
+#| eval: false
 #| message: false
 #| warning: false
 # Run five trials per parameter setting, i.e., for each specified adaptive_fitness
@@ -120,6 +126,7 @@ trials <-
 Now we have a total of 40 trials: 8 adaptive fitness values times five trials per setting:
 
 ```{r}
+#| eval: false
 length(trials) == 40
 ```
 
@@ -127,6 +134,7 @@ Let's take out only a couple values of adaptive fitness, 0.8 and 1.4, and plot t
 prevalence time series for each:
 
 ```{r}
+#| eval: false
 t_series_summaries <- 
   summarise_prevalence(trials, across_trials = FALSE)
 

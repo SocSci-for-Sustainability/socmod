@@ -5,9 +5,9 @@
 #'
 #' @return A character vector of hex color codes
 #' @export
-SOCMOD_PLOT_PALETTE <- c(
+SOCMOD_PALETTE <- c(
   "#E24B4A",  # bright red
-  "#007F7D",  # teal
+  "#00AF7D",  # teal
   "#428BCA",  # blue
   "#A3A843",  # olive green
   "#F0C04D",  # yellow
@@ -24,7 +24,7 @@ SOCMOD_PLOT_PALETTE <- c(
 #'
 #' @param x A `Trial` or `AgentBasedModel`.
 #' @param behaviors Behavior levels. Default: `c("Adaptive", "Legacy")`.
-#' @param behavior_colors Color palette. Default: first 2 of `SOCMOD_PLOT_PALETTE`.
+#' @param behavior_colors Color palette. Default: first 2 of `SOCMOD_PALETTE`.
 #' @param node_size Single number or named list (e.g. `list(Degree = igraph::degree)`).
 #' @param label Whether to show node labels. Default: TRUE.
 #' @param plot_mod A function to modify the ggplot object. Default: `identity`.
@@ -51,7 +51,7 @@ SOCMOD_PLOT_PALETTE <- c(
 #' @export
 plot_network_adoption <- function(
     x, layout = NULL, behaviors = c("Adaptive", "Legacy"),
-    behavior_colors = SOCMOD_PLOT_PALETTE[c(2,1)], node_size = 6,
+    behavior_colors = SOCMOD_PALETTE[c(2,1)], node_size = 6,
     label = FALSE, plot_mod = identity
   ) {
   
@@ -135,7 +135,10 @@ plot_network_adoption <- function(
 #' @export
 #' @examples
 plot_prevalence <- function(trials_or_tibble, 
-                            behavior_order = c("Legacy", "Adaptive"),
+                            behavior_order = c("Legacy",
+                                               "Adaptive"),
+                            line_color_palette = SOCMOD_PALETTE,
+                            linetypes = c("dashed", "solid"),
                             theme_size = 16) {
   # Initialize the prevalence table, summarising if necessary 
   prevalence_tbl <- trials_or_tibble
@@ -144,19 +147,26 @@ plot_prevalence <- function(trials_or_tibble,
       trials_or_tibble, tracked_behaviors = behavior_order
     )
   }
+  
   # Put factors in order for plotting
   prevalence_tbl <- dplyr::mutate(
-    prevalence_tbl, Behavior = factor(Behavior, levels =  behavior_order)
+    prevalence_tbl, 
+    Behavior = factor(Behavior, levels =  behavior_order)
   ) %>% dplyr::arrange(Behavior)
       
   # Plot dynamics
   p <- 
     prevalence_tbl %>%
-      ggplot2::ggplot(ggplot2::aes(x = Step, y = Prevalence, color = Behavior)) +
+      ggplot2::ggplot(
+        ggplot2::aes(x = Step, y = Prevalence, 
+                     color = Behavior, linetype = Behavior)
+      ) +
       ggplot2::geom_line(linewidth = 1.15) +
       ggplot2::theme_classic(base_size = theme_size) +
-      ggplot2::scale_color_manual(values = SOCMOD_PLOT_PALETTE) +
-      ggplot2::guides(color = guide_legend(reverse = TRUE))
+      ggplot2::scale_color_manual(values = line_color_palette) +
+      ggplot2::guides(color = guide_legend(reverse = TRUE)) +
+      ggplot2::scale_linetype_manual(values = linetypes)
+  
   
   return (p)
 }
@@ -255,8 +265,6 @@ summarise_prevalence <- function(trials_or_trial,
     return (prevalence_summary)
   })
   
-  # return (prevalence_tbl)
-  # print(prevalence_tbl)
   if (across_trials) {
     # Prepare grouping variables: convert parameter names to 
     # symbols for tidy evaluation

@@ -29,16 +29,15 @@ Agent <- R6::R6Class(
   "Agent",
   private = list(
     id = NULL,
-    name = NULL,
-    behavior_current = NULL,
     behavior_next = NULL,
-    fitness_current = NULL,
     fitness_next = NULL,
     neighbors = NULL,
     attributes = list()
   ),
   public = list(
-    
+    name = NULL,
+    behavior_current = NULL,
+    fitness_current = NULL,
     #' @description
     #' Initialize an Agent
     #'
@@ -70,27 +69,27 @@ Agent <- R6::R6Class(
     #' @description
     #' Get the agent's name
     get_name = function() {
-      private$name
+      self$name
     },
     
     #' @description
     #' Set the agent's name
     #' @param name New name to assign
     set_name = function(name) {
-      private$name <- name
+      self$name <- name
     },
     
     #' @description
     #' Get current behavior
     get_behavior = function() {
-      private$behavior_current
+      self$behavior_current
     },
     
     #' @description
     #' Set current behavior
     #' @param value New current behavior
     set_behavior = function(value) {
-      private$behavior_current <- as.character(value)
+      self$behavior_current <- as.character(value)
       invisible (self)
     },
     
@@ -110,14 +109,14 @@ Agent <- R6::R6Class(
     #' @description
     #' Get current fitness
     get_fitness = function() {
-      private$fitness_current
+    self$fitness_current
     },
     
     #' @description
     #' Set current fitness
-    #' @param value Numeric value to assign
+    #' @param value Numeric value to assign    
     set_fitness = function(value) {
-      private$fitness_current <- value
+      self$fitness_current <- value
       invisible (self)
     },
     
@@ -137,13 +136,13 @@ Agent <- R6::R6Class(
     #' @description
     #' Advance to the next behavior
     advance_behavior = function() {
-      private$behavior_current <- private$behavior_next
+      self$behavior_current <- private$behavior_next
     },
     
     #' @description
     #' Advance to the next fitness
     advance_fitness = function() {
-      private$fitness_current <- private$fitness_next
+    self$fitness_current <- private$fitness_next
     },
     
     #' @description

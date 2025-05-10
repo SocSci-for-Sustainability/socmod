@@ -35,54 +35,59 @@ Trial <- R6::R6Class(
     #' @param legacy_behavior The maladaptive behavior treated as "adaptation failure"
     #' @param adaptive_behavior The behavior treated as "adaptation success"
     run = function(
-        stop = 50, legacy_behavior = "Legacy", adaptive_behavior = "Adaptive") {
+        stop = 50, legacy_behavior = "Legacy", 
+        adaptive_behavior = "Adaptive", 
+        aggregate_observations = TRUE) {
       
       step <- 0
-
+      obs_list <- list()
+      n_agents <- length(self$model$agents)
+      if (aggregate_observations) {
+        obs_list[[1]] <- table(
+          vapply(self$model$agents, \(a) a$behavior_current, character(1))
+          ) |>
+          as.data.frame() |>
+          dplyr::mutate(
+            Behavior = as.character(Var1),
+            Count = as.integer(Freq),
+            Step = step,
+            Prevalence = Count / n_agents
+          ) |>
+          dplyr::select(Step, Behavior, Count, Prevalence)
+      } else {
+        obs_list[[1]] <- tibble::tibble(
+          Step = 0,
+          agent = vapply(self$model$agents, 
+                         \(a) a$name, character(1)),
+          Behavior = vapply(self$model$agents, 
+                            \(a) as.character(a$behavior_current), character(1)),
+          Fitness = vapply(self$model$agents, 
+                           \(a) a$fitness_current, numeric(1)),
+          label = self$label
+        )
+      }
+      
       self$model$set_parameter("legacy_behavior", legacy_behavior)
       self$model$set_parameter("adaptive_behavior", adaptive_behavior)
       
-      # Record t = 0 before any updates.
-      self$observations <- dplyr::bind_rows(
-        self$observations,
-        tibble::tibble(
-          Step = 0,
-          agent = unlist(
-            purrr::map(
-              self$model$agents, 
-              \(a) a$get_name()
-            ), 
-            use.names = FALSE
-          ),
-          Behavior = unlist(
-            purrr::map(
-              self$model$agents, 
-              \(a) as.character(a$get_behavior())
-            ), 
-            use.names = FALSE
-          ),
-          Fitness = unlist(
-            purrr::map(
-              self$model$agents, 
-              \(a) a$get_fitness()
-            ), 
-            use.names = FALSE
-          ),
-          label = self$label
-        )
+      obs_list <- list()
+      obs_list[[1]] <- tibble::tibble( # initial t = 0
+        Step = 0,
+        agent = vapply(self$model$agents, \(a) a$get_name(), character(1)),
+        Behavior = vapply(self$model$agents, \(a) as.character(a$get_behavior()), character(1)),
+        Fitness = vapply(self$model$agents, \(a) a$get_fitness(), numeric(1)),
+        label = self$label
       )
       
-      # Get learning and iteration functions from the model's learning strategy.
+      # Get learning and iteration functions from the model's learning strategy
       lstrat <- self$model$get_parameter("learning_strategy")
       partner_selection <- lstrat$get_partner_selection()
       interaction <- lstrat$get_interaction()
       model_step <- lstrat$get_model_step()
-
+      
       # Main iteration loop.
       while (TRUE) {
-        
         step <- step + 1
-        
         # Partner selection and interaction with selected partner.
         for (agent in self$model$agents) {
           partner <- NULL
@@ -92,52 +97,45 @@ Trial <- R6::R6Class(
           interaction(agent, partner, self$model)
         }
         
-        # Run model step function if provided.
+        # Run model step function if provided
         if (!is.null(model_step)) {
           model_step(self$model)
         }
         
-        # Update observations. 
-        self$observations <- dplyr::bind_rows(
-          
-          self$observations,
-          
-          tibble::tibble(
-            Step = step,
-            agent = unlist(
-              purrr::map(
-                self$model$agents, 
-                \(a) a$get_name()
-              ), 
-              use.names = FALSE
-            ),
-            Behavior = unlist(
-              purrr::map(
-                self$model$agents, 
-                \(a) as.character(a$get_behavior())
-              ), 
-              use.names = FALSE
-            ),
-            Fitness = unlist(
-              purrr::map(
-                self$model$agents, 
-                \(a) a$get_fitness()
-              ), 
-              use.names = FALSE
-            ),
+        if (aggregate_observations) {
+          obs_list[[step]] <- table(
+            vapply(self$model$agents, 
+                   \(a) a$behavior_current, 
+                   character(1))) |>
+            as.data.frame() |>
+            dplyr::mutate(
+              Behavior = as.character(Var1),
+              Count = as.integer(Freq),
+              Step = step,
+              Prevalence = Count / n_agents
+            ) |>
+            dplyr::select(Step, Behavior, Count, Prevalence)
+        } else {
+          obs_list[[step]] <- tibble::tibble(
+            Step = 0,
+            agent = vapply(self$model$agents, \(a) a$name, character(1)),
+            Behavior = vapply(self$model$agents, \(a) as.character(a$behavior_current), character(1)),
+            Fitness = vapply(self$model$agents, \(a) a$fitness_current, numeric(1)),
             label = self$label
           )
-        ) # End observation update.
+        }
         
         # Stop when stop function returns TRUE or max steps reached.
         if (is.function(stop)) {
           if (stop(self$model)) {
             break
           }
-        } else if (step >= stop) {
+        } else if (step > stop) {
           break
         }
-      }
+      } # End simulation and observation loop
+      
+      self$observations <- dplyr::bind_rows(obs_list)
       
       behaviors <- unlist(
         purrr::map(
@@ -150,8 +148,8 @@ Trial <- R6::R6Class(
         length(unique(behaviors)) == 1 && 
           unique(behaviors) == adaptive_behavior
       
-      self$outcomes$fixation_steps <- step
-
+      self$outcomes$fixation_steps <- length(obs_list) - 1
+      
       invisible (self)
     },
     
@@ -253,6 +251,12 @@ run_trial <- function(model,
 #' @param stop Stopping condition (number or function).
 #' @param .progress Whether to show progressbar when running the trials.
 #' @param ... List of parameter label-value pairs; vector or singleton values.
+#' @param parallel Logical. If TRUE, uses `mirai::mirai_map()` to run trials in parallel. 
+#' Requires that `mirai::daemons(cores = ...)` has been called before execution.
+#' A warning is issued if `parallel = TRUE` but no daemons are active.
+#'
+#' @note To safely enable parallelism, call `mirai::daemons(cores = parallel::detectCores() - 1)` 
+#' before using `parallel = TRUE`.
 #'
 #' @return A list of Trial objects 
 #' @examples
@@ -275,10 +279,32 @@ run_trial <- function(model,
 #'   learning_strategy = success_bias_learning_strategy,
 #'   adaptive_fitness = c(0.8, 1.0, 1.2)
 #' )  # With this we'll have six total trials, two for each adaptive_fitness.
+#'
+#' # Enable parallelism with mirai (safe repeated use)
+#' if (requireNamespace("mirai", quietly = TRUE)) {
+#'   if (is.null(mirai::workers())) {
+#'     mirai::daemons(cores = parallel::detectCores() - 1)
+#'   }
+#'   trials <- run_trials(
+#'     model_generator = my_model_generator,
+#'     n_trials_per_param = 5,
+#'     stop = 10,
+#'     adaptive_fitness = c(1.0, 2.0),
+#'     parallel = TRUE
+#'   )
+#' }
+#'
 #' @export
 run_trials <- function(model_generator, n_trials_per_param = 10,
                        stop = 10, .progress = TRUE, 
-                       syncfile = NULL, overwrite = FALSE, ...) {
+                       syncfile = NULL, overwrite = FALSE, 
+                       parallel = FALSE, ...) {
+  
+  if (parallel && (mirai::status()$connections == 0)) {
+    warning(
+      "mirai::daemons() has not been called. Parallel execution will not occur."
+    )
+  }
   
   # Check if syncfile is given...
   if (!is.null(syncfile)) {
@@ -304,19 +330,66 @@ run_trials <- function(model_generator, n_trials_per_param = 10,
   if ("adaptive_behavior" %in% model_parameters) {
     adaptive_behavior <- model_parameters$adaptive_behavior
   }
-
-  # Create a list of trials, each trial initialized with a param list from the grid 
-  trials <- purrr::pmap(
-    parameter_grid, function(...) {
-      param_row <- list(...)
-      model <- model_generator(param_row)
-      run_trial( 
-        model, stop, legacy_behavior, adaptive_behavior, 
-        metadata = list(replication_id = param_row$replication_id)
+  
+  if (!requireNamespace("progressr", quietly = TRUE)) {
+    stop("Please install the 'progressr' package for progress tracking.")
+  }
+  if (parallel && !requireNamespace("mirai", quietly = TRUE)) {
+    stop("Please install the 'mirai' package for parallel execution.")
+  }
+  # Use a progress reporter 
+  progressr::handlers("progress")
+  progressr::with_progress({
+    p <- progressr::progressor(steps = nrow(parameter_grid))
+    
+    trials <- if (parallel) {
+      mirai::mirai_map(
+        .x = split(parameter_grid, seq_len(nrow(parameter_grid))),
+        .f = \(param_row_df) {
+          param_row <- as.list(param_row_df[1, ])
+          model <- model_generator(param_row)
+          result <- run_trial(
+            model, stop, legacy_behavior, adaptive_behavior,
+            metadata = 
+              list(replication_id = param_row$replication_id)
+          )
+          p()
+          return (result)
+        },
+        model_generator = abm_gen_fA_experiment,
+        stop = stop,
+        legacy_behavior = legacy_behavior,
+        adaptive_behavior = adaptive_behavior
       )
-    }, 
-    .progress = .progress
-  )
+    } else {
+      purrr::pmap(
+        parameter_grid, function(...) {
+          param_row <- list(...)
+          model <- model_generator(param_row)
+          result <- run_trial(
+            model, stop, legacy_behavior, adaptive_behavior,
+            metadata = list(replication_id = param_row$replication_id)
+          )
+          p()
+          return (result)
+        }
+      )
+    }
+  })
+  # 
+  # 
+  # # Create a list of trials, each trial initialized with a param list from the grid 
+  # trials <- purrr::pmap(
+  #   parameter_grid, function(...) {
+  #     param_row <- list(...)
+  #     model <- model_generator(param_row)
+  #     run_trial( 
+  #       model, stop, legacy_behavior, adaptive_behavior, 
+  #       metadata = list(replication_id = param_row$replication_id)
+  #     )
+  #   }, 
+  #   .progress = .progress
+  # )
 
   # Check if syncfile is given...
   if (!is.null(syncfile)) {

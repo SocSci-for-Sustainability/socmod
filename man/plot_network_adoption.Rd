@@ -8,7 +8,7 @@ plot_network_adoption(
   x,
   layout = NULL,
   behaviors = c("Adaptive", "Legacy"),
-  behavior_colors = SOCMOD_PLOT_PALETTE[c(2, 1)],
+  behavior_colors = SOCMOD_PALETTE[c(2, 1)],
   node_size = 6,
   label = FALSE,
   plot_mod = identity
@@ -19,7 +19,7 @@ plot_network_adoption(
 
 \item{behaviors}{Behavior levels. Default: \code{c("Adaptive", "Legacy")}.}
 
-\item{behavior_colors}{Color palette. Default: first 2 of \code{SOCMOD_PLOT_PALETTE}.}
+\item{behavior_colors}{Color palette. Default: first 2 of \code{SOCMOD_PALETTE}.}
 
 \item{node_size}{Single number or named list (e.g. \code{list(Degree = igraph::degree)}).}
 

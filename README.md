@@ -26,29 +26,37 @@ Prereq: load libraries.
 library(ggnetwork)
 library(igraph)
 library(magrittr) # Loads %>%
+devtools::install()
 library(socmod)
 ```
 
 ### Example 1: single model trial and visualization
 
 ``` r
-make_abm(n_agents = 100) %>%
+make_abm(graph = make_regular_lattice(10, 4)) %>%
   # Initialize 10% w/ Adaptive: fitness 12.5% greater than Legacy
   initialize_agents(
-    initial_prevalence = 0.1, 
+    initial_prevalence = 0.2,  
     adaptive_fitness = 1.125
-  ) %T>% (\(m) plot_network_adoption(m) %>% print()) %>%
+  ) %>%
   run_trial %>%
   plot_prevalence %>%
   print
 ```
 
-<img src="man/figures/README-unnamed-chunk-3-1.png" width="50%" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-3-2.png" width="50%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-3-1.png" width="50%" style="display: block; margin: auto;" />
 
 ``` r
-
-df <- plot_network_adoption(make_abm(n_agents = 10))
+make_abm(graph = make_regular_lattice(10, 4)) %>%
+  # Initialize 10% w/ Adaptive: fitness 12.5% greater than Legacy
+  initialize_agents(
+    initial_prevalence = 0.3,  
+    adaptive_fitness = 1.125
+  ) %>%
+  plot_network_adoption(layout = igraph::in_circle())
 ```
+
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="50%" style="display: block; margin: auto;" />
 
 ### Example 2: computational experiment over adaptive fitness
 
@@ -98,7 +106,6 @@ trials per setting:
 
 ``` r
 length(trials) == 40
-#> [1] TRUE
 ```
 
 Let’s take out only a couple values of adaptive fitness, 0.8 and 1.4,
