@@ -2,6 +2,12 @@
 
 library(magrittr)
 
+if (mirai::status()$connections == 0) {
+  mirai::daemons(parallel::detectCores() - 1)
+}
+
+
+
 ##------------Run trials------------
 
 # Model generating function
@@ -66,9 +72,6 @@ p <- ggplot(
 print(p)
 
 
-# 
-
-
 ##------------Analyze outcomes-------------------
 
 adaptive_fitness_vals <- seq(0.6, 1.6, 0.1)
@@ -85,9 +88,6 @@ adaptive_fitness_vals <- seq(0.6, 1.6, 0.1)
 #     adaptive_fitness = adaptive_fitness_vals
 #   )
 
-if (mirai::status()$connections == 0) {
-  mirai::daemons(cores = parallel::detectCores() - 1)
-}
 
 bigtrials <- run_trials(
  model_generator = abm_gen_fA_experiment,
@@ -102,5 +102,3 @@ summarybig <- summarise_outcomes(
   bigtrials, "adaptive_fitness", 
   outcome_measures = c("success_rate", "mean_fixation_steps")
 )
-
-# head(bigtrials[[1]]$get_outcomes())

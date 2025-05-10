@@ -356,10 +356,14 @@ run_trials <- function(model_generator, n_trials_per_param = 10,
           p()
           return (result)
         },
-        model_generator = abm_gen_fA_experiment,
-        stop = stop,
-        legacy_behavior = legacy_behavior,
-        adaptive_behavior = adaptive_behavior
+        # model_generator = model_generator,
+        # stop = stop,
+        # legacy_behavior = legacy_behavior,
+        # adaptive_behavior = adaptive_behavior
+        model_generator,
+        stop,
+        legacy_behavior,
+        adaptive_behavior
       )
     } else {
       purrr::pmap(
