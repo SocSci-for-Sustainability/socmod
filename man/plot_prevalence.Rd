@@ -9,6 +9,8 @@ Plot adoption counts of selected behaviors
 plot_prevalence(
   trials_or_tibble,
   behavior_order = c("Legacy", "Adaptive"),
+  line_color_palette = SOCMOD_PALETTE,
+  linetypes = c("dashed", "solid"),
   theme_size = 16
 )
 }
