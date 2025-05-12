@@ -26,29 +26,47 @@ Prereq: load libraries.
 library(ggnetwork)
 library(igraph)
 library(magrittr) # Loads %>%
+devtools::install()
 library(socmod)
+library(purrr)
 ```
 
 ### Example 1: single model trial and visualization
 
 ``` r
-make_abm(n_agents = 100) %>%
-  # Initialize 10% w/ Adaptive: fitness 12.5% greater than Legacy
-  initialize_agents(
-    initial_prevalence = 0.1, 
-    adaptive_fitness = 1.125
-  ) %T>% (\(m) plot_network_adoption(m) %>% print()) %>%
+make_example_abm <- function() {
+  return (
+    make_abm(graph = make_regular_lattice(10, 4)) %>%
+      # Initialize 10% w/ Adaptive,
+      # fitness 12.5% greater than Legacy
+      initialize_agents(
+        initial_prevalence = 0.2,  
+        adaptive_fitness = 1.125
+      )
+  )
+}
+
+abm <- make_example_abm()
+
+# Inspect the initialization
+plot_network_adoption(
+  abm, layout = igraph::in_circle(), 
+  plot_mod = 
+    \(p) p + ggtitle("Adoption at t = 0")
+)
+```
+
+<img src="man/figures/README-unnamed-chunk-3-1.png" width="50%" style="display: block; margin: auto;" />
+
+``` r
+# Initialize fresh ABM for a new simulation each time
+make_example_abm() %>%
   run_trial %>%
   plot_prevalence %>%
   print
 ```
 
-<img src="man/figures/README-unnamed-chunk-3-1.png" width="50%" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-3-2.png" width="50%" style="display: block; margin: auto;" />
-
-``` r
-
-df <- plot_network_adoption(make_abm(n_agents = 10))
-```
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="50%" style="display: block; margin: auto;" />
 
 ### Example 2: computational experiment over adaptive fitness
 
@@ -81,7 +99,7 @@ Now pass this function to run_trials:
 
 ``` r
 # Run five trials per parameter setting, i.e., for each specified adaptive_fitness
-adaptive_fitness_vals <- c(0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0)
+adaptive_fitness_vals <- c(0.8, 1.2, 1.8)
 trials <- 
   run_trials(
     abm_gen_fA_experiment, 
@@ -93,30 +111,80 @@ trials <-
   )
 ```
 
+Let’s take out only a couple values of adaptive fitness, 0.8 and 1.4,
+and plot the mean prevalence time series for each:
+
+``` r
+
+summary <- summarise_prevalence(
+  trials, across_trials = F
+) %>%
+  dplyr::filter(Behavior == "Adaptive") %>%
+  dplyr::filter(adaptive_fitness %in% c(0.8, 1.2, 1.6)) %>%
+  dplyr::mutate(`Adaptive fitness` = factor(adaptive_fitness,
+                                            adaptive_fitness_vals))
+
+p <- ggplot(
+  summary, 
+  aes(x=Step, y=Prevalence, 
+      color=`Adaptive fitness`, 
+      linetype=`Adaptive fitness`,
+      group = trial_id)) +
+  geom_line(linewidth=1.2) + theme_classic(base_size = 16) +
+  ggplot2::scale_color_manual(values = SOCMOD_PLOT_PALETTE)
+
+print(p)
+```
+
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="50%" style="display: block; margin: auto;" />
+
+``` r
+# Run five trials per parameter setting, i.e., for each specified adaptive_fitness
+adaptive_fitness_vals <- c(0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0)
+trials <- 
+  run_trials(
+    abm_gen_fA_experiment, 
+    n_trials_per_param = 20,
+    stop = socmod::fixated,
+    syncfile = "readme-demo-cpu-experiment.RData",
+    n_agents = 20,
+    .progress = T,
+    # overwrite = T,
+    initial_prevalence = 0.1,
+    adaptive_fitness = adaptive_fitness_vals
+  )
+#> 
+#> Loading trials from syncfile: readme-demo-cpu-experiment.RData
+```
+
 Now we have a total of 40 trials: 8 adaptive fitness values times five
 trials per setting:
 
 ``` r
 length(trials) == 40
-#> [1] TRUE
+#> [1] FALSE
 ```
-
-Let’s take out only a couple values of adaptive fitness, 0.8 and 1.4,
-and plot the mean prevalence time series for each:
 
 ``` r
-t_series_summaries <- 
-  summarise_prevalence(trials, across_trials = FALSE)
-
-filter_grp_lim <- 
-  t_series_summaries %>% 
-  dplyr::mutate(
-    adaptive_fitness = factor(adaptive_fitness, adaptive_fitness_vals)
-  ) %>% 
-  dplyr::filter(adaptive_fitness %in% c(0.8, 1.4)) %>% 
-  dplyr::mutate() %>% 
-  dplyr::group_by(Step, Behavior, adaptive_fitness)
+outcomes <- summarise_outcomes(trials, input_parameters = "adaptive_fitness", outcome_measures = "success_rate")
+head(outcomes)
+#> # A tibble: 6 × 4
+#>   adaptive_fitness mean_fixation_steps Measure      Value
+#>              <dbl>               <dbl> <chr>        <dbl>
+#> 1              0.6                2.55 success_rate  0   
+#> 2              0.8                4.65 success_rate  0   
+#> 3              1                  7.3  success_rate  0   
+#> 4              1.2               17.2  success_rate  0.6 
+#> 5              1.4               12.3  success_rate  0.75
+#> 6              1.6               11.8  success_rate  0.9
 ```
+
+``` r
+ggplot2::ggplot(outcomes, aes(x = adaptive_fitness, y = Value)) +
+  geom_line(color = SOCMOD_PLOT_PALETTE[1], linetype = "solid", linewidth=1.5) + theme_classic(base_size = 16)
+```
+
+<img src="man/figures/README-unnamed-chunk-11-1.png" width="50%" style="display: block; margin: auto;" />
 
 ### Installation
 

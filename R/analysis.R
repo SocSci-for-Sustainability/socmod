@@ -8,7 +8,7 @@
 SOCMOD_PLOT_PALETTE <- c(
   "#E24B4A",  # bright red
   "#007F7D",  # teal
-  "#428BCA",  # blue
+  "#428FFF",  # blue
   "#A3A843",  # olive green
   "#F0C04D",  # yellow
   "#D0743C",  # orange
@@ -52,7 +52,7 @@ SOCMOD_PLOT_PALETTE <- c(
 plot_network_adoption <- function(
     x, layout = NULL, behaviors = c("Adaptive", "Legacy"),
     behavior_colors = SOCMOD_PLOT_PALETTE[c(2,1)], node_size = 6,
-    label = FALSE, plot_mod = identity
+    label = FALSE, plot_mod = identity, edgewidth = 1
   ) {
   
   if (inherits(x, "Trial")) {
@@ -77,8 +77,12 @@ plot_network_adoption <- function(
   } else {
     stopifnot(is.numeric(node_size), length(node_size) == 1)
   }
-
-  df <- ggnetwork::ggnetwork(net, layout = layout)
+  df <- tibble::tibble()
+  if (is.null(layout)) {
+    df <- ggnetwork::ggnetwork(net)
+  } else {
+    df <- ggnetwork::ggnetwork(net, layout = layout)
+  }
   aes_base <- ggplot2::aes(x = x, y = y, xend = xend, yend = yend)
   if (use_size_aes) {
     aes_base$size <- rlang::sym(measure_name)
@@ -86,7 +90,7 @@ plot_network_adoption <- function(
 
   p <- 
     ggplot2::ggplot(df, mapping = aes_base) +
-      ggnetwork::geom_edges(color="lightgrey", linewidth = 0.2) +
+      ggnetwork::geom_edges(color="lightgrey", linewidth = edgewidth) +
     (if (use_size_aes) ggnetwork::geom_nodes(aes(color = Behavior)) 
      else ggnetwork::geom_nodes(aes(color = Behavior), size = node_size)) +
 
@@ -126,8 +130,6 @@ plot_network_adoption <- function(
 
 
 #' Plot adoption counts of selected behaviors over time
-#' Plot adoption counts of selected behaviors 
-#' (`tracked_behaviors`) over time.
 #'
 #' @param trial A Trial object
 #' @param tracked_behaviors Character vector of behaviors to track (e.g., c("Adaptive", "Legacy"))
@@ -302,7 +304,8 @@ summarise_prevalence <- function(trials_or_trial,
 #' summary <- summarise_outcomes(trials, input_parameters = "adoption_rate", outcome_measures = "success_rate")
 #' print(summary)
 #' @export
-summarise_outcomes <- function(trials, input_parameters, outcome_measures) {
+summarise_outcomes <- function(trials, input_parameters, 
+                               outcome_measures = NULL) {
   assertthat::assert_that(
     is.list(trials),
     all(purrr::map_lgl(trials, ~ inherits(.x, "Trial")))
@@ -338,10 +341,12 @@ summarise_outcomes <- function(trials, input_parameters, outcome_measures) {
       .groups = "drop"
     )
   
-  summary <- summary %>%
-    tidyr::pivot_longer(all_of(outcome_measures),
-                        names_to = "Measure",
-                        values_to = "Value")
+  if (!is.null(outcome_measures)) {
+    summary <- summary %>%
+      tidyr::pivot_longer(all_of(outcome_measures),
+                          names_to = "Measure",
+                          values_to = "Value")
+  }
   
   return (summary)
 }

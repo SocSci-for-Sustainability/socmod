@@ -11,7 +11,8 @@ plot_network_adoption(
   behavior_colors = SOCMOD_PLOT_PALETTE[c(2, 1)],
   node_size = 6,
   label = FALSE,
-  plot_mod = identity
+  plot_mod = identity,
+  edgewidth = 1
 )
 }
 \arguments{

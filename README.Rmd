@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.path = "man/figures/README-",
   out.width = "50%",
-  dpi=300,fig.width=6,fig.height=2.75,fig.align="center"
+  dpi=300,fig.width=8,fig.height=2.75,fig.align="center"
 )
 ```
 
@@ -46,28 +46,47 @@ library(igraph)
 library(magrittr) # Loads %>%
 devtools::install()
 library(socmod)
+library(purrr)
 ```
 
 ### Example 1: single model trial and visualization
 
 ```{r}
-make_abm(graph = make_regular_lattice(10, 4)) %>%
-  # Initialize 10% w/ Adaptive: fitness 12.5% greater than Legacy
-  initialize_agents(
-    initial_prevalence = 0.2,  
-    adaptive_fitness = 1.125
-  ) %T>% (
-    \(m) plot_network_adoption(m, layout = igraph::in_circle()
-  ) %>% print()) %>%
+#| fig-width: 4.15
+#| fig-height: 2.75
+make_example_abm <- function() {
+  return (
+    make_abm(graph = make_regular_lattice(10, 4)) %>%
+      # Initialize 10% w/ Adaptive,
+      # fitness 12.5% greater than Legacy
+      initialize_agents(
+        initial_prevalence = 0.2,  
+        adaptive_fitness = 1.125
+      )
+  )
+}
+
+abm <- make_example_abm()
+
+# Inspect the initialization
+plot_network_adoption(
+  abm, layout = igraph::in_circle(), 
+  plot_mod = 
+    \(p) p + ggtitle("Adoption at t = 0")
+)
+```
+
+```{r}
+#| fig-width: 6.15
+#| fig-height: 3.75
+# Initialize fresh ABM for a new simulation each time
+make_example_abm() %>%
   run_trial %>%
   plot_prevalence %>%
   print
 ```
 
-```{r}
 
-df <- plot_network_adoption(make_abm(n_agents = 10))
-```
 
 ### Example 2: computational experiment over adaptive fitness
 
@@ -105,7 +124,7 @@ Now pass this function to run_trials:
 #| message: false
 #| warning: false
 # Run five trials per parameter setting, i.e., for each specified adaptive_fitness
-adaptive_fitness_vals <- c(0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0)
+adaptive_fitness_vals <- c(0.8, 1.2, 1.8)
 trials <- 
   run_trials(
     abm_gen_fA_experiment, 
@@ -117,27 +136,98 @@ trials <-
   )
 ```
 
-Now we have a total of 40 trials: 8 adaptive fitness values times five trials per setting:
 
-```{r}
-length(trials) == 40
-```
 
 Let's take out only a couple values of adaptive fitness, 0.8 and 1.4, and plot the mean
 prevalence time series for each:
 
 ```{r}
-t_series_summaries <- 
-  summarise_prevalence(trials, across_trials = FALSE)
 
-filter_grp_lim <- 
-  t_series_summaries %>% 
-  dplyr::mutate(
-    adaptive_fitness = factor(adaptive_fitness, adaptive_fitness_vals)
-  ) %>% 
-  dplyr::filter(adaptive_fitness %in% c(0.8, 1.4)) %>% 
-  dplyr::mutate() %>% 
-  dplyr::group_by(Step, Behavior, adaptive_fitness)
+summary <- summarise_prevalence(
+  trials, across_trials = F
+) %>%
+  dplyr::filter(Behavior == "Adaptive") %>%
+  dplyr::filter(adaptive_fitness %in% c(0.8, 1.2, 1.6)) %>%
+  dplyr::mutate(`Adaptive fitness` = factor(adaptive_fitness,
+                                            adaptive_fitness_vals))
+
+p <- ggplot(
+  summary, 
+  aes(x=Step, y=Prevalence, 
+      color=`Adaptive fitness`, 
+      linetype=`Adaptive fitness`,
+      group = trial_id)) +
+  geom_line(linewidth=1.2) + theme_classic(base_size = 16) +
+  ggplot2::scale_color_manual(values = SOCMOD_PLOT_PALETTE)
+
+print(p)
+```
+```{r}
+#| message: false
+#| warning: false
+# Run five trials per parameter setting, i.e., for each specified adaptive_fitness
+adaptive_fitness_vals <- c(0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0)
+trials <- 
+  run_trials(
+    abm_gen_fA_experiment, 
+    n_trials_per_param = 20,
+    stop = socmod::fixated,
+    syncfile = "readme-demo-cpu-experiment.RData",
+    n_agents = 20,
+    .progress = T,
+    # overwrite = T,
+    initial_prevalence = 0.1,
+    adaptive_fitness = adaptive_fitness_vals
+  )
+```
+
+Now we have a total of 40 trials: 8 adaptive fitness values times five trials per setting:
+
+```{r}
+length(trials) == 40
+```
+```{r}
+outcomes <- summarise_outcomes(
+  trials, 
+  input_parameters = "adaptive_fitness", 
+  outcome_measures = c("success_rate", "mean_fixation_steps")
+) 
+
+print(outcomes, n = Inf)
+```
+
+```{r}
+max_fixation_steps <- 
+  (dplyr::filter(outcomes, Measure == "mean_fixation_steps") %>%
+  dplyr::filter(Value == max(Value)))$Value
+  
+mean_fix_steps <- 
+  dplyr::filter(outcomes, Measure == "mean_fixation_steps") %>%
+  dplyr::group_by(Measure) %>%
+  dplyr::mutate(Value = Value/max_fixation_steps)
+
+print(mean_fix_steps)
+```
+
+```{r}
+# Calculate the normalized mean_fixation_steps and plot as a dashed
+# line of the same color with success_rate
+library(ggplot2)
+
+outcomes %>% 
+ggplot(outcomes, aes(x=adaptive_fitness, y = ))
+```
+
+
+```{R}
+outcomes %>% dplyr::filter(Measure == "success_rate") %>%
+ggplot2::ggplot(aes(x = adaptive_fitness, y = Value)) +
+  geom_line(color = SOCMOD_PLOT_PALETTE[1], linetype = "solid", linewidth=1.5) + geom_line(mean_fix_steps, mapping = aes(x=adaptive_fitness, y = Value), color = SOCMOD_PLOT_PALETTE[1], linetype = "dashed") + theme_classic(base_size = 16) + xlab("Adaptive fitness") + ylab("Success rate/norm. fix. time")
+```
+
+```{r}
+ggplot2::ggplot(outcomes, aes(x = adaptive_fitness, y = mean_fixation_steps)) +
+  geom_line(color = SOCMOD_PLOT_PALETTE[1], linetype = "solid", linewidth=1.5) + theme_classic(base_size = 16) + xlab("Adaptive fitness") + ylab("")
 ```
 
 ### Installation

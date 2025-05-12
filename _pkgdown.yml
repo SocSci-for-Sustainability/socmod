@@ -21,7 +21,6 @@ reference:
   - plot_prevalence
   - plot_homophilynet
   - plot_friendship_paradox
-  - ggnetplot
   - SOCMOD_PLOT_PALETTE
 - title: Examples with real-world data
   desc: Simple examples of real-world data in socmod.

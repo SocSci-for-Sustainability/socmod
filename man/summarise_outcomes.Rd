@@ -4,7 +4,7 @@
 \alias{summarise_outcomes}
 \title{Summarize outcomes across trials by input parameters}
 \usage{
-summarise_outcomes(trials, input_parameters, outcome_measures)
+summarise_outcomes(trials, input_parameters, outcome_measures = NULL)
 }
 \arguments{
 \item{trials}{A list of \code{Trial} objects}

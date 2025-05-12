@@ -2,9 +2,7 @@
 % Please edit documentation in R/analysis.R
 \name{plot_prevalence}
 \alias{plot_prevalence}
-\title{Plot adoption counts of selected behaviors over time
-Plot adoption counts of selected behaviors
-(\code{tracked_behaviors}) over time.}
+\title{Plot adoption counts of selected behaviors over time}
 \usage{
 plot_prevalence(
   trials_or_tibble,
@@ -22,6 +20,4 @@ A ggplot object
 }
 \description{
 Plot adoption counts of selected behaviors over time
-Plot adoption counts of selected behaviors
-(\code{tracked_behaviors}) over time.
 }

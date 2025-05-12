@@ -41,35 +41,19 @@ Trial <- R6::R6Class(
 
       self$model$set_parameter("legacy_behavior", legacy_behavior)
       self$model$set_parameter("adaptive_behavior", adaptive_behavior)
+      step <- 0
+      obs_list <- list()
+      n_agents <- length(self$model$agents)
       
-      # Record t = 0 before any updates.
-      self$observations <- dplyr::bind_rows(
-        self$observations,
-        tibble::tibble(
-          Step = 0,
-          agent = unlist(
-            purrr::map(
-              self$model$agents, 
-              \(a) a$get_name()
-            ), 
-            use.names = FALSE
-          ),
-          Behavior = unlist(
-            purrr::map(
-              self$model$agents, 
-              \(a) as.character(a$get_behavior())
-            ), 
-            use.names = FALSE
-          ),
-          Fitness = unlist(
-            purrr::map(
-              self$model$agents, 
-              \(a) a$get_fitness()
-            ), 
-            use.names = FALSE
-          ),
-          label = self$label
-        )
+      obs_list[[1]] <- tibble::tibble(
+        Step = 0,
+        agent = vapply(self$model$agents, 
+                       \(a) a$name, character(1)),
+        Behavior = vapply(self$model$agents, 
+                          \(a) as.character(a$behavior_current), character(1)),
+        Fitness = vapply(self$model$agents, 
+                         \(a) a$fitness_current, numeric(1)),
+        label = self$label
       )
       
       # Get learning and iteration functions from the model's learning strategy.
@@ -98,36 +82,13 @@ Trial <- R6::R6Class(
         }
         
         # Update observations. 
-        self$observations <- dplyr::bind_rows(
-          
-          self$observations,
-          
-          tibble::tibble(
-            Step = step,
-            agent = unlist(
-              purrr::map(
-                self$model$agents, 
-                \(a) a$get_name()
-              ), 
-              use.names = FALSE
-            ),
-            Behavior = unlist(
-              purrr::map(
-                self$model$agents, 
-                \(a) as.character(a$get_behavior())
-              ), 
-              use.names = FALSE
-            ),
-            Fitness = unlist(
-              purrr::map(
-                self$model$agents, 
-                \(a) a$get_fitness()
-              ), 
-              use.names = FALSE
-            ),
-            label = self$label
-          )
-        ) # End observation update.
+        obs_list[[step + 1]] <- tibble::tibble(
+          Step = step,
+          agent = vapply(self$model$agents, \(a) a$name, character(1)),
+          Behavior = vapply(self$model$agents, \(a) as.character(a$behavior_current), character(1)),
+          Fitness = vapply(self$model$agents, \(a) a$fitness_current, numeric(1)),
+          label = self$label
+        )
         
         # Stop when stop function returns TRUE or max steps reached.
         if (is.function(stop)) {
@@ -137,7 +98,7 @@ Trial <- R6::R6Class(
         } else if (step >= stop) {
           break
         }
-      }
+      } # End main iteration loop
       
       behaviors <- unlist(
         purrr::map(
@@ -145,6 +106,7 @@ Trial <- R6::R6Class(
         ), 
         use.names = FALSE
       )
+      self$observations <- dplyr::bind_rows(obs_list)
       
       self$outcomes$adaptation_success <- 
         length(unique(behaviors)) == 1 && 
