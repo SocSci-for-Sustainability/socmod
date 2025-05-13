@@ -1,21 +1,39 @@
 #' Custom color palette for scientific plots
 #'
-#' This palette was extracted from a provided source image and refined for use in scientific plots,
-#' emphasizing high contrast and perceptual separability. Recommended for use in `scale_color_manual()`.
+#' Recommended for use in `scale_color_manual()`.
 #'
-#' @return A character vector of hex color codes
+#' @return A named character vector of hex color codes
 #' @export
-SOCMOD_PLOT_PALETTE <- c(
-  "#E24B4A",  # bright red
-  "#007F7D",  # teal
-  "#428FFF",  # blue
-  "#A3A843",  # olive green
-  "#F0C04D",  # yellow
-  "#D0743C",  # orange
-  "#5E3B68",  # plum
-  "#BF2A40",  # deep red
-  "#7D766F"   # neutral gray
+SOCMOD_PALETTE <- c(
+  red     = "#F24B4A",
+  green_1 = "#007F7D",
+  blue_1  = "#32BFFA",
+  magenta = "#D000AC",
+  blue_2  = "#320FFA",
+  pink    = "#EE80FF",
+  plum    = "#5E3B68",
+  green_2 = "#32BF9A",
+  sienna  = "#ED610F"
 )
+
+#' CVD-safe custom color palette for scientific plots
+#'
+#' Recommended for use in `scale_color_manual()`.
+#'
+#' @return A named character vector of hex color codes
+#' @export
+SOCMOD_PALETTE_CVD <- c(
+  red     = "#E15759",
+  green_1 = "#59A14F",
+  blue_1  = "#32BFFA",
+  magenta = "#B07AA1",
+  blue_2  = "#4E79A7",
+  pink    = "#EE80FF",
+  plum    = "#5E3B68",
+  green_2 = "#32BF9A",
+  sienna  = "#ED610F"
+)
+
 
 #' Plot behavior adoption on a network
 #'
@@ -24,7 +42,7 @@ SOCMOD_PLOT_PALETTE <- c(
 #'
 #' @param x A `Trial` or `AgentBasedModel`.
 #' @param behaviors Behavior levels. Default: `c("Adaptive", "Legacy")`.
-#' @param behavior_colors Color palette. Default: first 2 of `SOCMOD_PLOT_PALETTE`.
+#' @param behavior_colors Color palette. Default: first 2 of `SOCMOD_PALETTE`.
 #' @param node_size Single number or named list (e.g. `list(Degree = igraph::degree)`).
 #' @param label Whether to show node labels. Default: TRUE.
 #' @param plot_mod A function to modify the ggplot object. Default: `identity`.
@@ -51,7 +69,7 @@ SOCMOD_PLOT_PALETTE <- c(
 #' @export
 plot_network_adoption <- function(
     x, layout = NULL, behaviors = c("Adaptive", "Legacy"),
-    behavior_colors = SOCMOD_PLOT_PALETTE[c(2,1)], node_size = 6,
+    behavior_colors = SOCMOD_PALETTE[c(2,1)], node_size = 6,
     label = FALSE, plot_mod = identity, edgewidth = 1
   ) {
   
@@ -137,19 +155,21 @@ plot_network_adoption <- function(
 #' @export
 #' @examples
 plot_prevalence <- function(trials_or_tibble, 
-                            behavior_order = c("Legacy", "Adaptive"),
+                            tracked_behaviors = c("Legacy", "Adaptive"),
                             theme_size = 16) {
   # Initialize the prevalence table, summarising if necessary 
   prevalence_tbl <- trials_or_tibble
   if (!inherits(trials_or_tibble, "tbl_df")) {
     prevalence_tbl <- summarise_prevalence(
-      trials_or_tibble, tracked_behaviors = behavior_order
+      trials_or_tibble, tracked_behaviors = tracked_behaviors
     )
   }
-  # Put factors in order for plotting
-  prevalence_tbl <- dplyr::mutate(
-    prevalence_tbl, Behavior = factor(Behavior, levels =  behavior_order)
-  ) %>% dplyr::arrange(Behavior)
+  # Put factors in order for plotting if there's more than one behavior
+  if (length(tracked_behaviors) > 1) {
+    prevalence_tbl <- dplyr::mutate(
+      prevalence_tbl, Behavior = factor(Behavior, levels =  tracked_behaviors)
+    ) %>% dplyr::arrange(Behavior)
+  }
       
   # Plot dynamics
   p <- 
@@ -157,7 +177,7 @@ plot_prevalence <- function(trials_or_tibble,
       ggplot2::ggplot(ggplot2::aes(x = Step, y = Prevalence, color = Behavior)) +
       ggplot2::geom_line(linewidth = 1.15) +
       ggplot2::theme_classic(base_size = theme_size) +
-      ggplot2::scale_color_manual(values = SOCMOD_PLOT_PALETTE) +
+      ggplot2::scale_color_manual(values = SOCMOD_PALETTE) +
       ggplot2::guides(color = guide_legend(reverse = TRUE))
   
   return (p)

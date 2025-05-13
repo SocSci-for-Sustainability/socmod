@@ -234,8 +234,9 @@ make_preferential_attachment <- function(N) {
 #' @examples
 #' hnet_5grp <- make_homophily_network(rep(5, 5), mean_degree = 2, homophily = -0.5)
 #' plot_homophilynet(hnet_5grp)
-plot_homophilynet <- function(net, node_size = 3, line_width = 0.1, theme_base_size = 10) {
-  ggnetplot(net) + 
+plot_homophilynet <- function(net, node_size = 3, line_width = 0.1, 
+                              theme_base_size = 10) {
+  ggplot(ggnetwork(net, layout = "circular"), aes(x=x, y=y, xend=xend, yend=yend)) + 
     geom_edges(color = "grey", linewidth = line_width) + 
     geom_nodes(aes(color = group), size = node_size) + 
     theme_blank(base_size = theme_base_size)

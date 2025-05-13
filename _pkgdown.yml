@@ -64,7 +64,6 @@ reference:
   - G_NM
   - make_regular_lattice
   - plot_homophilynet
-  - ggnetplot
   - add_unique_edge
   - get_all_possible_edges
   - not_adjacent

@@ -15,7 +15,8 @@ site:
 
 # Rebuild README.md and associated docs/index.html, opening in new window
 readme:
-	Rscript -e "devtools::build_readme()" \
+	Rscript -e "source('tools/make-figures-readme.R')" \
+	  && Rscript -e "devtools::build_readme()" \
 	  && Rscript -e "pkgdown::build_home()" \
 	  && open docs/index.html
 

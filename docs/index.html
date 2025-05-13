@@ -76,7 +76,6 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/briatte/ggnetwork" class="external-link">ggnetwork</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r.igraph.org/" class="external-link">igraph</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span> <span class="co"># Loads %&gt;%</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://css4s.github.io/socmod/">socmod</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://purrr.tidyverse.org/" class="external-link">purrr</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
@@ -101,23 +100,24 @@
 <span><span class="fu"><a href="reference/plot_network_adoption.html">plot_network_adoption</a></span><span class="op">(</span></span>
 <span>  <span class="va">abm</span>, layout <span class="op">=</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/layout_in_circle.html" class="external-link">in_circle</a></span><span class="op">(</span><span class="op">)</span>, </span>
 <span>  plot_mod <span class="op">=</span> </span>
-<span>    \<span class="op">(</span><span class="va">p</span><span class="op">)</span> <span class="va">p</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Adoption at t = 0"</span><span class="op">)</span></span>
+<span>    \<span class="op">(</span><span class="va">p</span><span class="op">)</span> <span class="va">p</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Adoption at t = 0"</span><span class="op">)</span>,</span>
+<span>  edgewidth <span class="op">=</span> <span class="fl">0.4</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-3-1.png" width="50%" style="display: block; margin: auto;"></p>
+<p><img src="reference/figures/readme-network-adoption.png"></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Initialize fresh ABM for a new simulation each time</span></span>
-<span><span class="fu">make_example_abm</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="va">run_trial</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="va">plot_prevalence</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="va">print</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-4-1.png" width="50%" style="display: block; margin: auto;"></p>
+<span><span class="va">trial</span> <span class="op">&lt;-</span> <span class="fu">make_example_abm</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="va">run_trial</span></span>
+<span><span class="fu"><a href="reference/summarise_prevalence.html">summarise_prevalence</a></span><span class="op">(</span><span class="va">trial</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="reference/plot_prevalence.html">plot_prevalence</a></span><span class="op">(</span><span class="va">trial</span>, tracked_behavior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Adaptive"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="example-2-computational-experiment-over-adaptive-fitness">Example 2: computational experiment over adaptive fitness<a class="anchor" aria-label="anchor" href="#example-2-computational-experiment-over-adaptive-fitness"></a>
 </h3>
 <p>Success-biased learning is the default, so we do not need to specify the learning strategy. We can just define the model generating function to initialize a certain fraction with the adaptive behavior and vary the adaptive fitness, the main outcome variable of this analysis. Note the functional style: we pass two functions as arguments to <code>run_trials</code>: <code>abm_gen_fA_experiment</code> and <code><a href="reference/fixated.html">socmod::fixated</a></code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Model generating function</span></span>
+<code class="sourceCode R"><span></span>
+<span><span class="co"># Model generating function</span></span>
 <span><span class="va">abm_gen_fA_experiment</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">parameter_list</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># Initialize ABM with given parameters.</span></span>
 <span>  <span class="va">abm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">make_abm</span>, <span class="va">parameter_list</span><span class="op">)</span></span>
@@ -131,11 +131,10 @@
 <span>        adaptive_fitness <span class="op">=</span> <span class="va">pl</span><span class="op">$</span><span class="va">adaptive_fitness</span></span>
 <span>      <span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<p>Now pass this function to run_trials:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Run five trials per parameter setting, i.e., for each specified adaptive_fitness</span></span>
-<span><span class="va">adaptive_fitness_vals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="fl">1.2</span>, <span class="fl">1.8</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="co"># Run five trials per parameter setting, i.e., for each specified adaptive_fitness</span></span>
+<span><span class="va">adaptive_fitness_vals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="fl">1.15</span>, <span class="fl">1.4</span><span class="op">)</span></span>
 <span><span class="va">trials</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="fu"><a href="reference/run_trials.html">run_trials</a></span><span class="op">(</span></span>
 <span>    <span class="va">abm_gen_fA_experiment</span>, </span>
@@ -144,15 +143,13 @@
 <span>    n_agents <span class="op">=</span> <span class="fl">20</span>,</span>
 <span>    initial_prevalence <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>    adaptive_fitness <span class="op">=</span> <span class="va">adaptive_fitness_vals</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
-<p>Let’s take out only a couple values of adaptive fitness, 0.8 and 1.4, and plot the mean prevalence time series for each:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
 <span><span class="va">summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/summarise_prevalence.html">summarise_prevalence</a></span><span class="op">(</span></span>
 <span>  <span class="va">trials</span>, across_trials <span class="op">=</span> <span class="cn">F</span></span>
 <span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Behavior</span> <span class="op">==</span> <span class="st">"Adaptive"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">adaptive_fitness</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="fl">1.2</span>, <span class="fl">1.6</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">adaptive_fitness</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="fl">1.15</span>, <span class="fl">1.4</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>`Adaptive fitness` <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">adaptive_fitness</span>,</span>
 <span>                                            <span class="va">adaptive_fitness_vals</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -162,18 +159,17 @@
 <span>      color<span class="op">=</span><span class="va">`Adaptive fitness`</span>, </span>
 <span>      linetype<span class="op">=</span><span class="va">`Adaptive fitness`</span>,</span>
 <span>      group <span class="op">=</span> <span class="va">trial_id</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth<span class="op">=</span><span class="fl">1.2</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_classic</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">16</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="va">SOCMOD_PLOT_PALETTE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-7-1.png" width="50%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth<span class="op">=</span><span class="fl">1.4</span>, alpha <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_classic</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">16</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="va">SOCMOD_PLOT_PALETTE</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run five trials per parameter setting, i.e., for each specified adaptive_fitness</span></span>
 <span><span class="va">adaptive_fitness_vals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.6</span>, <span class="fl">0.8</span>, <span class="fl">1.0</span>, <span class="fl">1.2</span>, <span class="fl">1.4</span>, <span class="fl">1.6</span>, <span class="fl">1.8</span>, <span class="fl">2.0</span><span class="op">)</span></span>
 <span><span class="va">trials</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="fu"><a href="reference/run_trials.html">run_trials</a></span><span class="op">(</span></span>
 <span>    <span class="va">abm_gen_fA_experiment</span>, </span>
-<span>    n_trials_per_param <span class="op">=</span> <span class="fl">20</span>,</span>
+<span>    n_trials_per_param <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>    stop <span class="op">=</span> <span class="fu">socmod</span><span class="fu">::</span><span class="va"><a href="reference/fixated.html">fixated</a></span>,</span>
 <span>    syncfile <span class="op">=</span> <span class="st">"readme-demo-cpu-experiment.RData"</span>,</span>
 <span>    n_agents <span class="op">=</span> <span class="fl">20</span>,</span>
@@ -181,41 +177,51 @@
 <span>    <span class="co"># overwrite = T,</span></span>
 <span>    initial_prevalence <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>    adaptive_fitness <span class="op">=</span> <span class="va">adaptive_fitness_vals</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Loading trials from syncfile: readme-demo-cpu-experiment.RData</span></span></code></pre></div>
+<span>  <span class="op">)</span></span></code></pre></div>
 <p>Now we have a total of 40 trials: 8 adaptive fitness values times five trials per setting:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">trials</span><span class="op">)</span> <span class="op">==</span> <span class="fl">40</span></span></code></pre></div>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">trials</span><span class="op">)</span> <span class="op">==</span> <span class="fl">40</span></span>
-<span><span class="co">#&gt; [1] FALSE</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">outcomes</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/summarise_outcomes.html">summarise_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="va">trials</span>, </span>
+<span>  input_parameters <span class="op">=</span> <span class="st">"adaptive_fitness"</span>, </span>
+<span>  outcome_measures <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"success_rate"</span>, <span class="st">"mean_fixation_steps"</span><span class="op">)</span></span>
+<span><span class="op">)</span> </span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">outcomes</span>, n <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">outcomes</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/summarise_outcomes.html">summarise_outcomes</a></span><span class="op">(</span><span class="va">trials</span>, input_parameters <span class="op">=</span> <span class="st">"adaptive_fitness"</span>, outcome_measures <span class="op">=</span> <span class="st">"success_rate"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">outcomes</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 6 × 4</span></span>
-<span><span class="co">#&gt;   adaptive_fitness mean_fixation_steps Measure      Value</span></span>
-<span><span class="co">#&gt;              &lt;dbl&gt;               &lt;dbl&gt; &lt;chr&gt;        &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1              0.6                2.55 success_rate  0   </span></span>
-<span><span class="co">#&gt; 2              0.8                4.65 success_rate  0   </span></span>
-<span><span class="co">#&gt; 3              1                  7.3  success_rate  0   </span></span>
-<span><span class="co">#&gt; 4              1.2               17.2  success_rate  0.6 </span></span>
-<span><span class="co">#&gt; 5              1.4               12.3  success_rate  0.75</span></span>
-<span><span class="co">#&gt; 6              1.6               11.8  success_rate  0.9</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">max_fixation_steps</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">outcomes</span>, <span class="va">Measure</span> <span class="op">==</span> <span class="st">"mean_fixation_steps"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Value</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">Value</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">$</span><span class="va">Value</span></span>
+<span>  </span>
+<span><span class="va">mean_fix_steps</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">outcomes</span>, <span class="va">Measure</span> <span class="op">==</span> <span class="st">"mean_fixation_steps"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">Measure</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Value <span class="op">=</span> <span class="va">Value</span><span class="op">/</span><span class="va">max_fixation_steps</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">mean_fix_steps</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">outcomes</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">adaptive_fitness</span>, y <span class="op">=</span> <span class="va">Value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">SOCMOD_PLOT_PALETTE</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, linetype <span class="op">=</span> <span class="st">"solid"</span>, linewidth<span class="op">=</span><span class="fl">1.5</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_classic</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">16</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-11-1.png" width="50%" style="display: block; margin: auto;"></p>
+<code class="sourceCode R"><span><span class="co"># Calculate the normalized mean_fixation_steps and plot as a dashed</span></span>
+<span><span class="co"># line of the same color with success_rate</span></span>
+<span><span class="co"># library(ggplot2)</span></span>
+<span><span class="co"># </span></span>
+<span><span class="co"># outcomes %&gt;% ggplot(outcomes, aes(x=adaptive_fitness, y = ))</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">outcomes</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Measure</span> <span class="op">==</span> <span class="st">"success_rate"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">adaptive_fitness</span>, y <span class="op">=</span> <span class="va">Value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">SOCMOD_PLOT_PALETTE</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, linetype <span class="op">=</span> <span class="st">"solid"</span>, linewidth<span class="op">=</span><span class="fl">1.5</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="va">mean_fix_steps</span>, mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">adaptive_fitness</span>, y <span class="op">=</span> <span class="va">Value</span><span class="op">)</span>, color <span class="op">=</span> <span class="va">SOCMOD_PLOT_PALETTE</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_classic</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">16</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Adaptive fitness"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Success rate/norm. fix. time"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h3>
 <p>You can install the development version of socmod from <a href="https://github.com/" class="external-link">GitHub</a> with <code>devtools</code> or <code>pak</code>:</p>
 <p><strong>devtools</strong></p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Install this if you don't have devtools.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"css4s/socmod"</span><span class="op">)</span></span></code></pre></div>
 <p><strong>pak</strong></p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Install this if you don't have pak.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"pak"</span><span class="op">)</span></span>
 <span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"css4s/socmod"</span><span class="op">)</span></span></code></pre></div>

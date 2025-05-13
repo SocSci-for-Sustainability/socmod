@@ -4,29 +4,29 @@
 # Introduction
 
 The goal of `socmod` is to simplify development of models of social
-behavior for beginners and experts alike, currently focusing on
-agent-based models of adaptation diffusion. The framework is general,
-though, and the software could be extended to other social behavior
-models.
+behavior for beginners and experts alike. The current focus is
+agent-based models of adaptive behavior diffusion. The framework is
+designed to be extensible to other contexts in social behavior modeling
+and beyond.
 
 ## Quickstart examples
 
 Below we present two examples of how `socmod` can be used for succinctly
 defining models of social behavior.
 
-1.  Initialize and run, then visualize adaptation prevalence over time
-    for a single model paramterization
-2.  Set up and run a computational experiment to probe how adaptation
-    prevalence dynamics and intervention success depend on the adaptive
-    fitness assuming agents use success-biased learning.
+1.  Initialize and run, then visualize adaptation diffusion over time
+    for a single simulation trial
+2.  Set up and run a computational experiment of simulated *adaptation
+    success* (i.e., fixation of adaptive behavior) and time to fixation
+    for different adaptive fitness values when agents learn using
+    success-biased partner selection
 
-Prereq: load libraries.
+### Prereq: load required libraries.
 
 ``` r
 library(ggnetwork)
 library(igraph)
 library(magrittr) # Loads %>%
-devtools::install()
 library(socmod)
 library(purrr)
 ```
@@ -34,11 +34,12 @@ library(purrr)
 ### Example 1: single model trial and visualization
 
 ``` r
+# Helper function to create an agent-based model on a N=10, k=4 regular lattice
+# with 10% of agents doing Adaptive behavior w/ fitness 1.125 (Legacy is 1.0 by default)
 make_example_abm <- function() {
   return (
     make_abm(graph = make_regular_lattice(10, 4)) %>%
-      # Initialize 10% w/ Adaptive,
-      # fitness 12.5% greater than Legacy
+      # Initialize 
       initialize_agents(
         initial_prevalence = 0.2,  
         adaptive_fitness = 1.125
@@ -46,27 +47,27 @@ make_example_abm <- function() {
   )
 }
 
+# Create a new instance of an ABM with example parameters
 abm <- make_example_abm()
 
-# Inspect the initialization
+# Inspect the initialization to ensure 2 agents do Adaptive
 plot_network_adoption(
   abm, layout = igraph::in_circle(), 
   plot_mod = 
-    \(p) p + ggtitle("Adoption at t = 0")
+    \(p) p + ggtitle("Adoption at t = 0"),
+  edgewidth = 0.4
 )
 ```
 
-<img src="man/figures/README-unnamed-chunk-3-1.png" width="50%" style="display: block; margin: auto;" />
+![](man/figures/readme/network-adoption.png)
 
 ``` r
 # Initialize fresh ABM for a new simulation each time
-make_example_abm() %>%
-  run_trial %>%
-  plot_prevalence %>%
-  print
-```
+trial <- make_example_abm() %>% run_trial
+summarise_prevalence(trial)
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="50%" style="display: block; margin: auto;" />
+plot_prevalence(trial, tracked_behavior = c("Adaptive"))
+```
 
 ### Example 2: computational experiment over adaptive fitness
 
@@ -78,6 +79,7 @@ functional style: we pass two functions as arguments to `run_trials`:
 `abm_gen_fA_experiment` and `socmod::fixated`.
 
 ``` r
+
 # Model generating function
 abm_gen_fA_experiment <- function(parameter_list) {
   # Initialize ABM with given parameters.
@@ -93,13 +95,9 @@ abm_gen_fA_experiment <- function(parameter_list) {
       )
   )
 }
-```
 
-Now pass this function to run_trials:
-
-``` r
 # Run five trials per parameter setting, i.e., for each specified adaptive_fitness
-adaptive_fitness_vals <- c(0.8, 1.2, 1.8)
+adaptive_fitness_vals <- c(0.8, 1.15, 1.4)
 trials <- 
   run_trials(
     abm_gen_fA_experiment, 
@@ -109,18 +107,12 @@ trials <-
     initial_prevalence = 0.1,
     adaptive_fitness = adaptive_fitness_vals
   )
-```
-
-Let’s take out only a couple values of adaptive fitness, 0.8 and 1.4,
-and plot the mean prevalence time series for each:
-
-``` r
 
 summary <- summarise_prevalence(
   trials, across_trials = F
 ) %>%
   dplyr::filter(Behavior == "Adaptive") %>%
-  dplyr::filter(adaptive_fitness %in% c(0.8, 1.2, 1.6)) %>%
+  dplyr::filter(adaptive_fitness %in% c(0.8, 1.15, 1.4)) %>%
   dplyr::mutate(`Adaptive fitness` = factor(adaptive_fitness,
                                             adaptive_fitness_vals))
 
@@ -130,13 +122,13 @@ p <- ggplot(
       color=`Adaptive fitness`, 
       linetype=`Adaptive fitness`,
       group = trial_id)) +
-  geom_line(linewidth=1.2) + theme_classic(base_size = 16) +
-  ggplot2::scale_color_manual(values = SOCMOD_PLOT_PALETTE)
-
-print(p)
+  geom_line(linewidth=1.4, alpha = 0.7) + theme_classic(base_size = 16) +
+  ggplot2::scale_color_manual(values = SOCMOD_PALETTE)
 ```
 
-<img src="man/figures/README-unnamed-chunk-7-1.png" width="50%" style="display: block; margin: auto;" />
+``` r
+print(p)
+```
 
 ``` r
 # Run five trials per parameter setting, i.e., for each specified adaptive_fitness
@@ -144,7 +136,8 @@ adaptive_fitness_vals <- c(0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0)
 trials <- 
   run_trials(
     abm_gen_fA_experiment, 
-    n_trials_per_param = 20,
+    n_trials_per_param = 5,
+    # n_trials_per_param = 20,  # <- uncomment to try accumulating more simulation data
     stop = socmod::fixated,
     syncfile = "readme-demo-cpu-experiment.RData",
     n_agents = 20,
@@ -153,8 +146,6 @@ trials <-
     initial_prevalence = 0.1,
     adaptive_fitness = adaptive_fitness_vals
   )
-#> 
-#> Loading trials from syncfile: readme-demo-cpu-experiment.RData
 ```
 
 Now we have a total of 40 trials: 8 adaptive fitness values times five
@@ -162,29 +153,41 @@ trials per setting:
 
 ``` r
 length(trials) == 40
-#> [1] FALSE
 ```
 
 ``` r
-outcomes <- summarise_outcomes(trials, input_parameters = "adaptive_fitness", outcome_measures = "success_rate")
-head(outcomes)
-#> # A tibble: 6 × 4
-#>   adaptive_fitness mean_fixation_steps Measure      Value
-#>              <dbl>               <dbl> <chr>        <dbl>
-#> 1              0.6                2.55 success_rate  0   
-#> 2              0.8                4.65 success_rate  0   
-#> 3              1                  7.3  success_rate  0   
-#> 4              1.2               17.2  success_rate  0.6 
-#> 5              1.4               12.3  success_rate  0.75
-#> 6              1.6               11.8  success_rate  0.9
+outcomes <- summarise_outcomes(
+  trials, 
+  input_parameters = "adaptive_fitness", 
+  outcome_measures = c("success_rate", "mean_fixation_steps")
+) 
+
+max_fix_time <- max(outcomes$Value[outcomes$Measure == "mean_fixation_steps"])
+
+outcomes_norm <- outcomes %>%
+  dplyr::mutate(Value = dplyr::case_when(
+    Measure == "mean_fixation_steps" ~ Value / max_fix_time,
+    TRUE ~ Value
+  ))
+
+
+print(outcomes_norm, n = Inf)
 ```
 
 ``` r
-ggplot2::ggplot(outcomes, aes(x = adaptive_fitness, y = Value)) +
-  geom_line(color = SOCMOD_PLOT_PALETTE[1], linetype = "solid", linewidth=1.5) + theme_classic(base_size = 16)
+# Rename and set order of Measure factors to avoid messing with the legend in plotting
+outcomes_norm$Measure[outcomes_norm$Measure == "success_rate"] <- "Success rate"
+outcomes_norm$Measure[outcomes_norm$Measure == "mean_fixation_steps"] <- "Normalized fixation time"
+outcomes_norm$Measure <- factor(outcomes_norm$Measure, levels = c(
+  "Success rate", "Normalized fixation time"
+))
+# Use a custom socmod line color
+line_color <- SOCMOD_PALETTE_CVD["pink"]
+outcomes_norm %>%
+  ggplot2::ggplot(aes(x = adaptive_fitness, y = Value, linetype = Measure)) +
+    geom_line(color = line_color, linewidth=1.5) + scale_x_continuous(breaks = adaptive_fitness_vals) +
+    theme_classic(base_size = 16) + xlab("Adaptive fitness") + ylab("Value")
 ```
-
-<img src="man/figures/README-unnamed-chunk-11-1.png" width="50%" style="display: block; margin: auto;" />
 
 ### Installation
 

@@ -1,62 +1,25 @@
----
-output: github_document
-editor_options: 
-  markdown: 
-    wrap: 90
----
+##
+# Script version of the README.Rmd file where we generate the plots included 
+# as example outcomes in the README to have more control over its build.
+#
+# Date: 2025-05-12
+# 
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  eval = FALSE,
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/",
-  cache = FALSE,
-  fig.keep = "high",
-  out.width = "90%",
-  dpi=150,
-  fig.width=8.0, 
-  fig.height=4.15,
-  fig.align="center"
-)
-```
-
-# Introduction
-
-The goal of `socmod` is to simplify development of models of social behavior for beginners
-and experts alike. The current focus is agent-based models of adaptive behavior diffusion. The
-framework is designed to be extensible to other contexts in social behavior modeling and beyond.
-
-## Quickstart examples
-
-Below we present two examples of how `socmod` can be used for succinctly defining models
-of social behavior.
-
-1.  Initialize and run, then visualize adaptation diffusion over time for a single simulation trial
-2.  Set up and run a computational experiment of simulated _adaptation success_ (i.e., fixation of adaptive behavior) and time to fixation for different adaptive fitness values when agents learn using success-biased partner selection
-
-### Prereq: load required libraries.
-
-```{r}
+#---------Setup-------------
 library(ggnetwork)
 library(igraph)
 library(magrittr) # Loads %>%
 library(socmod)
 library(purrr)
-```
 
 
-### Example 1: single model trial and visualization
-
-```{r}
-# Helper function to create an agent-based model on a N=10, k=4 regular lattice
-# with 10% of agents doing Adaptive behavior w/ fitness 1.125 (Legacy is 1.0 by default)
+###------------------Example 1: single model trial and visualization-----------
 make_example_abm <- function() {
   return (
     make_abm(graph = make_regular_lattice(10, 4)) %>%
-      # Initialize 
+      # Initialize 10% w/ Adaptive,
+      # fitness 12.5% greater than Legacy
       initialize_agents(
         initial_prevalence = 0.2,  
         adaptive_fitness = 1.125
@@ -64,47 +27,31 @@ make_example_abm <- function() {
   )
 }
 
-# Create a new instance of an ABM with example parameters
 abm <- make_example_abm()
 
-# Inspect the initialization to ensure 2 agents do Adaptive
-plot_network_adoption(
+# Inspect the initialization
+p <- plot_network_adoption(
   abm, layout = igraph::in_circle(), 
   plot_mod = 
     \(p) p + ggtitle("Adoption at t = 0"),
   edgewidth = 0.4
 )
-```
+ggsave(
+  "man/figures/readme-network-adoption.png", plot = p, 
+  width = 6, height = 4, dpi = 300
+)
 
-![](man/figures/readme/network-adoption.png)
-
-```{r}
-#| fig-width: 6.15
-#| fig-height: 3.75
 # Initialize fresh ABM for a new simulation each time
 trial <- make_example_abm() %>% run_trial
 summarise_prevalence(trial)
+p <- plot_prevalence(trial, tracked_behavior = c("Adaptive"))
+ggsave(
+  "man/figures/readme-prevalence.png", plot = p, width = 6, height = 4, dpi = 300
+)
 
-plot_prevalence(trial, tracked_behavior = c("Adaptive"))
-```
 
-
-
-### Example 2: computational experiment over adaptive fitness
-
-Success-biased learning is the default, so we do not need to specify the learning
-strategy. We can just define the model generating function to initialize a certain
-fraction with the adaptive behavior and vary the adaptive fitness, the main outcome
-variable of this analysis. Note the functional style: we pass two functions as arguments
-to `run_trials`: `abm_gen_fA_experiment` and `socmod::fixated`.
-
-```{r}
-#| results: hide
-#| message: false
-#| warning: false
-#| fig-width: 9
-#| fig-height: 3.5
-
+###------------Example 2: computational experiment over adaptive fitness-------
+####-----------Example 2A: plot several trials prevalence series---------------
 
 # Model generating function
 abm_gen_fA_experiment <- function(parameter_list) {
@@ -149,77 +96,59 @@ p <- ggplot(
       linetype=`Adaptive fitness`,
       group = trial_id)) +
   geom_line(linewidth=1.4, alpha = 0.7) + theme_classic(base_size = 16) +
-  ggplot2::scale_color_manual(values = SOCMOD_PALETTE)
-```
+  ggplot2::scale_color_manual(values = SOCMOD_PLOT_PALETTE)
+
+ggsave(
+  "man/figures/readme-summary-prevalence.png", plot = p, 
+  width = 6, height = 4, dpi = 300
+)
 
 
-```{r}
-print(p)
-```
+####-----------Example 2B: success rate over adaptive fitness---------------
 
 
-```{r}
-#| message: false
-#| warning: false
 # Run five trials per parameter setting, i.e., for each specified adaptive_fitness
-adaptive_fitness_vals <- c(0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0)
+# This may take a few minutes to run everything–reduce n_trials_per_param to
+# start.
+adaptive_fitness_vals <- c(0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5)
 trials <- 
   run_trials(
     abm_gen_fA_experiment, 
-    n_trials_per_param = 5,
-    # n_trials_per_param = 20,  # <- uncomment to try accumulating more simulation data
+    n_trials_per_param = 20,
     stop = socmod::fixated,
-    syncfile = "readme-demo-cpu-experiment.RData",
+    syncfile = "man/build/readme-demo-cpu-experiment.RData",
     n_agents = 20,
     .progress = T,
     # overwrite = T,
     initial_prevalence = 0.1,
     adaptive_fitness = adaptive_fitness_vals
   )
-```
 
-Now we have a total of 40 trials: 8 adaptive fitness values times five trials per setting:
-
-```{r}
-length(trials) == 40
-```
-
-```{r}
 outcomes <- summarise_outcomes(
   trials, 
   input_parameters = "adaptive_fitness", 
   outcome_measures = c("success_rate", "mean_fixation_steps")
 ) 
 
-max_fix_time <- max(outcomes$Value[outcomes$Measure == "mean_fixation_steps"])
+# Calculate the mean  
+max_fixation_steps <- 
+  (dplyr::filter(outcomes, Measure == "mean_fixation_steps") %>%
+  dplyr::filter(Value == max(Value)))$Value
+  
+mean_fix_steps <- 
+  dplyr::filter(outcomes, Measure == "mean_fixation_steps") %>%
+  dplyr::group_by(Measure) %>%
+  dplyr::mutate(Value = Value/max_fixation_steps)
 
-outcomes_norm <- outcomes %>%
-  dplyr::mutate(Value = dplyr::case_when(
-    Measure == "mean_fixation_steps" ~ Value / max_fix_time,
-    TRUE ~ Value
-  ))
-
-
-print(outcomes_norm, n = Inf)
-```
-
-
-```{R}
-#| fig-width: 8
-#| fig-asp: 0.375
-# Rename and set order of Measure factors to avoid messing with the legend in plotting
-outcomes_norm$Measure[outcomes_norm$Measure == "success_rate"] <- "Success rate"
-outcomes_norm$Measure[outcomes_norm$Measure == "mean_fixation_steps"] <- "Normalized fixation time"
-outcomes_norm$Measure <- factor(outcomes_norm$Measure, levels = c(
-  "Success rate", "Normalized fixation time"
-))
-
-# Use a custom socmod line color
-line_color <- SOCMOD_PALETTE_CVD["pink"]
-outcomes_norm %>%
-  ggplot2::ggplot(aes(x = adaptive_fitness, y = Value, linetype = Measure)) +
-    geom_line(color = line_color, linewidth=1.5) + scale_x_continuous(breaks = adaptive_fitness_vals) +
-    theme_classic(base_size = 16) + xlab("Adaptive fitness") + ylab("Value")
+outcomes %>% dplyr::filter(Measure == "success_rate") %>%
+ggplot2::ggplot(aes(x = adaptive_fitness, y = Value)) +
+  geom_line(color = SOCMOD_PLOT_PALETTE[1], linetype = "solid", linewidth=1.5) + 
+  geom_line(
+    mean_fix_steps, mapping = aes(x=adaptive_fitness, y = Value), 
+    color = SOCMOD_PLOT_PALETTE[1], linetype = "dashed"
+  ) + 
+  theme_classic(base_size = 16) + 
+  xlab("Adaptive fitness") + ylab("Success rate/norm. fix. time")
 ```
 
 ### Installation
