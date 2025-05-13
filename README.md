@@ -59,15 +59,17 @@ plot_network_adoption(
 )
 ```
 
-![](man/figures/readme/network-adoption.png)
+<img src="man/figures/readme/network-adoption.png" width="800" />
 
 ``` r
 # Initialize fresh ABM for a new simulation each time
 trial <- make_example_abm() %>% run_trial
 summarise_prevalence(trial)
 
-plot_prevalence(trial, tracked_behavior = c("Adaptive"))
+plot_prevalence(trial, tracked_behavior = c("Adaptive", "Legacy"))
 ```
+
+![](man/figures/readme/prevalence.png)
 
 ### Example 2: computational experiment over adaptive fitness
 
@@ -181,6 +183,7 @@ outcomes_norm$Measure[outcomes_norm$Measure == "mean_fixation_steps"] <- "Normal
 outcomes_norm$Measure <- factor(outcomes_norm$Measure, levels = c(
   "Success rate", "Normalized fixation time"
 ))
+
 # Use a custom socmod line color
 line_color <- SOCMOD_PALETTE_CVD["pink"]
 outcomes_norm %>%

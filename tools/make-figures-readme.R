@@ -36,20 +36,25 @@ p <- plot_network_adoption(
     \(p) p + ggtitle("Adoption at t = 0"),
   edgewidth = 0.4
 )
+print(p)
 ggsave(
-  "man/figures/readme-network-adoption.png", plot = p, 
+  "man/figures/readme/network-adoption.png", plot = p, 
   width = 6, height = 4, dpi = 300
 )
 
 # Initialize fresh ABM for a new simulation each time
+devtools::load_all()
 trial <- make_example_abm() %>% run_trial
-summarise_prevalence(trial)
-p <- plot_prevalence(trial, tracked_behavior = c("Adaptive"))
+print(summarise_prevalence(trial))
+
+print(p)
+p <- plot_prevalence(trial, tracked_behaviors = c("Adaptive"))
+
+p <- p + scale_x_continuous(breaks = 0:12)
+print(p)
 ggsave(
-  "man/figures/readme-prevalence.png", plot = p, width = 6, height = 4, dpi = 300
+  "man/figures/readme/prevalence.png", plot = p, width = 6, height = 3, dpi = 300
 )
-
-
 ###------------Example 2: computational experiment over adaptive fitness-------
 ####-----------Example 2A: plot several trials prevalence series---------------
 
@@ -149,43 +154,4 @@ ggplot2::ggplot(aes(x = adaptive_fitness, y = Value)) +
   ) + 
   theme_classic(base_size = 16) + 
   xlab("Adaptive fitness") + ylab("Success rate/norm. fix. time")
-```
 
-### Installation
-
-You can install the development version of socmod from [GitHub](https://github.com/) with
-`devtools` or `pak`:
-
-**devtools**
-
-```{r, eval=FALSE}
-# Install this if you don't have devtools.
-install.packages("devtools")
-devtools::install_github("css4s/socmod")
-```
-
-**pak**
-
-```{r, eval=FALSE}
-# Install this if you don't have pak.
-install.packages("pak")
-pak::pak("css4s/socmod")
-```
-
-## More information and the philosophy of socmod
-
-Different models of social behavior are specified by the details of how many individuals
-are in a population, what behaviors or opinions they do or have, what benefits they
-accrue(d) through their behaviors, how they learn or influence one another, and any
-environmental or other relevant factors. This framework seeks to encapsulate different
-approaches to modeling diverse social behaviors, such as those thoroughly reviewed in Paul
-Smaldino's (2023) textbook [*Modeling Social
-Behavior*](https://press.princeton.edu/books/paperback/9780691224145/modeling-social-behavior?srsltid=AfmBOop2zNSsOtNlOMs6uaLTlAQs8saVMC_I6y_OnyklIKz-GUnoNapR).
-
-Technically, `socmod` uses object-oriented programming, provided by
-[`R6`](https://r6.r-lib.org/), and functional-style agent and model behavior specification
-inspired by [Agents.jl](https://juliadynamics.github.io/Agents.jl/stable/), which I myself
-have enjoyed using. But, I still had to do my plotting in R, and more beginning students
-across disciplines will tend to know R than Julia. R also seems to have a great community
-with the `r-lib` project that seems to be bringing a continuity to scientific programming
-that I have not seen in any other programming language.

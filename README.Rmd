@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
   eval = FALSE,
   collapse = TRUE,
   comment = "#>",
-  fig.path = "man/figures/",
+  fig.path = "man/figures/readme",
   cache = FALSE,
   fig.keep = "high",
   out.width = "90%",
@@ -26,16 +26,20 @@ knitr::opts_chunk$set(
 # Introduction
 
 The goal of `socmod` is to simplify development of models of social behavior for beginners
-and experts alike. The current focus is agent-based models of adaptive behavior diffusion. The
-framework is designed to be extensible to other contexts in social behavior modeling and beyond.
+and experts alike. The current focus is agent-based models of adaptive behavior diffusion.
+The framework is designed to be extensible to other contexts in social behavior modeling
+and beyond.
 
 ## Quickstart examples
 
 Below we present two examples of how `socmod` can be used for succinctly defining models
 of social behavior.
 
-1.  Initialize and run, then visualize adaptation diffusion over time for a single simulation trial
-2.  Set up and run a computational experiment of simulated _adaptation success_ (i.e., fixation of adaptive behavior) and time to fixation for different adaptive fitness values when agents learn using success-biased partner selection
+1.  Initialize and run, then visualize adaptation diffusion over time for a single
+    simulation trial
+2.  Set up and run a computational experiment of simulated *adaptation success* (i.e.,
+    fixation of adaptive behavior) and time to fixation for different adaptive fitness
+    values when agents learn using success-biased partner selection
 
 ### Prereq: load required libraries.
 
@@ -46,7 +50,6 @@ library(magrittr) # Loads %>%
 library(socmod)
 library(purrr)
 ```
-
 
 ### Example 1: single model trial and visualization
 
@@ -76,19 +79,17 @@ plot_network_adoption(
 )
 ```
 
-![](man/figures/readme/network-adoption.png)
+![](man/figures/readme/network-adoption.png){width="800"}
 
 ```{r}
-#| fig-width: 6.15
-#| fig-height: 3.75
 # Initialize fresh ABM for a new simulation each time
 trial <- make_example_abm() %>% run_trial
 summarise_prevalence(trial)
 
-plot_prevalence(trial, tracked_behavior = c("Adaptive"))
+plot_prevalence(trial, tracked_behavior = c("Adaptive", "Legacy"))
 ```
 
-
+![](man/figures/readme/prevalence.png)
 
 ### Example 2: computational experiment over adaptive fitness
 
@@ -152,11 +153,9 @@ p <- ggplot(
   ggplot2::scale_color_manual(values = SOCMOD_PALETTE)
 ```
 
-
 ```{r}
 print(p)
 ```
-
 
 ```{r}
 #| message: false
@@ -202,7 +201,6 @@ outcomes_norm <- outcomes %>%
 
 print(outcomes_norm, n = Inf)
 ```
-
 
 ```{R}
 #| fig-width: 8

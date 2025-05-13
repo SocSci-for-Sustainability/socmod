@@ -155,7 +155,8 @@ plot_network_adoption <- function(
 #' @export
 #' @examples
 plot_prevalence <- function(trials_or_tibble, 
-                            tracked_behaviors = c("Legacy", "Adaptive"),
+                            tracked_behaviors = 
+                              c("Legacy", "Adaptive"),
                             theme_size = 16) {
   # Initialize the prevalence table, summarising if necessary 
   prevalence_tbl <- trials_or_tibble
@@ -163,21 +164,39 @@ plot_prevalence <- function(trials_or_tibble,
     prevalence_tbl <- summarise_prevalence(
       trials_or_tibble, tracked_behaviors = tracked_behaviors
     )
+    # After summarise_prevalence() returns prevalence_tbl
+    prevalence_tbl <- prevalence_tbl %>%
+      dplyr::filter(Behavior %in% tracked_behaviors)
   }
-  # Put factors in order for plotting if there's more than one behavior
-  if (length(tracked_behaviors) > 1) {
-    prevalence_tbl <- dplyr::mutate(
-      prevalence_tbl, Behavior = factor(Behavior, levels =  tracked_behaviors)
-    ) %>% dplyr::arrange(Behavior)
-  }
-      
+  
+  # Ensure all tracked behaviors are present
+  prevalence_tbl <- dplyr::mutate(
+    prevalence_tbl, 
+    Behavior = factor(Behavior, levels = tracked_behaviors)
+  ) %>% dplyr::arrange(Behavior)
+  
+  
+  # Use socmod colors; lookup table for later loading
+  socmod_behavior_colors <- list(
+    Adaptive = SOCMOD_PALETTE[["green_1"]],
+    Legacy   = SOCMOD_PALETTE[["red"]]
+  )
+  print(socmod_behavior_colors)
+  
+  palette_subset <- socmod_behavior_colors[[tracked_behaviors]]
+  print(palette_subset)    
   # Plot dynamics
   p <- 
     prevalence_tbl %>%
-      ggplot2::ggplot(ggplot2::aes(x = Step, y = Prevalence, color = Behavior)) +
+      ggplot2::ggplot(
+        ggplot2::aes(x = Step, y = Prevalence, color = Behavior)
+      ) +
       ggplot2::geom_line(linewidth = 1.15) +
       ggplot2::theme_classic(base_size = theme_size) +
-      ggplot2::scale_color_manual(values = SOCMOD_PALETTE) +
+      ggplot2::scale_color_manual(
+        values = palette_subset,
+        limits = tracked_behaviors
+      ) +
       ggplot2::guides(color = guide_legend(reverse = TRUE))
   
   return (p)
@@ -221,83 +240,131 @@ plot_prevalence <- function(trials_or_tibble,
 #' print(summary_per_trial)
 #'
 #' @export
-summarise_prevalence <- function(trials_or_trial, 
-                                 tracked_behaviors = 
-                                   c("Adaptive"), 
-                                 across_trials = TRUE) {
-  
-  # First handle case where data is a single Trial
-  if (inherits(trials_or_trial, "Trial")) {
-    trials <- list(trials_or_trial)
-    # Then handle case of list of Trial instances
-  } else if (is.list(trials_or_trial) && all(purrr::map_lgl(trials_or_trial, ~ inherits(.x, "Trial")))) {
-    trials <- trials_or_trial
+summarise_prevalence <- function(trials_or_trial,
+tracked_behaviors = c("Adaptive"),
+across_trials = TRUE) {
+  # Normalize input to list of trials
+  trials <- if (inherits(trials_or_trial, "Trial")) {
+    list(trials_or_trial)
   } else {
-    stop("Input must be a Trial or list of Trial objects")
+    stopifnot(is.list(trials_or_trial), all(purrr::map_lgl(trials_or_trial, ~ inherits(.x, "Trial"))))
+    trials_or_trial
   }
   
-  obs1 <- trials[[1]]$get_observations()
-  
-  all_behaviors <- unique(c(tracked_behaviors, obs1$Behavior))
-  prevalence_tbl <- purrr::imap_dfr(trials, \(trial, trial_index) {
-    
-    # Extract observations
-    obs <-
-      trial$get_observations() %>%
-      dplyr::mutate(Behavior = factor(Behavior, all_behaviors))
-    
-    # Build parameters list, replacing the graph and learning strategy
-    # instances with their labels.
-    params_list <- trial$model$get_parameters()$as_list()
-    params_list$graph <- c(igraph::graph_attr(params_list$graph, "label"))
-    params_list$learning_strategy <- c(params_list$learning_strategy$get_label())
-    
-    # Need this now for parameters and later for calculating Prevalence.
+  prevalence_tbl <- purrr::imap_dfr(trials, function(trial, trial_index) {
+    obs <- trial$get_observations()
     n_agents <- trial$model$get_parameter("n_agents")
-    params_list$n_agents <- n_agents
     
-    params_row <- tibble::as_tibble(params_list)
+    # Ensure Behavior is a factor with full set of tracked behaviors
+    obs <- dplyr::mutate(obs, Behavior = factor(Behavior, levels = tracked_behaviors))
     
-    # Create a within-trial summary for each trial.
-    prevalence_summary <- obs %>%
-      # dplyr::filter(Behavior %in% tracked_behaviors) %>%
+    summary <- obs %>%
       dplyr::group_by(Step, Behavior) %>%
       dplyr::summarise(Count = dplyr::n(), .groups = "drop") %>%
-      dplyr::mutate(Prevalence = Count / n_agents) %>%
-      tidyr::complete(Step, Behavior, fill = list(Count = 0, Prevalence = 0)) %>%
-      dplyr::bind_cols(
-        # Although this is a one-row tibble, the values will be repeated to fill
-        # in however many rows are present in prevalence_summary up to this point.
-        params_row
+      tidyr::complete(Step, Behavior, fill = list(Count = 0)) %>%
+      dplyr::mutate(
+        Prevalence = Count / n_agents,
+        trial_id = trial_index
       )
     
-    # Assign trial index as ID
-    prevalence_summary$trial_id <- trial_index
-    
-    return (prevalence_summary)
+    return(summary)
   })
   
-  # return (prevalence_tbl)
-  # print(prevalence_tbl)
   if (across_trials) {
-    # Prepare grouping variables: convert parameter names to 
-    # symbols for tidy evaluation
-    group_params <- names(
-      trials[[1]]$model$get_parameters()$as_list()
-    ) %>% rlang::syms()
-    
     prevalence_tbl <- prevalence_tbl %>%
-      # Dynamically group by Step, Behavior, and all parameter columns
-      dplyr::group_by(Step, Behavior, !!!group_params) %>%
+      dplyr::group_by(Step, Behavior) %>%
       dplyr::summarise(
-        Prevalence = mean(Prevalence),
         Count = mean(Count),
+        Prevalence = mean(Prevalence),
         .groups = "drop"
-      )
+      ) %>%
+      tidyr::complete(Step, Behavior, fill = list(Count = 0, Prevalence = 0))
   }
   
-  return (prevalence_tbl)
+  return(prevalence_tbl)
 }
+# 
+# summarise_prevalence <- function(trials_or_trial, 
+#                                  tracked_behaviors = 
+#                                    c("Adaptive"), 
+#                                  across_trials = TRUE) {
+#   
+#   # First handle case where data is a single Trial
+#   if (inherits(trials_or_trial, "Trial")) {
+#     trials <- list(trials_or_trial)
+#     # Then handle case of list of Trial instances
+#   } else if (is.list(trials_or_trial) && all(purrr::map_lgl(trials_or_trial, ~ inherits(.x, "Trial")))) {
+#     trials <- trials_or_trial
+#   } else {
+#     stop("Input must be a Trial or list of Trial objects")
+#   }
+#   
+#   obs1 <- trials[[1]]$get_observations()
+#   
+#   prevalence_tbl <- purrr::imap_dfr(trials, \(trial, trial_index) {
+#     
+#     # Extract observations
+#     obs <- trial$get_observations() %>%
+#       dplyr::filter(Behavior %in% tracked_behaviors) %>%  # <- new line
+#       dplyr::mutate(Behavior = factor(Behavior, tracked_behaviors))
+#     
+#     
+#     # Build parameters list, replacing the graph and learning strategy
+#     # instances with their labels.
+#     params_list <- trial$model$get_parameters()$as_list()
+#     params_list$graph <- c(igraph::graph_attr(params_list$graph, "label"))
+#     params_list$learning_strategy <- c(params_list$learning_strategy$get_label())
+#     
+#     # Need this now for parameters and later for calculating Prevalence.
+#     n_agents <- trial$model$get_parameter("n_agents")
+#     params_list$n_agents <- n_agents
+#     
+#     params_row <- tibble::as_tibble(params_list)
+#     # Create a within-trial summary for each trial
+#     # Create a within-trial summary for each trial.
+#     prevalence_summary <- obs %>%
+#       dplyr::mutate(Behavior = factor(Behavior, levels = tracked_behaviors)) %>%
+#       dplyr::group_by(Step, Behavior) %>%
+#       dplyr::summarise(Count = dplyr::n(), .groups = "drop") %>%
+#       tidyr::complete(Step, Behavior, fill = list(Count = 0)) %>%
+#       dplyr::mutate(Prevalence = Count / n_agents) %>%
+#       dplyr::bind_cols(params_row)
+#     
+#     
+#     # Assign trial index as ID
+#     prevalence_summary$trial_id <- trial_index
+#     
+#     return (prevalence_summary)
+#   })
+#   
+#   # return (prevalence_tbl)
+#   # print(prevalence_tbl)
+#   if (across_trials) {
+#     # Prepare grouping variables: convert parameter names to 
+#     # symbols for tidy evaluation
+#     group_params <- names(
+#       trials[[1]]$model$get_parameters()$as_list()
+#     ) %>% rlang::syms()
+#     
+#     prevalence_tbl <- prevalence_tbl %>%
+#       dplyr::mutate(
+#         Behavior = factor(Behavior, levels = tracked_behaviors)
+#       ) %>%
+#       # Dynamically group by Step, Behavior, and all parameter columns
+#       dplyr::group_by(Step, Behavior, !!!group_params) %>%
+#       dplyr::summarise(
+#         Prevalence = mean(Prevalence),
+#         Count = mean(Count),
+#         .groups = "drop"
+#       )  %>%
+#       # Ensure zeros are filled in for *tracked* behaviors only
+#       tidyr::complete(
+#         Step, Behavior, fill = list(Count = 0, Prevalence = 0)
+#       )
+#   }
+#   
+#   return (prevalence_tbl)
+# }
 
 
 
