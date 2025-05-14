@@ -1,3 +1,8 @@
+# socmod 0.2.2 (2025-05-14)
+
+- `summarise_*` now work even if there are vectors/lists in parameters by
+  removing them via helper `.clean_summary_params`
+
 # socmod 0.2.1 (2025-05-13)
 
 - Refined analysis helpers with updated, passing tests

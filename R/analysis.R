@@ -1,39 +1,3 @@
-#' Custom color palette for scientific plots
-#'
-#' Recommended for use in `scale_color_manual()`.
-#'
-#' @return A named character vector of hex color codes
-#' @export
-SOCMOD_PALETTE <- c(
-  red     = "#F24B4A",
-  green_1 = "#007F7D",
-  blue_1  = "#32BFFA",
-  magenta = "#D000AC",
-  blue_2  = "#320FFA",
-  pink    = "#EE80FF",
-  plum    = "#5E3B68",
-  green_2 = "#32BF9A",
-  sienna  = "#ED610F"
-)
-
-#' CVD-safe custom color palette for scientific plots
-#'
-#' Recommended for use in `scale_color_manual()`.
-#'
-#' @return A named character vector of hex color codes
-#' @export
-SOCMOD_PALETTE_CVD <- c(
-  red     = "#E15759",
-  green_1 = "#59A14F",
-  blue_1  = "#32BFFA",
-  magenta = "#B07AA1",
-  blue_2  = "#4E79A7",
-  pink    = "#EE80FF",
-  plum    = "#5E3B68",
-  green_2 = "#32BF9A",
-  sienna  = "#ED610F"
-)
-
 
 #' Plot behavior adoption on a network
 #'
@@ -272,9 +236,11 @@ summarise_prevalence <- function(trials_or_trial,
           Prevalence = Count / n_agents
         )
     
-    param_list <- trial$model$get_parameters()$as_list()
+    param_list <- 
+      trial$model$get_parameters()$as_list() %>% .clean_summary_params
+
     param_list$learning_strategy <- 
-    param_list$learning_strategy$get_label()
+      param_list$learning_strategy$get_label()
     
     # Assign default label to this trial's model's graph if missing
     if (!"label" %in% names(igraph::graph_attr(param_list$graph))) {
@@ -363,7 +329,9 @@ summarise_outcomes <- function(trials, input_parameters,
   
   outcomes <- purrr::imap_dfr(trials, function(trial, trial_index) {
     
-    param_list <- trial$model$get_parameters()$as_list() 
+    param_list <- 
+      trial$model$get_parameters()$as_list() %>% .clean_summary_params
+
     param_list$learning_strategy <- param_list$learning_strategy$get_label()
     graph_label <- igraph::graph_attr(param_list$graph, "label")
     param_list$graph <- param_list$graph_label
@@ -478,3 +446,87 @@ initialize_agents <- function(model,
   # Return the model to continue down the pipeline.
   return (invisible(model))
 }
+
+
+#' Custom color palette for scientific plots
+#'
+#' Recommended for use in `scale_color_manual()`.
+#'
+#' @return A named character vector of hex color codes
+#' @export
+SOCMOD_PALETTE <- c(
+  red     = "#F24B4A",
+  green_1 = "#007F7D",
+  blue_1  = "#32BFFA",
+  magenta = "#D000AC",
+  blue_2  = "#320FFA",
+  pink    = "#EE80FF",
+  plum    = "#5E3B68",
+  green_2 = "#32BF9A",
+  sienna  = "#ED610F"
+)
+
+#' CVD-safe custom color palette for scientific plots
+#'
+#' Recommended for use in `scale_color_manual()`.
+#'
+#' @return A named character vector of hex color codes
+#' @export
+SOCMOD_PALETTE_CVD <- c(
+  red     = "#E15759",
+  green_1 = "#59A14F",
+  blue_1  = "#32BFFA",
+  magenta = "#B07AA1",
+  blue_2  = "#4E79A7",
+  pink    = "#EE80FF",
+  plum    = "#5E3B68",
+  green_2 = "#32BF9A",
+  sienna  = "#ED610F"
+)
+
+# ------------------------------------------------------------------
+# Helper functions for summarise_* and plot_* methods
+# ------------------------------------------------------------------
+
+
+#' Clean metadata parameters for summary functions
+#'
+#' Removes elements from a parameter list that are not safe to include
+#' in `summarise_prevalence()` or `summarise_outcomes()`. An element is kept if:
+#' - It is an atomic value of length 1 (e.g., a number or string)
+#' - It is a single object instance (e.g., an R6 or S3 class object)
+#'
+#' Elements such as vectors of length > 1 or lists of objects are removed,
+#' and a warning is issued listing the removed keys. This is necessary because 
+#' may be helper parameters such as pre-computed lists of which agents are in 
+#' which group, e.g., in homophily models.
+#'
+#' @param param_list A named list of metadata parameters.
+#'
+#' @return A cleaned version of \code{param_list} with unsupported entries removed.
+#'
+#' @keywords internal
+.clean_summary_params <- function(param_list) {
+  # Identify which parameters to keep
+  keep <- vapply(
+    param_list,
+    function(x) {
+      is.object(x) || (is.atomic(x) && length(x) == 1)
+    },
+    logical(1)
+  )
+  # Remove parameters that are not atomic length 1 or an object if necessary
+  if (!all(keep)) {
+    bad <- names(param_list)[!keep]
+    warning(
+      sprintf(
+        "Removed non-summary-safe metadata: %s",
+        paste(bad, collapse = ", ")
+      ),
+      call. = FALSE
+    )
+  }
+  return (param_list[keep])
+}
+
+
