@@ -3,7 +3,7 @@
 either returning a summary for each individual trial or averaging across multiple trials.
 Prevalence is normalized by the number of agents in each trial."><meta property="og:description" content="This function summarizes the prevalence of tracked behaviors over time,
 either returning a summary for each individual trial or averaging across multiple trials.
-Prevalence is normalized by the number of agents in each trial."><meta property="og:image" content="https://css4s.github.io/socmod/logo.png"></head><body>
+Prevalence is normalized by the number of agents in each trial."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -11,7 +11,7 @@ Prevalence is normalized by the number of agents in each trial."><meta property=
 
     <a class="navbar-brand me-2" href="../index.html">socmod</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,7 +34,8 @@ Prevalence is normalized by the number of agents in each trial."><meta property=
 </nav><div class="container template-reference-topic">
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>Summarize behavior prevalence over time within or across trials</h1>
+
+      <h1>Summarize behavior prevalence over time within or across trials</h1>
 
       <div class="d-none name"><code>summarise_prevalence.Rd</code></div>
     </div>
@@ -49,6 +50,7 @@ Prevalence is normalized by the number of agents in each trial.</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">summarise_prevalence</span><span class="op">(</span></span>
 <span>  <span class="va">trials_or_trial</span>,</span>
+<span>  input_parameters <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  tracked_behaviors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Adaptive"</span><span class="op">)</span>,</span>
 <span>  across_trials <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -59,7 +61,11 @@ Prevalence is normalized by the number of agents in each trial.</p>
 
 
 <dl><dt id="arg-trials-or-trial">trials_or_trial<a class="anchor" aria-label="anchor" href="#arg-trials-or-trial"></a></dt>
-<dd><p>A <code>Trial</code> object or a list of <code>Trial</code> objects</p></dd>
+<dd><p><code>Trial</code> object or a list of <code>Trial</code> objects</p></dd>
+
+
+<dt id="arg-input-parameters">input_parameters<a class="anchor" aria-label="anchor" href="#arg-input-parameters"></a></dt>
+<dd><p>Character vector or NULL (default), required for list of <code>Trial</code> input</p></dd>
 
 
 <dt id="arg-tracked-behaviors">tracked_behaviors<a class="anchor" aria-label="anchor" href="#arg-tracked-behaviors"></a></dt>
@@ -110,7 +116,7 @@ If FALSE, returns per-trial prevalence values with a <code>trial_id</code> colum
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">summary</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> function (object, ...) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> UseMethod("summary")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;bytecode: 0x10956dae0&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;bytecode: 0x112f208e0&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: namespace:base&gt;</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Per-trial summary without aggregation</span></span></span>
