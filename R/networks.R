@@ -180,16 +180,24 @@ get_all_possible_edges <- function(N, directed = FALSE) {
 #' @param N Population size
 #' @param k Seed lattice degree
 #' @param p Rewire probability
+#' @param label_func Specify a function that takes N, k, p and makes a label assigned to igraph via igraph::graph_attr(...)
 #' 
 #' @export
 #'
 #' @return igraph::graph
-make_small_world <- function(N, k, p) {
-  return (
+make_small_world <- function(N, k, p, label_func = .sw_label_func) {
+  
+  ret_graph <- 
     igraph::rewire(make_regular_lattice(N, k), igraph::each_edge(p))
-  )
+  
+  # Use helper to make a default label for the graph
+  igraph::graph_attr(ret_graph, "label") <- .sw_label_func(N, k, p)
+  
+  return (ret_graph)
 }
-
+.sw_label_func <- function(N, k, p) {
+  return (paste0("Small-world(N=", N, ",k=", k, ",p=", p, ")"))
+}
 
 #' Make a preferential attachment network.
 #'

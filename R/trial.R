@@ -270,11 +270,12 @@ run_trials <- function(model_generator, n_trials_per_param = 10,
   # Create a list of trials, each trial initialized with a param list from the grid 
   trials <- purrr::pmap(
     parameter_grid, function(...) {
-      param_row <- list(...)
-      model <- model_generator(param_row)
+      param_list <- list(...)
+      model <- model_generator(param_list)
+      
       run_trial( 
         model, stop, legacy_behavior, adaptive_behavior, 
-        metadata = list(replication_id = param_row$replication_id)
+        metadata = list(replication_id = param_list$replication_id)
       )
     }, 
     .progress = .progress

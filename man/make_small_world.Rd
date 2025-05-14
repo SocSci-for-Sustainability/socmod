@@ -4,7 +4,7 @@
 \alias{make_small_world}
 \title{Make a small world network.}
 \usage{
-make_small_world(N, k, p)
+make_small_world(N, k, p, label_func = .sw_label_func)
 }
 \arguments{
 \item{N}{Population size}
@@ -12,6 +12,8 @@ make_small_world(N, k, p)
 \item{k}{Seed lattice degree}
 
 \item{p}{Rewire probability}
+
+\item{label_func}{Specify a function that takes N, k, p and makes a label assigned to igraph via igraph::graph_attr(...)}
 }
 \value{
 igraph::graph

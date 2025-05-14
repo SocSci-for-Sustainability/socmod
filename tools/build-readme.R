@@ -9,4 +9,5 @@ unlink("man/figures", recursive = TRUE, force = TRUE)
 devtools::build_readme(quiet = FALSE)
 
 # Rebuild the pkgdown homepage (uses README.md)
-pkgdown::build_home(preview = FALSE, quiet = FALSE)
+# pkgdown::build_home(preview = FALSE, quiet = FALSE)
+pkgdown::build_home(preview = TRUE, quiet = FALSE)

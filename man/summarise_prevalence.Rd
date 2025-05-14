@@ -6,12 +6,15 @@
 \usage{
 summarise_prevalence(
   trials_or_trial,
+  input_parameters = NULL,
   tracked_behaviors = c("Adaptive"),
   across_trials = TRUE
 )
 }
 \arguments{
-\item{trials_or_trial}{A \code{Trial} object or a list of \code{Trial} objects}
+\item{trials_or_trial}{\code{Trial} object or a list of \code{Trial} objects}
+
+\item{input_parameters}{Character vector or NULL (default), required for list of \code{Trial} input}
 
 \item{tracked_behaviors}{Character vector of behavior names to include in the summary.
 Defaults to \code{"Adaptive"}.}

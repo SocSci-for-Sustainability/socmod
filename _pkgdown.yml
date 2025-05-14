@@ -19,9 +19,11 @@ reference:
   desc: Tools to plot networks, outcomes, and time series
   contents:
   - plot_prevalence
+  - plot_network_adoption
   - plot_homophilynet
   - plot_friendship_paradox
-  - SOCMOD_PLOT_PALETTE
+  - SOCMOD_PALETTE
+  - SOCMOD_PALETTE_CVD
 - title: Examples with real-world data
   desc: Simple examples of real-world data in socmod.
   contents:

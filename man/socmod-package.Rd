@@ -4,10 +4,8 @@
 \name{socmod-package}
 \alias{socmod}
 \alias{socmod-package}
-\title{socmod: Models of Social Behavior in R}
+\title{socmod: Social behavior models in R}
 \description{
-\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
-
 Provides software tools and conceptual framework for creating computational models of social behavior for sustainability.
 }
 \seealso{

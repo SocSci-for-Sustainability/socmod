@@ -1,16 +1,13 @@
 test_that("summarise_prevalence summarizes prevalence across trials", {
   # Create mock trials
-  trials <- purrr::map(1:3, function(ii) {
-    model <- make_abm(make_model_parameters(n_agents = 5))
-    trial <- run_trial(model, stop = 10)
-    return (trial)
-  })
+  abm_gen <- \(.) make_abm(n_agents = 10) %>% initialize_agents(initial_prevalence = 0.4)
+  trials <- run_trials(abm_gen, n_trials_per_param = 2)
   
   # Summarize within each trial's series indexed by trial_id
   prevalence_summary_keeptrials <- summarise_prevalence(trials, across_trials = FALSE)
   
   expect_s3_class(prevalence_summary_keeptrials, "tbl_df")
-  expect_true(all(c("Step", "Behavior", "Count", "Prevalence", "trial_id") %in% names(prevalence_summary_keeptrials)))
+  expect_true(all(c("Step", "Behavior", "Count", "Prevalence", "legacy_behavior", "adaptive_behavior", "learning_strategy", "graph", "n_agents") %in% names(prevalence_summary_keeptrials)))
   expect_true(nrow(prevalence_summary_keeptrials) >= 1)
   
   # If any input parameters were included, test they appear as columns
