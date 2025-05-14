@@ -1,0 +1,124 @@
+---
+editor: 
+  markdown: 
+    wrap: 72
+author: Matt Turner
+title: "Prominent minority groups and transitive majority groups promote
+diffusion of adaptations"
+bibliography: /Users/mt/workspace/Writing/library.bib
+---
+
+Communities most affected by climate change deserve to be included in
+promoting sustainable adaptive behavior. In the South Pacific Island
+nations, Indigenous peoples may be a minority in terms of population
+size, but they could have a great impact on climate change adaptation.
+Indigenous peoples in a place have been adapting to a changing climate
+for possibly thousands of years.
+
+Communities tend to have distinguishable groups, even if on some measures a
+population seems homogeneous. 
+If this *group structure* does not affect the diffusion of
+adaptations, we could leave it out to focus on other, more
+significant factors. However, the South Pacific Island case presents an
+important example of when it is important to include this group
+structure.
+
+*Group structure*, in the South Pacific Islands case and in general,
+defined by the size of each group and how frequently groups interact
+with others from *within* their own group or *between* groups. These
+frequencies are set by the *homophily* of each group, which measures how
+much more frequent within-group versus between-group interactions are.
+Homophily arises due to personal *choice*, called *choice homophily*, or
+involuntarily due to circumstance, called *induced homophily*
+[@Kossinets2009]. If you like a certain type of food, and you go to a
+restaurant that serves that food, your preference for that food leads
+you to encounter others with similar taste, an instance of *choice
+homophily*.
+
+For some demographic group divisions, such as socio-economic status and
+race, homophily is heavily induced by, for example, historical legal and
+other obstacles to home ownership and other economic opportunity that
+led to economically and racially segregated neighborhoods, even after
+"segregation" became illegal. In these cases, *induced homophily* would
+dominate, say, in explaining why certain people of certain races tend to
+be geographically co-located, i.e., geographically *assorted*, since we
+can assume that for most people this was not a conscious choice.
+
+In the models in this example we do not distinguish between types of
+homophily. They *are* important to distinguish when we go to interpret
+our models in real-world situations. Interpreting results like this can
+help guide real-world measurements of homophily by guiding researcher
+intuition for which measurements may the most significant.
+
+In 2023 some colleagues and I developed an agent-based model of
+adaptation diffusion in a model population composed of a minority group
+and a majority group and analyzed how the *asymmetric homophily* of each
+group affected the diffusion of a model adaptation. *Homophily* is the
+degree to which We found that diffusion could be promoted by harnessing
+minority knowledge of adaptive behaviors at the outset of some
+hypothetical intervention, while majority groups could support
+adaptation by rapid spread in tight-knit communities [@Turner2023].
+
+
+$$
+\Pr(\text{Neighbor is in own group}) = \frac{1 + h}{2}
+$$
+
+The probability the agent learns from an outgroup is just the complement
+of this. In this setup there is only one outgroup, but the `make_homophily_network` can create symmetric or asymmetric networks with an arbitrary number of groups, provided the network is constructable given the homophily values and group sizes.
+
+## Model setup
+
+
+First let's create a model generation function for use in `run_trials` that
+we can also use for running individual trials.
+
+```{r}
+gen_homophily_abm <- function(param_row) {
+  # Extract all parameters used in ABM construction
+  pr <- param_row
+  N <- pr$n_agents
+  m <- pr$minority_fraction
+  k <- pr$mean_degree
+  h <- pr$homophily
+  f_A <- pr$adaptive_fitness
+  start_group <- pr$start_group
+  
+  N_min <- round(N * m)
+  N_maj <- N - N_min
+  
+  h_graph <- make_homophily_network(
+    group_sizes = c(N_min, N_maj),
+    mean_degree = k,
+    homophily = h
+  )
+  
+  abm <- make_abm(graph = h_graph)
+  minority_idxs <- which(igraph::V(abm$get_network())$group == 1)
+  majority_idxs <- which(igraph::V(abm$get_network())$group == 2)
+  abm$set_parameter("minority_idxs", minority_idxs)
+  purrr::walk(abm$agents[minority_idxs], \(a) a$set_attribute("Group", "Minority"))
+  purrr::walk(abm$agents[majority_idxs], \(a) a$set_attribute("Group", "Majority"))
+  
+  minority_agents <- abm$agents[minority_idxs]
+  majority_agents <- abm$agents[majority_idxs]
+  # abm$set_parameter("minority_agents", minority_agents)
+  # abm$set_parameter("majority_agents", majority_agents)
+  
+  params <- abm$get_parameters()$as_list()
+  if (start_group == "Minority" || start_group == "Both") {
+    a_min <- sample(minority_agents, 1)[[1]]
+    a_min$set_behavior("Adaptive")
+    a_min$set_fitness(f_A) 
+  }
+  if (start_group == "Majority" || start_group == "Both") {
+    a_maj <- sample(majority_agents, 1)[[1]]
+    a_maj$set_behavior("Adaptive")
+    a_maj$set_fitness(f_A)
+  }
+  
+  return (abm)
+}
+```
+
+
