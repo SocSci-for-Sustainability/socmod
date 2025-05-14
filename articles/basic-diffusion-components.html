@@ -18,6 +18,7 @@
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><script src="basic-diffusion-components_files/libs/quarto-html/popper.min.js"></script><script src="basic-diffusion-components_files/libs/quarto-html/tippy.umd.min.js"></script><link href="basic-diffusion-components_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="basic-diffusion-components_files/libs/quarto-html/light-border.css" rel="stylesheet">
 <!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Components for basic diffusion modeling with socmod">
+<meta property="og:image" content="https://css4s.github.io/socmod/logo.png">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -27,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">socmod</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,8 +58,7 @@
 </nav><div class="container template-quarto">
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-
-      <h1>Components for basic diffusion modeling with socmod</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Components for basic diffusion modeling with socmod</h1>
 
       <p class="author">Matt Turner</p>
 
@@ -517,20 +517,20 @@
 <span><span class="co"># Play three matches.</span></span>
 <span><span class="fu">play_match</span><span class="op">(</span><span class="va">whales</span>, <span class="va">squirrels</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Squirrels wins!!!
-Whales :  2     Squirrels :  7 </code></pre>
+<pre><code>Tie game!
+Whales :  5     Squirrels :  5 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb63"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">play_match</span><span class="op">(</span><span class="va">squirrels</span>, <span class="va">whales</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Squirrels wins!!!
-Squirrels :  5     Whales :  1 </code></pre>
+Squirrels :  2     Whales :  1 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb65"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">play_match</span><span class="op">(</span><span class="va">squirrels</span>, <span class="va">whales</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Squirrels wins!!!
-Squirrels :  6     Whales :  4 </code></pre>
+Squirrels :  7     Whales :  4 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb67"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Print how many games each time won.</span></span>
@@ -539,7 +539,7 @@ Squirrels :  6     Whales :  4 </code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 After three games...
-The Whales have won 0 games and the Squirrels have won 3</code></pre>
+The Whales have won 0 games and the Squirrels have won 2</code></pre>
 </div>
 </div>
 </section></section><section class="level2"><h2 id="agent-based-models-of-social-behavior">Agent-based models of social behavior<a class="anchor" aria-label="anchor" href="#agent-based-models-of-social-behavior"></a>
