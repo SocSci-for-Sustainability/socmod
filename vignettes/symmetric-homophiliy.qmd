@@ -3,8 +3,7 @@ editor:
   markdown: 
     wrap: 72
 author: Matt Turner
-title: "Prominent minority groups and transitive majority groups promote
-diffusion of adaptations"
+title: "Prominent minority groups and transitive majority groups promote diffusion of adaptations"
 bibliography: /Users/mt/workspace/Writing/library.bib
 ---
 
@@ -69,56 +68,90 @@ of this. In this setup there is only one outgroup, but the `make_homophily_netwo
 
 ## Model setup
 
+```{r}
+library(ggnetwork)
+library(socmod)
+```
 
 First let's create a model generation function for use in `run_trials` that
 we can also use for running individual trials.
 
 ```{r}
 gen_homophily_abm <- function(param_row) {
-  # Extract all parameters used in ABM construction
-  pr <- param_row
-  N <- pr$n_agents
-  m <- pr$minority_fraction
-  k <- pr$mean_degree
-  h <- pr$homophily
-  f_A <- pr$adaptive_fitness
-  start_group <- pr$start_group
-  
+
+  # Extract all parameters used in ABM construction with short var names
+  pr <- param_row; N <- pr$n_agents; m <- pr$minority_fraction
+  k <- pr$mean_degree; h <- pr$homophily 
+  f_A <- pr$adaptive_fitness; start_group <- pr$start_group
+  # Calculate number of minorty and majority agents
   N_min <- round(N * m)
   N_maj <- N - N_min
   
+  # Initialize agent-based model with the homophily graph, ensuring connected graph
   h_graph <- make_homophily_network(
-    group_sizes = c(N_min, N_maj),
-    mean_degree = k,
-    homophily = h
-  )
+      group_sizes = c(N_min, N_maj),
+      mean_degree = k,
+      homophily = h
+    )
+  # The network construction is random, doesn't always create connected network;
+  # re-create h_graph until it's connected
+  while (!igraph::is_connected(h_graph)) {
+    print("Not yet connected, attempting to create connected homophily network")
+    
+    # Create the homophily network given the parameters
+    h_graph <- make_homophily_network(
+      group_sizes = c(N_min, N_maj),
+      mean_degree = k,
+      homophily = h
+    )
+  }
   
-  abm <- make_abm(graph = h_graph)
+  # Create ABM with guaranteed-connected h_graph
+  abm <- make_abm(graph = h_graph, mean_degree = k, group_sizes = c(N_min, N_maj), homophily = h)
+  
   minority_idxs <- which(igraph::V(abm$get_network())$group == 1)
   majority_idxs <- which(igraph::V(abm$get_network())$group == 2)
   abm$set_parameter("minority_idxs", minority_idxs)
+  abm$set_parameter("majority_idxs", majority_idxs)
+
+  # Set agent Group attributes
   purrr::walk(abm$agents[minority_idxs], \(a) a$set_attribute("Group", "Minority"))
   purrr::walk(abm$agents[majority_idxs], \(a) a$set_attribute("Group", "Majority"))
-  
-  minority_agents <- abm$agents[minority_idxs]
-  majority_agents <- abm$agents[majority_idxs]
-  # abm$set_parameter("minority_agents", minority_agents)
-  # abm$set_parameter("majority_agents", majority_agents)
-  
+
+  # Initialize one agent from one or each group with adaptive behavior 
   params <- abm$get_parameters()$as_list()
   if (start_group == "Minority" || start_group == "Both") {
-    a_min <- sample(minority_agents, 1)[[1]]
+    a_min <- sample(abm$agents[minority_idxs], 1)[[1]]
     a_min$set_behavior("Adaptive")
     a_min$set_fitness(f_A) 
   }
   if (start_group == "Majority" || start_group == "Both") {
-    a_maj <- sample(majority_agents, 1)[[1]]
+    a_maj <- sample(abm$agents[majority_idxs], 1)[[1]]
     a_maj$set_behavior("Adaptive")
     a_maj$set_fitness(f_A)
   }
   
   return (abm)
 }
+
+make_example_homophily_abm <- function(n_agents = 50, minority_fraction = 0.1,
+                                       mean_degree = 5, homophily = 0.2,
+                                       adaptive_fitness = 1.2, 
+                                       start_group = "Both") {
+  
+  param_row <- tibble::as_tibble(as.list(environment()))
+  print(param_row)
+  return (gen_homophily_abm(param_row))                                      
+}
+
+abm <- make_example_homophily_abm()
+
+plot_network_adoption(abm, layout = igraph::in_circle())
+                      # plot_mod = 
+                      #   \(p) p + geom_edges(size = 0.1, color="grey") + geom_nodes(aes(color = group), size = 6) + geom_nodelabel(aes(label = substr(Behavior, 1, 1), color = group), size = 2) + 
+                        ggtitle("1: Minority, 2: Majority"))
+
+plot_homophily_network_adoption(abm)
 ```
 
 

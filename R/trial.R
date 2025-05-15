@@ -257,7 +257,7 @@ run_trials <- function(model_generator, n_trials_per_param = 10,
                         list(replication_id = 1:(n_trials_per_param)))
   
   parameter_grid <- tidyr::crossing(!!!model_parameters)
-  
+  print(parameter_grid)
   legacy_behavior <- "Legacy"
   adaptive_behavior <- "Adaptive"
   if ("legacy_behavior" %in% model_parameters) {

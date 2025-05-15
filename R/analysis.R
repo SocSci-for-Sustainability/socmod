@@ -1,3 +1,70 @@
+#' Plot homophily network adoption
+#'
+#' 
+#' @export
+plot_homophily_network_adoption <- function( 
+    x, layout = igraph::in_circle(), behaviors = c("Adaptive", "Legacy"),
+    group_names = c("Minority", "Majority"), 
+    group_colors = c(SOCMOD_PALETTE_CVD[["blue_2"]], "sienna"), 
+    node_size = 6.75,
+    label = FALSE, plot_mod = identity, edgewidth = 0.5) {
+
+  network_tbl <- .make_homophily_adoption_network_tbl(x, layout)
+  network_tbl$Group <- 
+    factor(
+      ifelse(network_tbl$Group == 1, "Minority", "Majority"),
+      levels = c("Minority", "Majority")
+    )
+
+  aes_base <- ggplot2::aes(x = x, y = y, xend = xend, yend = yend)
+  p <- 
+    ggplot2::ggplot(network_tbl, mapping = aes_base) +
+    ggnetwork::geom_edges(color="lightgrey", linewidth = edgewidth) +
+    ggnetwork::geom_nodes(aes(color = Group), size = node_size) +
+    ggplot2::scale_color_manual(values = unname(group_colors)) +
+    ggnetwork:: geom_nodetext(
+      aes(label = substr(Behavior, 1, 1)), color = "white"
+    ) +
+    ggnetwork::theme_blank()
+
+  return (p)
+}
+.make_homophily_adoption_network_tbl <- function(x, layout) {
+
+  net <- .set_up_network(x)
+  net <- igraph::set_vertex_attr(net, "Group", value = V(net)$group)
+
+  network_tbl <- .ggnetify(net, layout)
+
+  return (network_tbl)
+}
+.ggnetify <- function(net, layout) {
+
+  network_tbl <- tibble::tibble()
+  if (is.null(layout)) {
+    network_tbl <- ggnetwork::ggnetwork(net)
+  } else {
+    network_tbl <- ggnetwork::ggnetwork(net, layout = layout)
+  }
+
+  return (network_tbl)
+}
+.set_up_network <- function(x) {
+  if (inherits(x, "Trial")) {
+    model <- x$model
+  } else if (inherits(x, "AgentBasedModel")) {
+    model <- x
+  } else {
+    stop("Input must be a Trial or AgentBasedModel.")
+  }
+
+  net <- model$get_network()
+  behavior_vec <- 
+    vapply(model$agents, function(a) a$get_behavior(), character(1))
+  net <- igraph::set_vertex_attr(net, "Behavior", value = behavior_vec)
+
+  return (net)
+}
 
 #' Plot behavior adoption on a network
 #'
@@ -37,77 +104,24 @@ plot_network_adoption <- function(
     label = FALSE, plot_mod = identity, edgewidth = 1
   ) {
   
-  if (inherits(x, "Trial")) {
-    model <- x$model
-  } else if (inherits(x, "AgentBasedModel")) {
-    model <- x
-  } else {
-    stop("Input must be a Trial or AgentBasedModel.")
-  }
+  network_tbl <- .make_adoption_network_tbl(x, layout)
 
-  net <- model$get_network()
-  behavior_vec <- vapply(model$agents, function(a) a$get_behavior(), character(1))
-  net <- igraph::set_vertex_attr(net, "Behavior", value = behavior_vec)
-
-  use_size_aes <- FALSE
-  if (is.list(node_size)) {
-    stopifnot(length(node_size) == 1, !is.null(names(node_size)))
-    result <- .compute_node_size_measure(net, node_size)
-    net <- result$net
-    measure_name <- result$measure_name
-    use_size_aes <- TRUE
-  } else {
-    stopifnot(is.numeric(node_size), length(node_size) == 1)
-  }
-  df <- tibble::tibble()
-  if (is.null(layout)) {
-    df <- ggnetwork::ggnetwork(net)
-  } else {
-    df <- ggnetwork::ggnetwork(net, layout = layout)
-  }
   aes_base <- ggplot2::aes(x = x, y = y, xend = xend, yend = yend)
-  if (use_size_aes) {
-    aes_base$size <- rlang::sym(measure_name)
-  }
-
   p <- 
-    ggplot2::ggplot(df, mapping = aes_base) +
-      ggnetwork::geom_edges(color="lightgrey", linewidth = edgewidth) +
-    (if (use_size_aes) ggnetwork::geom_nodes(aes(color = Behavior)) 
-     else ggnetwork::geom_nodes(aes(color = Behavior), size = node_size)) +
-
+    ggplot2::ggplot(network_tbl, mapping = aes_base) +
+    ggnetwork::geom_edges(color="lightgrey", linewidth = edgewidth) +
     ggplot2::scale_color_manual(values = setNames(behavior_colors, behaviors), 
                                 limits = behaviors, na.value = "gray80") +
     ggnetwork::theme_blank()
 
-  if (label) {
-    p <- 
-      p + 
-        ggnetwork::geom_nodelabel_repel(ggplot2::aes(label = name), size = 1.5)
-  }
-
   return (plot_mod(p))
 }
+.make_adoption_network_tbl <- function(x, layout) {
 
+  net <- .set_up_network(x)
+  network_tbl <- .ggnetify(net, layout)
 
-# Internal helper
-.compute_node_size_measure <- function(net, node_size) {
-  measure_name <- names(node_size)[1]
-  measure_fun <- node_size[[1]]
-
-  assertthat::assert_that(
-    is.function(measure_fun),
-    msg = "node_size value must be a function (e.g. list(Degree = igraph::degree))"
-  )
-
-  measure_vec <- measure_fun(net)
-  assertthat::assert_that(
-    length(measure_vec) == igraph::vcount(net),
-    msg = "node_size function must return one value per vertex"
-  )
-
-  net <- igraph::set_vertex_attr(net, measure_name, value = measure_vec)
-  return (list(net = net, measure_name = measure_name))
+  return (network_tbl)
 }
 
 
@@ -448,6 +462,8 @@ initialize_agents <- function(model,
 }
 
 
+#--------------SOCMOD & SOCMOD CVD SAFE PALETTES-----
+
 #' Custom color palette for scientific plots
 #'
 #' Recommended for use in `scale_color_manual()`.
@@ -484,9 +500,8 @@ SOCMOD_PALETTE_CVD <- c(
   sienna  = "#ED610F"
 )
 
-# ------------------------------------------------------------------
-# Helper functions for summarise_* and plot_* methods
-# ------------------------------------------------------------------
+#--------Helper functions for summarise_* and plot_* method-----
+
 
 
 #' Clean metadata parameters for summary functions
