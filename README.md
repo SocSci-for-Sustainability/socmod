@@ -1,9 +1,9 @@
 
 # socmod <a href="https://css4s.github.io/socmod/"><img src="man/figures/logo.png" align="right" height="130" alt="socmod website" /></a>
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+## tidy social behavior models in R
 
-# Introduction
+<!-- README.md is generated from README.Rmd. Please edit that file -->
 
 The goal of `socmod` is to simplify development of models of social
 behavior for beginners and experts alike. The current focus is
