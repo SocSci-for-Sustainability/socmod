@@ -74,3 +74,10 @@ reference:
   - plot_friendship_paradox
 
 
+articles:
+  title: "Introduction"
+  - abm-tutorial-beginner
+  - dev-foundations-socmod-abm
+  - abm-tutorial-advanced
+  title: "Applications"
+  - minority-majority-diffusion

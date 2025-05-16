@@ -1,0 +1,218 @@
+---
+editor: 
+  markdown: 
+    wrap: 72
+author: Matt Turner
+title: "Basic tutorial examples for social behavior modeling with socmod"
+bibliography: /Users/mt/workspace/Writing/library.bib
+---
+
+```{r, SETUP}
+devtools::load_all()
+library(socmod)
+```
+
+
+
+Here we develop our first agent-based models of social behavior. We'll start small, with the following four-household network of solar panel electrification using only success-biased learning (@fig-four-agent-example). Then we'll do a detailed comparison of different social learning strategies with different parameterizations.
+
+![Example social network and sustainable adaptation diffusion problem.](four-agent-example.png){#fig-four-agent-example width="600"}
+
+In the example, agent 2 has adopted rooftop solar. It has some adaptive fitness, which can be thought of as the financial gain from adopting a sustainable, adaptive behavior. We can directly create the social network using `igraph::make_graph()` then set it as the model's social network, along with setting the learning strategy to be contagion learning. The `adoption_rate` parameter specifies how likely another agent is to adopt the adaptive behavior when exposed to it. The `drop_rate` is how likely an agent doing the adaptive behavior is to stop doing it and revert to the non-adaptive behavior.
+
+## Example 1: Time series of adaptation diffusion
+
+```{r}
+#| fig-width: 5.75
+#| fig-height: 3
+
+# Run model and save figure
+g <- igraph::make_graph(~ 1-2, 1-3, 1-4, 3-2)
+mps <- make_model_parameters(
+  contagion_learning_strategy, graph = g, adoption_rate = 0.8, drop_rate = 0.1
+)
+cabm <- make_abm(mps)
+cabm$get_agent(2)$set_behavior("Adaptive")
+trial <- run_trial(cabm, stop = fixated)
+
+p <- plot_prevalence(trial)
+print(p)
+```
+
+
+```{r}
+#| fig-width: 5.75
+#| fig-height: 3
+# Same, but now call the adaptive behavior "Baglowie" instead of "Adaptive".
+# load_all()
+g <- igraph::make_graph(~ 1-2, 1-3, 1-4, 3-2)
+mps <- make_model_parameters(
+  contagion_learning_strategy, graph = g, adoption_rate = 0.8, drop_rate = 0.1
+)
+
+cabm <- make_abm(mps)
+cabm$get_agent(2)$set_behavior("Baglowie");
+# Run a trial on the custom example ABM, print first rows, plot prevalence
+trial <- run_trial(cabm, stop = fixated, adaptive_behavior = "Baglowie")
+head(trial$get_observations())
+p <- plot_prevalence(trial, tracked_behaviors = c("Baglowie", "Legacy"))
+print(p)
+```
+
+## Example: comparison of learning strategies and parameters
+
+Agent-based models in `socmod` are composed of sub-models of cognition and social behavior and social networks. One component of agent cognition is its *social learning strategy*. Three social learning strategies are included in `socmod`: success-biased, frequency-biased, and contagion learning strategies [see ABM course notes for more details](https://css4s.github.io/abm-notes/intro.html#social-learning-strategies).
+
+Here we show how to compare the three learning strategies across different learning parameters. One parameter we systematically vary affects only success-biased learning, and the other we systematically vary affects only contagion learning. We will design computational experiments to understand their effects, and overall differences between the three learning strategies.
+
+```{r}
+#| eval: false
+#| number-lines: true
+# Load ggplot2 to avoid writing it during plotting below.
+library(ggplot2)
+# Model generation function used in both computational experiments below.
+gen <- function(model_parameter_row) {
+  
+  # Extract adaptive_fitness to create agents.
+  adaptive_fitness <- model_parameter_row$adaptive_fitness
+  
+  agent_1 <- socmod::Agent$new(1, behavior = "Legacy", 
+                               fitness = 1.0, name = "a1")
+  agent_2 <- socmod::Agent$new(2, behavior = "Adaptive", 
+                               fitness = adaptive_fitness, name = "a2")
+  agent_3 <- socmod::Agent$new(3, behavior = "Legacy", 
+                               fitness = 1.0, name = "a3")
+  agent_4 <- socmod::Agent$new(4, behavior = "Legacy", 
+                               fitness = 1.0, name = "a4")
+  
+  agents <- list(agent_1, agent_2, agent_3, agent_4)
+  graph <- igraph::make_graph(~ 1-2, 1-3, 1-4, 3-2)
+  
+  # Extract other necessary model parameters.
+  learning_strategy <- model_parameter_row$learning_strategy
+  drop_rate <- model_parameter_row$drop_rate
+  adoption_rate <- model_parameter_row$adoption_rate
+  
+  # Make ModelParameters to encapsulate this model's parameters.
+  model_parameters <- socmod::make_model_parameters(
+    learning_strategy, graph, adaptive_fitness = adaptive_fitness, 
+    adoption_rate = adoption_rate, drop_rate = drop_rate
+  )
+  
+  return (
+    socmod::make_abm(
+      model_parameters,
+      agents = agents
+    )
+  )
+}
+```
+
+### Experiment over adaptive fitness values
+
+```{r}
+#| eval: false
+#| number-lines: true
+# Run the adaptive fitness trials if there is not already a variable
+# name for it in the current environment. Change n_trials_per_param to
+# a small number like 2-20 for development purposes.
+if (!("trials_adaptive_fitness" %in% ls(all.names = TRUE))) {
+  trials_adaptive_fitness <- socmod::run_trials(
+    gen, 
+    n_trials_per_param = 100,  # change to 2-20 for shorter runs
+    stop = socmod::fixated, 
+    syncfile = "trials-adaptive_fitness.RData",
+    # overwrite = TRUE,
+    learning_strategy = c(socmod::success_bias_learning_strategy,
+                          socmod::frequency_bias_learning_strategy,
+                          socmod::contagion_learning_strategy),
+    adaptive_fitness = seq(0.8, 2.4, 0.2),
+    adoption_rate = 0.6,
+    drop_rate = 0.2
+  )
+}
+
+trials_summary <- socmod::summarise_by_parameters(
+  trials_adaptive_fitness, c("learning_strategy", "adaptive_fitness")
+)
+
+trials_success_rate <- dplyr::filter(trials_summary, Measure == "success_rate")
+```
+
+Now plot...
+
+```{r}
+#| eval: false
+#| number-lines: true
+p <- ggplot(trials_success_rate, 
+              aes(x=adaptive_fitness, y=Value, 
+                  color=learning_strategy)
+) +
+  geom_line(linewidth=1.0) + geom_point(size=2.15) +
+  ggsci::scale_color_aaas() + ggsci::scale_fill_aaas() +
+  xlab("Adaptive fitness") + ylab("Success rate") +
+  scale_x_continuous(breaks = sort(
+    unique(trials_summary$adaptive_fitness)
+  )) +
+  theme_classic(base_size=14) +
+  ylim(0, 1.0) +
+  guides(color = guide_legend(title = "Learning strategy")) +
+  ggtitle("Adoption rate = 0.6, drop rate = 0.2")
+```
+
+```{r}
+print(getwd())
+ggsave("../inst/figures/vignettes/adaptive_fitness_experiment.png", p,
+       width = 5, height = 3)
+```
+
+![Example computational experiment testing effect of adaptive fitness on success rate across the three learning strategies.](adaptive_fitness_experiment.png)
+
+### Experiment over adoption rate values
+
+```{r}
+#| eval: FALSE
+#| number-lines: TRUE
+if (!("trials_adoption" %in% ls(all.names = TRUE))) {
+  trials_adoption <- socmod::run_trials(
+    gen,
+    n_trials_per_param = 100,
+    stop = socmod::fixated, 
+    syncfile = "trials-adoption-rate.RData",
+    overwrite = TRUE,
+    learning_strategy = c(socmod::success_bias_learning_strategy,
+                          socmod::frequency_bias_learning_strategy,
+                          socmod::contagion_learning_strategy),
+    adaptive_fitness = 1.4,
+    adoption_rate = c(0.05, 0.2, 0.4, 0.6, 0.8, 1.0),
+    drop_rate = 0.2
+  )
+}
+trials_summary <- socmod::summarise_by_parameters(
+  trials_adoption, c("learning_strategy", "adoption_rate")
+)
+
+trials_success_rate <- dplyr::filter(
+  trials_summary, Measure == "success_rate"
+)
+```
+
+```{r}
+#| eval: false
+#| number-lines: true
+p <- ggplot(trials_success_rate, 
+            aes(x=adoption_rate, y=Value, color=learning_strategy)) +
+  geom_line(linewidth=1.0) + geom_point(size=2.15) +
+  ggsci::scale_color_aaas() + ggsci::scale_fill_aaas() +
+  xlab("Adoption rate") + ylab("Success rate") +
+  scale_x_continuous(breaks = sort(unique(trials_summary$adoption_rate))) +
+  theme_classic(base_size=14) +
+  ylim(0, 1.0) +
+  guides(color = guide_legend(title = "Learning strategy")) +
+  ggtitle("Adaptive fitness = 1.4, drop rate = 0.2")
+# 
+ggsave("../inst/figures/vignettes/resources/adoption_rate_experiment.png", 
+       p, width=5, height=3)
+```
+
+![Example computational experiment testing effect of adoption rate on success rate across the three learning strategies.](adoption_rate_experiment.png)
