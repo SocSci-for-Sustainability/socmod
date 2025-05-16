@@ -14,6 +14,7 @@ dir.create(here::here("vignettes", "resources"), recursive = TRUE)
 ```{r setup, include=FALSE}
 library(socmod)
 library(magrittr)
+library(ggplot2)
 ```
 
 This vignette introduces agent-based modeling in `socmod` starting with basic functional and object-oriented programming in R. It therefore builds on an assumed knowledge of R basics which can be gained by studying, for example, [*Hands-On Programming with R*](https://rstudio-education.github.io/hopr/index.html) or other basic R tutorial introductions.

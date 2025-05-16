@@ -1,9 +1,12 @@
-pandoc: '3.2'
+pandoc: 3.1.3
 pkgdown: 2.1.2
 pkgdown_sha: ~
 articles:
-  basic-diffusion-components: basic-diffusion-components.html
-last_built: 2025-05-14T03:53Z
+  abm-tutorial-advanced: abm-tutorial-advanced.html
+  abm-tutorial-beginner: abm-tutorial-beginner.html
+  dev-foundations-socmod-abm: dev-foundations-socmod-abm.html
+  minority-majority-diffusion: minority-majority-diffusion.html
+last_built: 2025-05-16T18:54Z
 urls:
   reference: https://css4s.github.io/socmod/reference
   article: https://css4s.github.io/socmod/articles
