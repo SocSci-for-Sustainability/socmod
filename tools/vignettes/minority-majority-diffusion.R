@@ -16,7 +16,7 @@ library(magrittr)
 gen_homophily_abm <- function(param_row) {
   
   # Extract all parameters used in ABM construction with short var names
-  pr <- param_row; N <- pr$n_agents; m <- pr$minority_fraction; k <- pr$mean_degree; 
+  pr <- param_row; N <- pr$n_agents; m <- pr$minority_fraction; k <- pr$mean_degree;
   h <- pr$homophily; f_A <- pr$adaptive_fitness; start_group <- pr$start_group
   
   # Calculate number of minorty and majority agents
@@ -118,7 +118,7 @@ trials <- run_trials(
   # System configuration: show progress and optionally sync/overwrite to file
   .progress = TRUE, 
   syncfile = "small-homoph.RData", 
-  overwrite = TRUE
+  # overwrite = TRUE
 )
 
 prev_summary <- 
@@ -138,5 +138,30 @@ prev_summary %>% dplyr::filter(Homophily %in% c(-0.9, 0.0, 0.5, 0.9)) %>%
   scale_color_manual(values = unname(SOCMOD_PALETTE))
 
 
-outcomes_summary <- summarise_outcomes(trials, input_parameters = "homophily",
-                                       outcome_measures = c(""))
+outcomes <- summarise_outcomes(
+  trials, input_parameters = "homophily",
+  outcome_measures = c("success_rate", "mean_fixation_steps")
+)
+
+max_fix_time <- max(outcomes$Value[outcomes$Measure == "mean_fixation_steps"])
+# Normalize to calculate mean fixation time as a fraction of maximum
+outcomes_norm <- outcomes %>%
+  dplyr::mutate(Value = dplyr::case_when(
+    Measure == "mean_fixation_steps" ~ Value / max_fix_time,
+    TRUE ~ Value
+  ))
+
+# Rename and set order of Measure factors to avoid messing with the legend in plotting
+outcomes_norm$Measure[outcomes_norm$Measure == "success_rate"] <- "Success rate"
+outcomes_norm$Measure[outcomes_norm$Measure == "mean_fixation_steps"] <- "Normalized fixation time"
+outcomes_norm$Measure <- factor(outcomes_norm$Measure, levels = c(
+  "Success rate", "Normalized fixation time"
+))
+
+# Use a custom socmod line color
+line_color <- SOCMOD_PALETTE_CVD["pink"]
+outcomes_norm %>%
+  ggplot2::ggplot(aes(x = homophily, y = Value, linetype = Measure)) +
+  geom_line(color = line_color, linewidth=1.5) + 
+  scale_x_continuous(breaks = homophily_vals) +
+  theme_classic(base_size = 16) + xlab("Homophily") + ylab("Value")
