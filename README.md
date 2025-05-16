@@ -3,8 +3,6 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# Introduction
-
 The goal of `socmod` is to simplify development of models of social
 behavior for beginners and experts alike. The current focus is
 agent-based models of adaptive behavior diffusion. The framework is
