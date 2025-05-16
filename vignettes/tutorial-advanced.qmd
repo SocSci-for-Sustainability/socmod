@@ -1,16 +1,13 @@
 ```{r, SETUP}
-devtools::load_all()
+# devtools::load_all()
 library(socmod)
+library(ggplot2)
 ```
 
 
 # Advanced tutorial: the tidy, `socmod` approach
 
-Here we develop our first agent-based models of social behavior. We'll start small, with the following four-household network of solar panel electrification using only success-biased learning (@fig-four-agent-example). Then we'll do a detailed comparison of different social learning strategies with different parameterizations.
-
-![Example social network and sustainable adaptation diffusion problem.](four-agent-example.png){#fig-four-agent-example width="600"}
-
-In the example, agent 2 has adopted rooftop solar. It has some adaptive fitness, which can be thought of as the financial gain from adopting a sustainable, adaptive behavior. We can directly create the social network using `igraph::make_graph()` then set it as the model's social network, along with setting the learning strategy to be contagion learning. The `adoption_rate` parameter specifies how likely another agent is to adopt the adaptive behavior when exposed to it. The `drop_rate` is how likely an agent doing the adaptive behavior is to stop doing it and revert to the non-adaptive behavior.
+In the 
 
 ## Example 1: Time series of adaptation diffusion
 ```{r}
@@ -66,7 +63,6 @@ Here we show how to compare the three learning strategies across different learn
 #| eval: false
 #| number-lines: true
 # Load ggplot2 to avoid writing it during plotting below.
-library(ggplot2)
 # Model generation function used in both computational experiments below.
 gen <- function(model_parameter_row) {
   
@@ -159,8 +155,8 @@ p <- ggplot(trials_success_rate,
 
 ```{r}
 print(getwd())
-ggsave("vignettes/resources/adaptive_fitness_experiment.png", p,
-       width = 5, height = 3)
+# ggsave("vignettes/resources/adaptive_fitness_experiment.png", p,
+#        width = 5, height = 3)
 ```
 
 ![Example computational experiment testing effect of adaptive fitness on success rate across the three learning strategies.](adaptive_fitness_experiment.png)

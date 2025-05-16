@@ -73,11 +73,40 @@ reference:
   - load_igraph_from_csv
   - plot_friendship_paradox
 
-
 articles:
-  title: "Introduction"
-  - abm-tutorial-beginner
-  - dev-foundations-socmod-abm
-  - abm-tutorial-advanced
-  title: "Applications"
-  - minority-majority-diffusion
+  - title: Introduction
+    contents:
+    - abm-tutorial-beginner
+    - dev-foundations-socmod-abm
+    - abm-tutorial-advanced
+  - title: Applications
+    contents:
+    - minority-majority-diffusion
+
+navbar:
+  structure:
+    left:
+      - home
+      - articles
+      - reference
+      - news
+    right:
+      - github
+    footer:
+      structure:
+        left: [license]
+        right:
+          - text: "Open an issue for edits, comments, corrections..."
+            href: https://github.com/css4s/socmod/issues 
+  components:
+    articles:
+      text: "Articles"
+      menu:
+        - text: "Basic tutorial examples"
+          href: articles/tutorial-basic.html
+        - text: "R foundations"
+          href: articles/dev-foundations-socmod-abm.html
+        - text: "Components for basic diffusion modeling with socmod"
+          href: articles/tutorial-advanced.html
+        - text: "Prominent minority groups for sustainable success"
+          href: articles/minority-majority.html
