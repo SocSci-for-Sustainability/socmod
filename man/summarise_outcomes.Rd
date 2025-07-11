@@ -22,7 +22,7 @@ This function summarizes trial-level outcomes by grouping across input parameter
 It computes the mean of specified outcome measures across all trials sharing the same input parameter values.
 }
 \examples{
-mps <- make_model_parameters(n_agents = 10, adoption_rate = 1.0, learning_strategy = contagion_learning_strategy)
+mps <- make_model_parameters(n_agents = 10, adoption_rate = 1.0, model_dynamics = contagion_model_dynamics)
 abm <- make_abm(mps)
 trial <- make_trial(abm)
 trial$run(steps = 5)

@@ -1,13 +1,13 @@
-#' LearningStrategy
+#' ModelDynamics
 #'
 #' Represents a reusable learning strategy composed of a partner selection function,
 #' an interaction function, and a descriptive label.
 #'
 #' @export
-LearningStrategy <- R6::R6Class(
-  "LearningStrategy",
+ModelDynamics <- R6::R6Class(
+  "ModelDynamics",
   public = list(
-    #' @description Create a new LearningStrategy
+    #' @description Create a new ModelDynamics
     #' @param partner_selection Function to select the teacher (or NULL)
     #' @param interaction Function to define the interaction (or NULL)
     #' @param label A string label for this strategy
@@ -52,17 +52,17 @@ LearningStrategy <- R6::R6Class(
 )
 
 
-#' Factory function for creating a LearningStrategy
+#' Factory function for creating a ModelDynamics
 #'
 #' @param partner_selection Function to select a partner for any `focal_agent` in the `model`.
 #' @param interaction Function for interaction between any `focal_agent` and `partner` in the `model`.
 #' @param model_step Step function for `model` run after all agents select partner and interact.
 #' @param label Character label for this strategy.
 #'
-#' @return A `LearningStrategy` instance containing social update functions and a metadata-friendly label.
+#' @return A `ModelDynamics` instance containing social update functions and a metadata-friendly label.
 #'
 #' @examples
-#' success_bias_strategy <- make_learning_strategy(
+#' success_bias_strategy <- make_model_dynamics(
 #'   partner_selection = success_bias_select_teacher,
 #'   interaction = success_bias_interact,
 #'   label = "Success-biased"
@@ -71,19 +71,19 @@ LearningStrategy <- R6::R6Class(
 #' mock_selection <- function (focal_agent) NULL
 #' mock_interaction <- function (focal_agent, partner, model) NULL
 #' mock_model_step <- function (model) NULL
-#' mock_strategy <- make_learning_strategy(mock_selection, mock_interaction,
+#' mock_strategy <- make_model_dynamics(mock_selection, mock_interaction,
 #'                                         mock_model_step, label = "mock")
-#' # Note make_learning_strategy wraps the R6 class constructor:
-#' mock_strategy_2 <- LearningStrategy$new(mock_selection, mock_interaction,
+#' # Note make_model_dynamics wraps the R6 class constructor:
+#' mock_strategy_2 <- ModelDynamics$new(mock_selection, mock_interaction,
 #'                                         mock_model_step, mock_strategy) 
 #' 
 #' @export
-make_learning_strategy <- function(partner_selection, 
+make_model_dynamics <- function(partner_selection, 
                                    interaction, 
                                    model_step = NULL, 
                                    label = "unlabelled") {
   return (
-    LearningStrategy$new(
+    ModelDynamics$new(
       partner_selection, interaction, model_step, label
     )
   )
@@ -93,9 +93,9 @@ make_learning_strategy <- function(partner_selection,
 #' Make a dummy learning strategy for mockups and testing.
 #' 
 #' @export
-dummy_learning_strategy <- function() {
+dummy_model_dynamics <- function() {
   return (
-    make_learning_strategy(
+    make_model_dynamics(
       partner_selection = \() NULL,
       interaction = \() NULL,
       label = "DummyStrategy"
@@ -319,7 +319,7 @@ contagion_model_step <- function(model) {
 #' Define success-biased learning strategy.
 #'
 #' @export
-success_bias_learning_strategy <- make_learning_strategy(
+success_bias_model_dynamics <- make_model_dynamics(
   success_bias_select_teacher, success_bias_interact, 
   learning_model_step, label = "Success-biased"
 )
@@ -328,7 +328,7 @@ success_bias_learning_strategy <- make_learning_strategy(
 #' Define frequency-biased learning strategy.
 #'
 #' @export
-frequency_bias_learning_strategy <- make_learning_strategy(
+frequency_bias_model_dynamics <- make_model_dynamics(
   frequency_bias_select_teacher, frequency_bias_interact, 
   learning_model_step, label = "Frequency-biased"
 )
@@ -337,7 +337,7 @@ frequency_bias_learning_strategy <- make_learning_strategy(
 #' Define contagion learning "strategy".
 #'
 #' @export
-contagion_learning_strategy <- make_learning_strategy(
+contagion_model_dynamics <- make_model_dynamics(
   contagion_partner_selection, contagion_interaction, 
   contagion_model_step, label = "Contagion"
 )

@@ -1,11 +1,11 @@
-test_that("LearningStrategy functions are correctly set and working as expected", {
+test_that("ModelDynamics functions are correctly set and working as expected", {
   
   # Dummy learning functions
   dummy_select <- function(learner, model) { NULL }
   dummy_interact <- function(learner, teacher, model) { NULL }
   
-  # Create LearningStrategy instance
-  dummy_strategy <- make_learning_strategy(
+  # Create ModelDynamics instance
+  dummy_strategy <- make_model_dynamics(
     partner_selection = dummy_select,
     interaction = dummy_interact,
     label = "Dummy Strategy"

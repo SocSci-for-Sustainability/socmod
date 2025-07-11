@@ -5,14 +5,14 @@
 \title{Wrapper for initializing new ModelParameters instance.}
 \usage{
 make_model_parameters(
-  learning_strategy = success_bias_learning_strategy,
+  model_dynamics = success_bias_model_dynamics,
   graph = NULL,
   n_agents = NULL,
   ...
 )
 }
 \arguments{
-\item{learning_strategy}{Learning strategy to use; must be type LearningStrategy}
+\item{model_dynamics}{Learning strategy to use; must be type LearningStrategy}
 
 \item{graph}{Graph object to use; must inherit igraph}
 

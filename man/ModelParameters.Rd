@@ -12,8 +12,8 @@ Overwrite existing auxiliary parameters.
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-ModelParameters-new}{\code{ModelParameters$new()}}
-\item \href{#method-ModelParameters-get_learning_strategy}{\code{ModelParameters$get_learning_strategy()}}
-\item \href{#method-ModelParameters-set_learning_strategy}{\code{ModelParameters$set_learning_strategy()}}
+\item \href{#method-ModelParameters-get_model_dynamics}{\code{ModelParameters$get_model_dynamics()}}
+\item \href{#method-ModelParameters-set_model_dynamics}{\code{ModelParameters$set_model_dynamics()}}
 \item \href{#method-ModelParameters-get_graph}{\code{ModelParameters$get_graph()}}
 \item \href{#method-ModelParameters-set_graph}{\code{ModelParameters$set_graph()}}
 \item \href{#method-ModelParameters-get_n_agents}{\code{ModelParameters$get_n_agents()}}
@@ -31,7 +31,7 @@ Overwrite existing auxiliary parameters.
 \subsection{Method \code{new()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{ModelParameters$new(
-  learning_strategy = success_bias_strategy,
+  model_dynamics = success_bias_strategy,
   graph = NULL,
   n_agents = NULL,
   auxiliary = list()
@@ -40,20 +40,20 @@ Overwrite existing auxiliary parameters.
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ModelParameters-get_learning_strategy"></a>}}
-\if{latex}{\out{\hypertarget{method-ModelParameters-get_learning_strategy}{}}}
-\subsection{Method \code{get_learning_strategy()}}{
+\if{html}{\out{<a id="method-ModelParameters-get_model_dynamics"></a>}}
+\if{latex}{\out{\hypertarget{method-ModelParameters-get_model_dynamics}{}}}
+\subsection{Method \code{get_model_dynamics()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelParameters$get_learning_strategy()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModelParameters$get_model_dynamics()}\if{html}{\out{</div>}}
 }
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-ModelParameters-set_learning_strategy"></a>}}
-\if{latex}{\out{\hypertarget{method-ModelParameters-set_learning_strategy}{}}}
-\subsection{Method \code{set_learning_strategy()}}{
+\if{html}{\out{<a id="method-ModelParameters-set_model_dynamics"></a>}}
+\if{latex}{\out{\hypertarget{method-ModelParameters-set_model_dynamics}{}}}
+\subsection{Method \code{set_model_dynamics()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{ModelParameters$set_learning_strategy(learning_strategy)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{ModelParameters$set_model_dynamics(model_dynamics)}\if{html}{\out{</div>}}
 }
 
 }

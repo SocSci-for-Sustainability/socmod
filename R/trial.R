@@ -57,7 +57,7 @@ Trial <- R6::R6Class(
       )
       
       # Get learning and iteration functions from the model's learning strategy.
-      lstrat <- self$model$get_parameter("learning_strategy")
+      lstrat <- self$model$get_parameter("model_dynamics")
       partner_selection <- lstrat$get_partner_selection()
       interaction <- lstrat$get_interaction()
       model_step <- lstrat$get_model_step()
@@ -224,7 +224,7 @@ run_trial <- function(model,
 #'     make_abm(
 #'       make_model_parameters(
 #'         # The first three positional ModelParameters fields go first.
-#'         success_biased_learning_strategy, graph,
+#'         success_biased_model_dynamics, graph,
 #'         # Then any auxiliary label-value pairs may be flexibly added here.
 #'         adaptive_fitness = mparam_list$adaptive_fitness
 #'       ), 
@@ -234,7 +234,7 @@ run_trial <- function(model,
 #' }
 #' # Run 2 trials per parameter setting, stopping after 10 time steps. 
 #' trials <- run_trials(mod_gen, n_trials_per_param = 2, stop = 10,
-#'   learning_strategy = success_bias_learning_strategy,
+#'   model_dynamics = success_bias_model_dynamics,
 #'   adaptive_fitness = c(0.8, 1.0, 1.2)
 #' )  # With this we'll have six total trials, two for each adaptive_fitness.
 #' @export

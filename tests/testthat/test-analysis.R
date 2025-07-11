@@ -7,7 +7,7 @@ test_that("summarise_prevalence summarizes prevalence across trials", {
   prevalence_summary_keeptrials <- summarise_prevalence(trials, across_trials = FALSE)
   
   expect_s3_class(prevalence_summary_keeptrials, "tbl_df")
-  expect_true(all(c("Step", "Behavior", "Count", "Prevalence", "legacy_behavior", "adaptive_behavior", "learning_strategy", "graph", "n_agents") %in% names(prevalence_summary_keeptrials)))
+  expect_true(all(c("Step", "Behavior", "Count", "Prevalence", "legacy_behavior", "adaptive_behavior", "model_dynamics", "graph", "n_agents") %in% names(prevalence_summary_keeptrials)))
   expect_true(nrow(prevalence_summary_keeptrials) >= 1)
   
   # If any input parameters were included, test they appear as columns

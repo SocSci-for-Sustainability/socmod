@@ -39,7 +39,7 @@ mod_gen <- function(mparam_list) {
     make_abm(
       make_model_parameters(
         # The first three positional ModelParameters fields go first.
-        success_biased_learning_strategy, graph,
+        success_biased_model_dynamics, graph,
         # Then any auxiliary label-value pairs may be flexibly added here.
         adaptive_fitness = mparam_list$adaptive_fitness
       ), 
@@ -49,7 +49,7 @@ mod_gen <- function(mparam_list) {
 }
 # Run 2 trials per parameter setting, stopping after 10 time steps. 
 trials <- run_trials(mod_gen, n_trials_per_param = 2, stop = 10,
-  learning_strategy = success_bias_learning_strategy,
+  model_dynamics = success_bias_model_dynamics,
   adaptive_fitness = c(0.8, 1.0, 1.2)
 )  # With this we'll have six total trials, two for each adaptive_fitness.
 }

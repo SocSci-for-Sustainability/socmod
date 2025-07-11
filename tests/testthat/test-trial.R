@@ -30,7 +30,7 @@ test_that("Trial records observations and outcomes correctly", {
 
 test_that("Trial stops after max steps and adapts outcomes", {
  
-  lstrat <- LearningStrategy$new(
+  lstrat <- ModelDynamics$new(
     function(learner, model) NULL,
     function(learner, partner, model) NULL,
     function(model) NULL,

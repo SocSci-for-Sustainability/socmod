@@ -39,7 +39,7 @@ either returning a summary for each individual trial or averaging across multipl
 Prevalence is normalized by the number of agents in each trial.
 }
 \examples{
-mps <- make_model_parameters(n_agents = 10, adoption_rate = 1.0, learning_strategy = contagion_learning_strategy)
+mps <- make_model_parameters(n_agents = 10, adoption_rate = 1.0, model_dynamics = contagion_model_dynamics)
 abm <- make_abm(mps)
 trial <- make_trial(abm)
 trial$run(steps = 5)

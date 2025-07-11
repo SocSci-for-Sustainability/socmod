@@ -4,7 +4,7 @@
 test_that("Success-bias selects the agent with highest fitness", {
   
   model <- make_abm(make_model_parameters(n_agents = 3))
-  expect_equal(model$get_parameter("learning_strategy")$get_label(), 
+  expect_equal(model$get_parameter("model_dynamics")$get_label(), 
                "Success-biased")
 
   model$get_agent(1)$set_behavior("Legacy")
@@ -55,12 +55,13 @@ test_that("Frequency bias adopts more common behavior", {
 # 
 # 
 test_that("Frequency bias fixates roughly equally when starting with tie", {
+  
   n_reps <- 500
-  # n_reps <- 10
+  
   do_one <- function() {
     model <- make_abm(
       make_model_parameters(
-        learning_strategy = frequency_bias_learning_strategy,
+        model_dynamics = frequency_bias_model_dynamics,
         n_agents = 4
       )
     )

@@ -193,7 +193,7 @@ plot_prevalence <- function(trials_or_tibble,
 #'   }
 #'
 #' @examples
-#' mps <- make_model_parameters(n_agents = 10, adoption_rate = 1.0, learning_strategy = contagion_learning_strategy)
+#' mps <- make_model_parameters(n_agents = 10, adoption_rate = 1.0, model_dynamics = contagion_model_dynamics)
 #' abm <- make_abm(mps)
 #' trial <- make_trial(abm)
 #' trial$run(steps = 5)
@@ -239,8 +239,8 @@ summarise_prevalence <- function(trials_or_trial,
     param_list <- 
       trial$model$get_parameters()$as_list() %>% .clean_summary_params
 
-    param_list$learning_strategy <- 
-      param_list$learning_strategy$get_label()
+    param_list$model_dynamics <- 
+      param_list$model_dynamics$get_label()
     
     # Assign default label to this trial's model's graph if missing
     if (!"label" %in% names(igraph::graph_attr(param_list$graph))) {
@@ -305,7 +305,7 @@ summarise_prevalence <- function(trials_or_trial,
 #'   containing the mean of each specified outcome measure.
 #'
 #' @examples
-#' mps <- make_model_parameters(n_agents = 10, adoption_rate = 1.0, learning_strategy = contagion_learning_strategy)
+#' mps <- make_model_parameters(n_agents = 10, adoption_rate = 1.0, model_dynamics = contagion_model_dynamics)
 #' abm <- make_abm(mps)
 #' trial <- make_trial(abm)
 #' trial$run(steps = 5)
@@ -332,7 +332,7 @@ summarise_outcomes <- function(trials, input_parameters,
     param_list <- 
       trial$model$get_parameters()$as_list() %>% .clean_summary_params
 
-    param_list$learning_strategy <- param_list$learning_strategy$get_label()
+    param_list$model_dynamics <- param_list$model_dynamics$get_label()
     graph_label <- igraph::graph_attr(param_list$graph, "label")
     param_list$graph <- param_list$graph_label
     

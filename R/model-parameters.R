@@ -3,23 +3,23 @@ ModelParameters <- R6::R6Class(
   "ModelParameters",
   
   public = list(
-    initialize = function(learning_strategy = success_bias_strategy, 
+    initialize = function(model_dynamics = success_bias_strategy, 
                           graph = NULL, n_agents = NULL,
                           auxiliary = list()) {
       
-      private$.learning_strategy <- learning_strategy
+      private$.model_dynamics <- model_dynamics
       private$.graph <- graph
       private$.n_agents <- n_agents
       private$.auxiliary <- auxiliary
     },
     
-    get_learning_strategy = function() {
-      return (private$.learning_strategy)
+    get_model_dynamics = function() {
+      return (private$.model_dynamics)
     },
 
-    set_learning_strategy = function(learning_strategy) {
-      stopifnot(inherits(learning_strategy, "LearningStrategy"))
-      private$.learning_strategy <- learning_strategy
+    set_model_dynamics = function(model_dynamics) {
+      stopifnot(inherits(model_dynamics, "LearningStrategy"))
+      private$.model_dynamics <- model_dynamics
 
       return (invisible(self))
     },
@@ -74,7 +74,7 @@ ModelParameters <- R6::R6Class(
       return (
         modifyList(
           list(
-            learning_strategy = self$get_learning_strategy(),
+            model_dynamics = self$get_model_dynamics(),
             graph = private$.graph,
             n_agents = self$get_n_agents()
           ),
@@ -84,7 +84,7 @@ ModelParameters <- R6::R6Class(
   ),
   
   private = list(
-    .learning_strategy = NULL,
+    .model_dynamics = NULL,
     .graph = NULL,
     .n_agents = NULL,
     .auxiliary = list()
@@ -94,7 +94,7 @@ ModelParameters <- R6::R6Class(
 
 #' Wrapper for initializing new ModelParameters instance.
 #' 
-#' @param learning_strategy Learning strategy to use; must be type LearningStrategy
+#' @param model_dynamics Learning strategy to use; must be type LearningStrategy
 #' @param graph Graph object to use; must inherit igraph
 #' @param n_agents Number of agents in the model
 #' @param ... Additional model parameters
@@ -103,18 +103,18 @@ ModelParameters <- R6::R6Class(
 #' 
 #' @export
 make_model_parameters <- 
-  function(learning_strategy =
-             success_bias_learning_strategy, 
+  function(model_dynamics =
+             success_bias_model_dynamics, 
            graph = NULL,
            n_agents = NULL,
            ...)   {
   return (
-    ModelParameters$new(learning_strategy, graph, n_agents, list(...))  
+    ModelParameters$new(model_dynamics, graph, n_agents, list(...))  
   )
 }
 
 
 #' Default parameters to create an agent-based model.
 DEFAULT_PARAMETERS <- make_model_parameters(
-  learning_strategy = NULL, graph = NULL, n_agents = 10, auxiliary = list()
+  model_dynamics = NULL, graph = NULL, n_agents = 10, auxiliary = list()
 ) 
