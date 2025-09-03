@@ -1,3 +1,9 @@
+# socmod 0.2.3 (2025-09-03)
+
+- Changed LearningStrategy and related functions to be ModelDynamics and
+  removed the `frequency_bias_learning_strategy` and similar objects (see
+  `R/model-dynamics.R`)
+
 # socmod 0.2.2 (2025-05-14)
 
 - `summarise_*` now work even if there are vectors/lists in parameters by

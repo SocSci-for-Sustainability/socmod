@@ -39,17 +39,19 @@ reference:
   - AgentBasedModel
   - ModelParameters
   - DEFAULT_PARAMETERS
-- title: Learning strategy class, make_learning_strategy, and other tools
+- title: Model dynamics class, make_model_dynamics, and other tools
   desc: |
     Functions to pass to run for model iteration in a learning model,  and for either success-biased or frequency-biased adaptive learning.
   contents:
   - iterate_learning_model
-  - LearningStrategy
+  - ModelDynamics
   - starts_with("success_bias")
   - starts_with("frequency_bias")
   - starts_with("contagion_")
-  - ends_with("_learning_strategy")
+  - ends_with("_learning_model")
   - learning_model_step
+  - dummy_model_dynamics
+  - make_model_dynamics
 - title: Agents and their neighbors
   desc: |
     Agents in the model are represented by a number of attributes, with select class methods to track lists of their neighbors.

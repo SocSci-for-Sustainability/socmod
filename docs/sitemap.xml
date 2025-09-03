@@ -13,6 +13,7 @@
 <url><loc>https://css4s.github.io/socmod/reference/DEFAULT_PARAMETERS.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/G_NM.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/LearningStrategy.html</loc></url>
+<url><loc>https://css4s.github.io/socmod/reference/ModelDynamics.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/ModelParameters.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/Neighbors.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/SOCMOD_PALETTE.html</loc></url>
@@ -23,12 +24,16 @@
 <url><loc>https://css4s.github.io/socmod/reference/compare_friendship_paradox.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/contagion_interaction.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/contagion_learning_strategy.html</loc></url>
+<url><loc>https://css4s.github.io/socmod/reference/contagion_model_dynamics.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/contagion_model_step.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/contagion_partner_selection.html</loc></url>
+<url><loc>https://css4s.github.io/socmod/reference/dot-clean_summary_params.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/dummy_learning_strategy.html</loc></url>
+<url><loc>https://css4s.github.io/socmod/reference/dummy_model_dynamics.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/fixated.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/frequency_bias_interact.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/frequency_bias_learning_strategy.html</loc></url>
+<url><loc>https://css4s.github.io/socmod/reference/frequency_bias_model_dynamics.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/frequency_bias_select_teacher.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/get_all_possible_edges.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/get_feld_1991_network.html</loc></url>
@@ -41,6 +46,7 @@
 <url><loc>https://css4s.github.io/socmod/reference/make_abm.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/make_homophily_network.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/make_learning_strategy.html</loc></url>
+<url><loc>https://css4s.github.io/socmod/reference/make_model_dynamics.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/make_model_parameters.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/make_preferential_attachment.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/make_regular_lattice.html</loc></url>
@@ -60,6 +66,7 @@
 <url><loc>https://css4s.github.io/socmod/reference/socmod-package.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/success_bias_interact.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/success_bias_learning_strategy.html</loc></url>
+<url><loc>https://css4s.github.io/socmod/reference/success_bias_model_dynamics.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/success_bias_select_teacher.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/summarise_adoption.html</loc></url>
 <url><loc>https://css4s.github.io/socmod/reference/summarise_by_parameters.html</loc></url>
