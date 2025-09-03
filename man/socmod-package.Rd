@@ -13,7 +13,7 @@ Provides software tools and conceptual framework for creating computational mode
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://css4s.github.io/socmod/}
+  \item \url{https://SocSci-for-Sustainability.github.io/socmod/}
 }
 
 }
