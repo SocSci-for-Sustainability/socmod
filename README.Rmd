@@ -203,6 +203,14 @@ outcomes_norm %>%
 
 ![](man/figures/readme/success_fixsteps.png){width="600"}
 
+## Learn more
+
+Comprehensive vignettes walk through the major workflows in `socmod`:
+
+* [Building diffusion models with socmod](https://css4s.github.io/socmod/articles/basic-diffusion-components.html)
+* [Running diffusion experiments](https://css4s.github.io/socmod/articles/diffusion-experiments.html)
+* [Working with empirical networks](https://css4s.github.io/socmod/articles/empirical-networks.html)
+
 ### Installation
 
 You can install the development version of socmod from [GitHub](https://github.com/) with

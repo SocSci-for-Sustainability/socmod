@@ -1,0 +1,204 @@
+---
+title: Running diffusion experiments with socmod
+author: Matt Turner
+vignette: >
+  %\VignetteIndexEntry{Running diffusion experiments with socmod}
+  %\VignetteEngine{quarto::quarto}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r}
+#| include: false
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
+
+```{r setup}
+#| message: false
+#| warning: false
+library(socmod)
+library(dplyr)
+library(purrr)
+library(ggplot2)
+```
+
+This vignette illustrates how to scale from a single diffusion simulation to a
+collection of trials that sweep across parameter values. Along the way we will
+summarise outcomes and generate figures suitable for research reports.
+
+The workflow follows three steps:
+
+1. Define a *model generator* that converts a row of parameter values into a
+   fully-initialised `AgentBasedModel`
+2. Run a trial or two to verify that the model behaves as expected
+3. Call `run_trials()` to iterate across the parameter grid and collect outcomes
+
+The examples build on the four-agent contagion model introduced in
+[Building diffusion models with socmod](basic-diffusion-components.html).
+
+## Step 1: model generator function
+
+A model generator accepts a tibble row describing the parameter combination of
+interest and returns a new model. Here we keep the social network fixed while
+varying the learning strategy and adaptive fitness.
+
+```{r}
+make_four_agent_model <- function(model_parameter_row) {
+  adaptive_fitness <- model_parameter_row$adaptive_fitness
+
+  agents <- list(
+    socmod::Agent$new(1, behavior = "Legacy", fitness = 1.0, name = "a1"),
+    socmod::Agent$new(2, behavior = "Adaptive", fitness = adaptive_fitness, name = "a2"),
+    socmod::Agent$new(3, behavior = "Legacy", fitness = 1.0, name = "a3"),
+    socmod::Agent$new(4, behavior = "Legacy", fitness = 1.0, name = "a4")
+  )
+
+  graph <- igraph::make_graph(~ 1-2, 1-3, 1-4, 3-2)
+
+  learning_strategy <- model_parameter_row$learning_strategy
+  drop_rate <- model_parameter_row$drop_rate
+  adoption_rate <- model_parameter_row$adoption_rate
+
+  model_parameters <- socmod::make_model_parameters(
+    learning_strategy = learning_strategy,
+    graph = graph,
+    adaptive_fitness = adaptive_fitness,
+    adoption_rate = adoption_rate,
+    drop_rate = drop_rate
+  )
+
+  socmod::make_abm(model_parameters, agents = agents)
+}
+```
+
+## Step 2: sanity-check a single run
+
+Before launching dozens of trials, confirm that the setup behaves sensibly. The
+call below runs the model until all four agents converge on a single behavior and
+plots the adoption trajectory.
+
+```{r}
+set.seed(42)
+trial_example <- socmod::run_trial(
+  make_four_agent_model(tibble::tibble(
+    learning_strategy = socmod::success_bias_learning_strategy,
+    adaptive_fitness = 1.2,
+    adoption_rate = 0.6,
+    drop_rate = 0.2
+  )),
+  stop = socmod::fixated
+)
+
+plot_prevalence(trial_example, tracked_behaviors = c("Adaptive"))
+```
+
+## Step 3: sweep across parameters with `run_trials()`
+
+`run_trials()` iterates across all combinations of input values, repeating each
+combination `n_trials_per_param` times. The arguments passed after `n_trials_per_param`
+and `stop` are forwarded to the generator function as columns in the parameter
+tibble.
+
+```{r}
+set.seed(2024)
+small_trial_set <- socmod::run_trials(
+  make_four_agent_model,
+  n_trials_per_param = 5,
+  stop = socmod::fixated,
+  learning_strategy = c(
+    socmod::success_bias_learning_strategy,
+    socmod::frequency_bias_learning_strategy,
+    socmod::contagion_learning_strategy
+  ),
+  adaptive_fitness = c(0.9, 1.4),
+  adoption_rate = 0.6,
+  drop_rate = 0.2
+)
+```
+
+### Summarise prevalence trajectories
+
+`summarise_prevalence()` aggregates time-series data across trials. Setting
+`between_trials = FALSE` returns one time series per replicate, which is useful
+for diagnostic plots or ribbon charts.
+
+```{r}
+prevalence_by_trial <- summarise_prevalence(
+  small_trial_set,
+  input_parameters = c("learning_strategy", "adaptive_fitness"),
+  between_trials = FALSE,
+  tracked_behaviors = c("Adaptive")
+)
+
+prevalence_by_trial %>%
+  select(learning_strategy, adaptive_fitness, trial_id, Step, Prevalence) %>%
+  head()
+```
+
+### Summarise outcomes across trials
+
+`summarise_outcomes()` condenses each parameter combination into metrics such as
+success rate or mean fixation steps.
+
+```{r}
+outcomes <- summarise_outcomes(
+  small_trial_set,
+  input_parameters = c("learning_strategy", "adaptive_fitness"),
+  outcome_measures = c("success_rate", "mean_fixation_steps")
+)
+
+outcomes
+```
+
+You can pivot and plot these summaries using standard `ggplot2` workflows. The
+example below compares success rates across learning strategies for the two fitness
+values.
+
+```{r}
+outcomes %>%
+  filter(Measure == "success_rate") %>%
+  ggplot(aes(x = adaptive_fitness, y = Value, color = learning_strategy)) +
+  geom_point(size = 2) +
+  geom_line(linewidth = 1) +
+  scale_x_continuous(breaks = unique(outcomes$adaptive_fitness)) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  labs(
+    x = "Adaptive fitness",
+    y = "Success rate",
+    color = "Learning strategy"
+  ) +
+  theme_classic(base_size = 14)
+```
+
+## Scaling up experiments
+
+Larger sweeps follow the same pattern—simply increase the parameter grid or the
+number of trials per combination. The script
+`vignettes/calculate_100_trials_result.R` reproduces the figures below by running
+100 simulations per parameter setting and saving the resulting plots alongside the
+vignette source.
+
+```{r}
+#| echo: false
+knitr::include_graphics("adaptive_fitness_experiment.png")
+```
+
+The experiment above varies adaptive fitness while keeping adoption and drop rates
+fixed. A complementary sweep over adoption rates highlights how quickly the
+population converges under different learning strategies.
+
+```{r}
+#| echo: false
+knitr::include_graphics("adoption_rate_experiment.png")
+```
+
+## Tips for efficient experimentation
+
+- Use the `syncfile` argument in `run_trials()` to cache results to disk. This is
+  invaluable when experiments take minutes or hours to run.
+- Keep generator functions pure: given the same row of parameters they should
+  always return identical model instances.
+- Record metadata with the `metadata` argument to `run_trial()` when you need to
+  track scenario labels or random seeds.
+
+With these tools you can iterate quickly on hypotheses, generate reproducible
+figures, and share your results via the rest of the `socmod` documentation.
