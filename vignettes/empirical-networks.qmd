@@ -1,0 +1,133 @@
+---
+title: Working with empirical networks in socmod
+author: Matt Turner
+vignette: >
+  %\VignetteIndexEntry{Working with empirical networks in socmod}
+  %\VignetteEngine{quarto::quarto}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r}
+#| include: false
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
+
+```{r setup}
+#| message: false
+#| warning: false
+library(socmod)
+library(dplyr)
+library(ggplot2)
+```
+
+Real-world datasets help ground diffusion models in empirical structure. `socmod`
+ships with helpers for loading a friendship network collected by Coleman and Feld
+(1982) and for simulating networks that reproduce the observed degree distribution.
+This vignette shows how to
+
+1. Inspect the network and quantify the friendship paradox
+2. Visualize the structure with built-in plotting helpers
+3. Seed an agent-based diffusion model directly from the empirical graph
+
+## Load the Marketville friendship network
+
+`socmod::get_feld_1991_network()` returns an undirected `igraph` object with 146
+students. The dataset is bundled with the package so you can load it without
+managing external files.
+
+```{r}
+marketville <- socmod::get_feld_1991_network()
+marketville
+```
+
+We can verify basic properties—number of edges, degree distribution, and whether
+any isolates are present.
+
+```{r}
+summary <- tibble::tibble(
+  n_students = igraph::gorder(marketville),
+  n_friendships = igraph::gsize(marketville),
+  min_degree = min(igraph::degree(marketville)),
+  median_degree = stats::median(igraph::degree(marketville)),
+  max_degree = max(igraph::degree(marketville))
+)
+summary
+```
+
+## Quantify the friendship paradox
+
+Many social networks exhibit the *friendship paradox*: most people have fewer
+friends than their friends do. `compare_friendship_paradox()` computes how strong
+this effect is for a given network.
+
+```{r}
+paradox <- socmod::compare_friendship_paradox(marketville)
+paradox$summary
+```
+
+Use `plot_friendship_paradox()` to visualize each student's number of friends
+against the average number of friends among their friends.
+
+```{r}
+socmod::plot_friendship_paradox(marketville)
+```
+
+## Visualize the network with `plot_network_adoption`
+
+The same plotting utilities used for simulated models work on empirical graphs as
+well. Here we colour nodes by whether they are initially assigned the adaptive
+behavior.
+
+```{r}
+set.seed(123)
+params_marketville <- socmod::make_model_parameters(
+  graph = marketville,
+  learning_strategy = socmod::contagion_learning_strategy,
+  adaptive_fitness = 1.2,
+  adoption_rate = 0.6,
+  drop_rate = 0.1
+)
+model_marketville <- socmod::make_abm(params_marketville) %>%
+  socmod::initialize_agents(initial_prevalence = 0.1, adaptive_fitness = 1.2)
+
+plot_network_adoption(model_marketville, edgewidth = 0.4)
+```
+
+## Run a diffusion trial on the empirical network
+
+Running simulations on real networks follows the same pattern as the toy examples.
+After initialization we call `run_trial()` and then summarise the prevalence of the
+adaptive behavior over time.
+
+```{r}
+trial_marketville <- socmod::run_trial(
+  model_marketville,
+  stop = socmod::fixated
+)
+
+socmod::summarise_outcomes(
+  trial_marketville,
+  outcome_measures = c("success_rate", "mean_fixation_steps")
+)
+```
+
+```{r}
+socmod::plot_prevalence(
+  trial_marketville,
+  tracked_behaviors = c("Adaptive", "Legacy")
+)
+```
+
+## Simulate additional networks with the same degree profile
+
+If you need more replicates with similar structure, call `simulate_feld_1991()` to
+sample new graphs that match the Marketville degree distribution.
+
+```{r}
+set.seed(99)
+simulated_network <- socmod::simulate_feld_1991()
+igraph::degree(simulated_network) %>% head()
+```
+
+These tools make it straightforward to bridge empirical observations and model
+dynamics within the `socmod` ecosystem.

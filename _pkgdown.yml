@@ -1,6 +1,13 @@
 url: https://css4s.github.io/socmod/
 template:
   bootstrap: 5
+articles:
+  - title: Tutorials
+    desc: Learn how to build models, run experiments, and work with real networks.
+    contents:
+      - basic-diffusion-components
+      - diffusion-experiments
+      - empirical-networks
 reference:
 - title: The `Trial` class and run helpers
   desc: |

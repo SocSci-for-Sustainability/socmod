@@ -80,7 +80,7 @@ p <- ggplot(trials_success_rate,
   guides(color = guide_legend(title = "Learning strategy")) +
   ggtitle("Adoption rate = 0.6, drop rate = 0.2")
 
-ggsave("vignettes/resources/adaptive_fitness_experiment.png", p, 
+ggsave("vignettes/adaptive_fitness_experiment.png", p,
        width = 5.75, height = 3)
 
 
@@ -122,5 +122,5 @@ p <- ggplot(trials_success_rate,
   guides(color = guide_legend(title = "Learning strategy")) +
   ggtitle("Adaptive fitness = 1.4, drop rate = 0.2")
 
-ggsave("vignettes/resources/adoption_rate_experiment.png", 
+ggsave("vignettes/adoption_rate_experiment.png",
        p, width=5.75, height=3)
