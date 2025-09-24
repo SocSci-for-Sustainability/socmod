@@ -18,7 +18,7 @@
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><script src="basic-diffusion-components_files/libs/quarto-html/popper.min.js"></script><script src="basic-diffusion-components_files/libs/quarto-html/tippy.umd.min.js"></script><link href="basic-diffusion-components_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="basic-diffusion-components_files/libs/quarto-html/light-border.css" rel="stylesheet">
 <!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Components for basic diffusion modeling with socmod">
-<meta property="og:image" content="https://css4s.github.io/socmod/logo.png">
+<meta property="og:image" content="https://SocSci-for-Sustainability.github.io/socmod/logo.png">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -448,7 +448,7 @@
 <code class="sourceCode R"><span><span class="va">footballer</span> <span class="op">&lt;-</span> <span class="va">Footballer</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span>accuracy <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span>
 <span><span class="va">footballer</span><span class="op">$</span><span class="fu">scored_goal</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 1</code></pre>
+<pre><code>[1] 0</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb59"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># sum(purrr::map_vec(1:10, \(.) p$scored_goal()))</span></span></code></pre></div>
@@ -517,20 +517,20 @@
 <span><span class="co"># Play three matches.</span></span>
 <span><span class="fu">play_match</span><span class="op">(</span><span class="va">whales</span>, <span class="va">squirrels</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Tie game!
-Whales :  3     Squirrels :  3 </code></pre>
+<pre><code>Whales wins!!!
+Whales :  3     Squirrels :  1 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb63"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">play_match</span><span class="op">(</span><span class="va">squirrels</span>, <span class="va">whales</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Whales wins!!!
-Squirrels :  4     Whales :  7 </code></pre>
+<pre><code>Squirrels wins!!!
+Squirrels :  6     Whales :  3 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb65"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">play_match</span><span class="op">(</span><span class="va">squirrels</span>, <span class="va">whales</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Squirrels wins!!!
-Squirrels :  6     Whales :  5 </code></pre>
+<pre><code>Whales wins!!!
+Squirrels :  4     Whales :  6 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb67"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Print how many games each time won.</span></span>
@@ -539,7 +539,7 @@ Squirrels :  6     Whales :  5 </code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 After three games...
-The Whales have won 1 games and the Squirrels have won 1</code></pre>
+The Whales have won 2 games and the Squirrels have won 1</code></pre>
 </div>
 </div>
 </section></section><section class="level2"><h2 id="agent-based-models-of-social-behavior">Agent-based models of social behavior<a class="anchor" aria-label="anchor" href="#agent-based-models-of-social-behavior"></a>
@@ -561,7 +561,7 @@ Figure 1: Example social network and sustainable adaptation diffusion problem.
 <code class="sourceCode R"><span><span class="co"># Run model and save figure</span></span>
 <span><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/make_graph.html" class="external-link">make_graph</a></span><span class="op">(</span><span class="op">~</span> <span class="fl">1</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">1</span><span class="op">-</span><span class="fl">4</span>, <span class="fl">3</span><span class="op">-</span><span class="fl">2</span><span class="op">)</span></span>
 <span><span class="va">mps</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_model_parameters.html">make_model_parameters</a></span><span class="op">(</span></span>
-<span>  <span class="va">contagion_learning_strategy</span>, graph <span class="op">=</span> <span class="va">g</span>, adoption_rate <span class="op">=</span> <span class="fl">0.8</span>, drop_rate <span class="op">=</span> <span class="fl">0.1</span></span>
+<span>  <span class="va">contagion_model_dynamics</span>, graph <span class="op">=</span> <span class="va">g</span>, adoption_rate <span class="op">=</span> <span class="fl">0.8</span>, drop_rate <span class="op">=</span> <span class="fl">0.1</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">cabm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_abm.html">make_abm</a></span><span class="op">(</span><span class="va">mps</span><span class="op">)</span></span>
 <span><span class="va">cabm</span><span class="op">$</span><span class="fu">get_agent</span><span class="op">(</span><span class="fl">2</span><span class="op">)</span><span class="op">$</span><span class="fu">set_behavior</span><span class="op">(</span><span class="st">"Adaptive"</span><span class="op">)</span></span>
@@ -582,7 +582,7 @@ Figure 1: Example social network and sustainable adaptation diffusion problem.
 <span><span class="co"># load_all()</span></span>
 <span><span class="va">g</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/make_graph.html" class="external-link">make_graph</a></span><span class="op">(</span><span class="op">~</span> <span class="fl">1</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">1</span><span class="op">-</span><span class="fl">4</span>, <span class="fl">3</span><span class="op">-</span><span class="fl">2</span><span class="op">)</span></span>
 <span><span class="va">mps</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_model_parameters.html">make_model_parameters</a></span><span class="op">(</span></span>
-<span>  <span class="va">contagion_learning_strategy</span>, graph <span class="op">=</span> <span class="va">g</span>, adoption_rate <span class="op">=</span> <span class="fl">0.8</span>, drop_rate <span class="op">=</span> <span class="fl">0.1</span></span>
+<span>  <span class="va">contagion_model_dynamics</span>, graph <span class="op">=</span> <span class="va">g</span>, adoption_rate <span class="op">=</span> <span class="fl">0.8</span>, drop_rate <span class="op">=</span> <span class="fl">0.1</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">cabm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_abm.html">make_abm</a></span><span class="op">(</span><span class="va">mps</span><span class="op">)</span></span>
@@ -638,13 +638,13 @@ Figure 1: Example social network and sustainable adaptation diffusion problem.
 <span>  <span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu">igraph</span><span class="fu">::</span><span class="fu"><a href="https://r.igraph.org/reference/make_graph.html" class="external-link">make_graph</a></span><span class="op">(</span><span class="op">~</span> <span class="fl">1</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">-</span><span class="fl">3</span>, <span class="fl">1</span><span class="op">-</span><span class="fl">4</span>, <span class="fl">3</span><span class="op">-</span><span class="fl">2</span><span class="op">)</span></span>
 <span>  </span>
 <span>  <span class="co"># Extract other necessary model parameters.</span></span>
-<span>  <span class="va">learning_strategy</span> <span class="op">&lt;-</span> <span class="va">model_parameter_row</span><span class="op">$</span><span class="va">learning_strategy</span></span>
+<span>  <span class="va">model_dynamics</span> <span class="op">&lt;-</span> <span class="va">model_parameter_row</span><span class="op">$</span><span class="va">model_dynamics</span></span>
 <span>  <span class="va">drop_rate</span> <span class="op">&lt;-</span> <span class="va">model_parameter_row</span><span class="op">$</span><span class="va">drop_rate</span></span>
 <span>  <span class="va">adoption_rate</span> <span class="op">&lt;-</span> <span class="va">model_parameter_row</span><span class="op">$</span><span class="va">adoption_rate</span></span>
 <span>  </span>
 <span>  <span class="co"># Make ModelParameters to encapsulate this model's parameters.</span></span>
 <span>  <span class="va">model_parameters</span> <span class="op">&lt;-</span> <span class="fu">socmod</span><span class="fu">::</span><span class="fu"><a href="../reference/make_model_parameters.html">make_model_parameters</a></span><span class="op">(</span></span>
-<span>    <span class="va">learning_strategy</span>, <span class="va">graph</span>, adaptive_fitness <span class="op">=</span> <span class="va">adaptive_fitness</span>, </span>
+<span>    <span class="va">model_dynamics</span>, <span class="va">graph</span>, adaptive_fitness <span class="op">=</span> <span class="va">adaptive_fitness</span>, </span>
 <span>    adoption_rate <span class="op">=</span> <span class="va">adoption_rate</span>, drop_rate <span class="op">=</span> <span class="va">drop_rate</span></span>
 <span>  <span class="op">)</span></span>
 <span>  </span>
@@ -670,9 +670,9 @@ Figure 1: Example social network and sustainable adaptation diffusion problem.
 <span>    stop <span class="op">=</span> <span class="fu">socmod</span><span class="fu">::</span><span class="va"><a href="../reference/fixated.html">fixated</a></span>, </span>
 <span>    syncfile <span class="op">=</span> <span class="st">"trials-adaptive_fitness.RData"</span>,</span>
 <span>    <span class="co"># overwrite = TRUE,</span></span>
-<span>    learning_strategy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu">socmod</span><span class="fu">::</span><span class="va">success_bias_learning_strategy</span>,</span>
-<span>                          <span class="fu">socmod</span><span class="fu">::</span><span class="va">frequency_bias_learning_strategy</span>,</span>
-<span>                          <span class="fu">socmod</span><span class="fu">::</span><span class="va">contagion_learning_strategy</span><span class="op">)</span>,</span>
+<span>    model_dynamics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu">socmod</span><span class="fu">::</span><span class="va"><a href="../reference/success_bias_model_dynamics.html">success_bias_model_dynamics</a></span>,</span>
+<span>                          <span class="fu">socmod</span><span class="fu">::</span><span class="va"><a href="../reference/frequency_bias_model_dynamics.html">frequency_bias_model_dynamics</a></span>,</span>
+<span>                          <span class="fu">socmod</span><span class="fu">::</span><span class="va"><a href="../reference/contagion_model_dynamics.html">contagion_model_dynamics</a></span><span class="op">)</span>,</span>
 <span>    adaptive_fitness <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="fl">2.4</span>, <span class="fl">0.2</span><span class="op">)</span>,</span>
 <span>    adoption_rate <span class="op">=</span> <span class="fl">0.6</span>,</span>
 <span>    drop_rate <span class="op">=</span> <span class="fl">0.2</span></span>
@@ -680,7 +680,7 @@ Figure 1: Example social network and sustainable adaptation diffusion problem.
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="va">trials_summary</span> <span class="op">&lt;-</span> <span class="fu">socmod</span><span class="fu">::</span><span class="fu">summarise_by_parameters</span><span class="op">(</span></span>
-<span>  <span class="va">trials_adaptive_fitness</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"learning_strategy"</span>, <span class="st">"adaptive_fitness"</span><span class="op">)</span></span>
+<span>  <span class="va">trials_adaptive_fitness</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"model_dynamics"</span>, <span class="st">"adaptive_fitness"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">trials_success_rate</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">trials_summary</span>, <span class="va">Measure</span> <span class="op">==</span> <span class="st">"success_rate"</span><span class="op">)</span></span></code></pre></div>
@@ -690,7 +690,7 @@ Figure 1: Example social network and sustainable adaptation diffusion problem.
 <div class="sourceCode cell-code" id="cb75"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">trials_success_rate</span>, </span>
 <span>              <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">adaptive_fitness</span>, y<span class="op">=</span><span class="va">Value</span>, </span>
-<span>                  color<span class="op">=</span><span class="va">learning_strategy</span><span class="op">)</span></span>
+<span>                  color<span class="op">=</span><span class="va">model_dynamics</span><span class="op">)</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth<span class="op">=</span><span class="fl">1.0</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">2.15</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggsci</span><span class="fu">::</span><span class="fu"><a href="https://nanx.me/ggsci/reference/scale_aaas.html" class="external-link">scale_color_aaas</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggsci</span><span class="fu">::</span><span class="fu"><a href="https://nanx.me/ggsci/reference/scale_aaas.html" class="external-link">scale_fill_aaas</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
@@ -721,16 +721,16 @@ Figure 1: Example social network and sustainable adaptation diffusion problem.
 <span>    stop <span class="op">=</span> <span class="fu">socmod</span><span class="fu">::</span><span class="va"><a href="../reference/fixated.html">fixated</a></span>, </span>
 <span>    syncfile <span class="op">=</span> <span class="st">"trials-adoption-rate.RData"</span>,</span>
 <span>    overwrite <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>    learning_strategy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu">socmod</span><span class="fu">::</span><span class="va">success_bias_learning_strategy</span>,</span>
-<span>                          <span class="fu">socmod</span><span class="fu">::</span><span class="va">frequency_bias_learning_strategy</span>,</span>
-<span>                          <span class="fu">socmod</span><span class="fu">::</span><span class="va">contagion_learning_strategy</span><span class="op">)</span>,</span>
+<span>    model_dynamics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu">socmod</span><span class="fu">::</span><span class="va"><a href="../reference/success_bias_model_dynamics.html">success_bias_model_dynamics</a></span>,</span>
+<span>                          <span class="fu">socmod</span><span class="fu">::</span><span class="va"><a href="../reference/frequency_bias_model_dynamics.html">frequency_bias_model_dynamics</a></span>,</span>
+<span>                          <span class="fu">socmod</span><span class="fu">::</span><span class="va"><a href="../reference/contagion_model_dynamics.html">contagion_model_dynamics</a></span><span class="op">)</span>,</span>
 <span>    adaptive_fitness <span class="op">=</span> <span class="fl">1.4</span>,</span>
 <span>    adoption_rate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.2</span>, <span class="fl">0.4</span>, <span class="fl">0.6</span>, <span class="fl">0.8</span>, <span class="fl">1.0</span><span class="op">)</span>,</span>
 <span>    drop_rate <span class="op">=</span> <span class="fl">0.2</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="va">trials_summary</span> <span class="op">&lt;-</span> <span class="fu">socmod</span><span class="fu">::</span><span class="fu">summarise_by_parameters</span><span class="op">(</span></span>
-<span>  <span class="va">trials_adoption</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"learning_strategy"</span>, <span class="st">"adoption_rate"</span><span class="op">)</span></span>
+<span>  <span class="va">trials_adoption</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"model_dynamics"</span>, <span class="st">"adoption_rate"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">trials_success_rate</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span>
@@ -740,7 +740,7 @@ Figure 1: Example social network and sustainable adaptation diffusion problem.
 <div class="cell" data-number-lines="true">
 <div class="sourceCode cell-code" id="cb77"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">trials_success_rate</span>, </span>
-<span>            <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">adoption_rate</span>, y<span class="op">=</span><span class="va">Value</span>, color<span class="op">=</span><span class="va">learning_strategy</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>            <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">adoption_rate</span>, y<span class="op">=</span><span class="va">Value</span>, color<span class="op">=</span><span class="va">model_dynamics</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth<span class="op">=</span><span class="fl">1.0</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">2.15</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggsci</span><span class="fu">::</span><span class="fu"><a href="https://nanx.me/ggsci/reference/scale_aaas.html" class="external-link">scale_color_aaas</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">ggsci</span><span class="fu">::</span><span class="fu"><a href="https://nanx.me/ggsci/reference/scale_aaas.html" class="external-link">scale_fill_aaas</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Adoption rate"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Success rate"</span><span class="op">)</span> <span class="op">+</span></span>

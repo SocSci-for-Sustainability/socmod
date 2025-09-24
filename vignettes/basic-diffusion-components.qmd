@@ -408,7 +408,7 @@ In the example, agent 2 has adopted rooftop solar. It has some adaptive fitness,
 # Run model and save figure
 g <- igraph::make_graph(~ 1-2, 1-3, 1-4, 3-2)
 mps <- make_model_parameters(
-  contagion_learning_strategy, graph = g, adoption_rate = 0.8, drop_rate = 0.1
+  contagion_model_dynamics, graph = g, adoption_rate = 0.8, drop_rate = 0.1
 )
 cabm <- make_abm(mps)
 cabm$get_agent(2)$set_behavior("Adaptive")
@@ -426,7 +426,7 @@ print(p)
 # load_all()
 g <- igraph::make_graph(~ 1-2, 1-3, 1-4, 3-2)
 mps <- make_model_parameters(
-  contagion_learning_strategy, graph = g, adoption_rate = 0.8, drop_rate = 0.1
+  contagion_model_dynamics, graph = g, adoption_rate = 0.8, drop_rate = 0.1
 )
 
 cabm <- make_abm(mps)
@@ -469,13 +469,13 @@ gen <- function(model_parameter_row) {
   graph <- igraph::make_graph(~ 1-2, 1-3, 1-4, 3-2)
   
   # Extract other necessary model parameters.
-  learning_strategy <- model_parameter_row$learning_strategy
+  model_dynamics <- model_parameter_row$model_dynamics
   drop_rate <- model_parameter_row$drop_rate
   adoption_rate <- model_parameter_row$adoption_rate
   
   # Make ModelParameters to encapsulate this model's parameters.
   model_parameters <- socmod::make_model_parameters(
-    learning_strategy, graph, adaptive_fitness = adaptive_fitness, 
+    model_dynamics, graph, adaptive_fitness = adaptive_fitness, 
     adoption_rate = adoption_rate, drop_rate = drop_rate
   )
   
@@ -503,9 +503,9 @@ if (!("trials_adaptive_fitness" %in% ls(all.names = TRUE))) {
     stop = socmod::fixated, 
     syncfile = "trials-adaptive_fitness.RData",
     # overwrite = TRUE,
-    learning_strategy = c(socmod::success_bias_learning_strategy,
-                          socmod::frequency_bias_learning_strategy,
-                          socmod::contagion_learning_strategy),
+    model_dynamics = c(socmod::success_bias_model_dynamics,
+                          socmod::frequency_bias_model_dynamics,
+                          socmod::contagion_model_dynamics),
     adaptive_fitness = seq(0.8, 2.4, 0.2),
     adoption_rate = 0.6,
     drop_rate = 0.2
@@ -513,7 +513,7 @@ if (!("trials_adaptive_fitness" %in% ls(all.names = TRUE))) {
 }
 
 trials_summary <- socmod::summarise_by_parameters(
-  trials_adaptive_fitness, c("learning_strategy", "adaptive_fitness")
+  trials_adaptive_fitness, c("model_dynamics", "adaptive_fitness")
 )
 
 trials_success_rate <- dplyr::filter(trials_summary, Measure == "success_rate")
@@ -526,7 +526,7 @@ Now plot...
 #| number-lines: true
 p <- ggplot(trials_success_rate, 
               aes(x=adaptive_fitness, y=Value, 
-                  color=learning_strategy)
+                  color=model_dynamics)
 ) +
   geom_line(linewidth=1.0) + geom_point(size=2.15) +
   ggsci::scale_color_aaas() + ggsci::scale_fill_aaas() +
@@ -557,16 +557,16 @@ if (!("trials_adoption" %in% ls(all.names = TRUE))) {
     stop = socmod::fixated, 
     syncfile = "trials-adoption-rate.RData",
     overwrite = TRUE,
-    learning_strategy = c(socmod::success_bias_learning_strategy,
-                          socmod::frequency_bias_learning_strategy,
-                          socmod::contagion_learning_strategy),
+    model_dynamics = c(socmod::success_bias_model_dynamics,
+                          socmod::frequency_bias_model_dynamics,
+                          socmod::contagion_model_dynamics),
     adaptive_fitness = 1.4,
     adoption_rate = c(0.05, 0.2, 0.4, 0.6, 0.8, 1.0),
     drop_rate = 0.2
   )
 }
 trials_summary <- socmod::summarise_by_parameters(
-  trials_adoption, c("learning_strategy", "adoption_rate")
+  trials_adoption, c("model_dynamics", "adoption_rate")
 )
 
 trials_success_rate <- dplyr::filter(
@@ -578,7 +578,7 @@ trials_success_rate <- dplyr::filter(
 #| eval: false
 #| number-lines: true
 p <- ggplot(trials_success_rate, 
-            aes(x=adoption_rate, y=Value, color=learning_strategy)) +
+            aes(x=adoption_rate, y=Value, color=model_dynamics)) +
   geom_line(linewidth=1.0) + geom_point(size=2.15) +
   ggsci::scale_color_aaas() + ggsci::scale_fill_aaas() +
   xlab("Adoption rate") + ylab("Success rate") +
