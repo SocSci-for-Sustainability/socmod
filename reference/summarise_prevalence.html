@@ -102,27 +102,31 @@ If FALSE, returns per-trial prevalence values with a <code>trial_id</code> colum
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">mps</span> <span class="op">&lt;-</span> <span class="fu"><a href="make_model_parameters.html">make_model_parameters</a></span><span class="op">(</span>n_agents <span class="op">=</span> <span class="fl">10</span>, adoption_rate <span class="op">=</span> <span class="fl">1.0</span>, model_dynamics <span class="op">=</span> <span class="va">contagion_model_dynamics</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">abm</span> <span class="op">&lt;-</span> <span class="fu"><a href="make_abm.html">make_abm</a></span><span class="op">(</span><span class="va">mps</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">trial</span> <span class="op">&lt;-</span> <span class="fu">make_trial</span><span class="op">(</span><span class="va">abm</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in make_trial(abm):</span> could not find function "make_trial"</span>
-<span class="r-in"><span><span class="va">trial</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span>steps <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'trial' not found</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Summary aggregated across trials (default)</span></span></span>
-<span class="r-in"><span><span class="va">summary</span> <span class="op">&lt;-</span> <span class="fu">summarise_prevalence</span><span class="op">(</span><span class="va">trial</span>, tracked_behaviors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"B"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'trial' not found</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">summary</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> function (object, ...) </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> UseMethod("summary")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;bytecode: 0x155526268&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: namespace:base&gt;</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Per-trial summary without aggregation</span></span></span>
-<span class="r-in"><span><span class="va">summary_per_trial</span> <span class="op">&lt;-</span> <span class="fu">summarise_prevalence</span><span class="op">(</span><span class="va">trial</span>, tracked_behaviors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"B"</span><span class="op">)</span>, between_trials <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in summarise_prevalence(trial, tracked_behaviors = c("A", "B"),     between_trials = FALSE):</span> unused argument (between_trials = FALSE)</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">summary_per_trial</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'summary_per_trial' not found</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">abm_gen</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">params</span><span class="op">$</span><span class="va">graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="make_small_world.html">make_small_world</a></span><span class="op">(</span><span class="va">params</span><span class="op">$</span><span class="va">n_agents</span>, <span class="fl">6</span>, <span class="fl">0.5</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">make_abm</span>, <span class="va">params</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>            <span class="fu"><a href="initialize_agents.html">initialize_agents</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>              initial_prevalence <span class="op">=</span> <span class="va">params</span><span class="op">$</span><span class="va">initial_prevalence</span>,</span></span>
+<span class="r-in"><span>              adaptive_fitness <span class="op">=</span> <span class="va">params</span><span class="op">$</span><span class="va">adaptive_fitness</span></span></span>
+<span class="r-in"><span>            <span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="va">adaptive_fitness_vals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="fl">1.1</span><span class="op">)</span> </span></span>
+<span class="r-in"><span><span class="va">trials</span> <span class="op">&lt;-</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="run_trials.html">run_trials</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="va">abm_gen</span>,</span></span>
+<span class="r-in"><span>    n_trials_per_param <span class="op">=</span> <span class="fl">2</span>,</span></span>
+<span class="r-in"><span>    stop <span class="op">=</span> <span class="fu">socmod</span><span class="fu">::</span><span class="va"><a href="fixated.html">fixated</a></span>,</span></span>
+<span class="r-in"><span>    n_agents <span class="op">=</span> <span class="fl">20</span>,</span></span>
+<span class="r-in"><span>    initial_prevalence <span class="op">=</span> <span class="fl">0.1</span>,</span></span>
+<span class="r-in"><span>    adaptive_fitness <span class="op">=</span> <span class="va">adaptive_fitness_vals</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">summary</span> <span class="op">&lt;-</span> <span class="fu">summarise_prevalence</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">trials</span>, input_parameters <span class="op">=</span> <span class="st">"adaptive_fitness"</span>, across_trials <span class="op">=</span> <span class="cn">F</span></span></span>
+<span class="r-in"><span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span></span>
+<span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    `Adaptive fitness` <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">adaptive_fitness</span>, <span class="va">adaptive_fitness_vals</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

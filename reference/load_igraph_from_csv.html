@@ -62,8 +62,22 @@ Assumes columns are either <code>from</code> and <code>to</code>, or <code>sourc
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">fnet</span> <span class="op">&lt;-</span> <span class="fu">load_igraph_from_csv</span><span class="op">(</span><span class="st">"marketville-friends-coleman-feld.csv"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in load_igraph_from_csv("marketville-friends-coleman-feld.csv"):</span> File does not exist: marketville-friends-coleman-feld.csv</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">load_igraph_from_csv</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"marketville-friends-coleman-feld.csv"</span>, </span></span>
+<span class="r-in"><span>              package <span class="op">=</span> <span class="st">"socmod"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> IGRAPH d469715 UN-- 137 181 -- </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> + attr: name (v/c)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> + edges from d469715 (vertex names):</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 015--039 015--041 041--039 041--019 041--020 020--016 018--068 020--022</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9] 022--040 022--045 045--044 044--047 047--023 047--037 037--023 037--091</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [17] 007--091 091--084 084--072 072--075 075--092 092--078 092--077 092--082</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [25] 082--094 089--094 089--090 090--094 045--026 034--048 048--109 048--081</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [33] 081--109 081--097 097--076 076--085 076--086 085--086 026--013 013--042</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [41] 042--058 058--052 058--056 058--055 058--057 056--052 056--055 052--055</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [49] 055--059 055--057 057--059 052--059 059--053 053--011 011--051 059--051</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [57] 059--051 059--054 057--054 057--025 057--035 035--025 025--046 105--046</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> + ... omitted several edges</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
