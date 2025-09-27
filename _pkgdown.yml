@@ -20,14 +20,11 @@ reference:
   contents:
   - plot_prevalence
   - plot_network_adoption
-  - plot_homophilynet
-  - plot_friendship_paradox
   - SOCMOD_PALETTE
   - SOCMOD_PALETTE_CVD
 - title: Examples with real-world data
   desc: Simple examples of real-world data in socmod.
   contents:
-  - simulate_feld_1991
   - get_feld_1991_network
 - title: AgentBasedModel and ModelParameters
   desc: |
@@ -67,12 +64,8 @@ reference:
   - make_preferential_attachment
   - G_NM
   - make_regular_lattice
-  - plot_homophilynet
   - add_unique_edge
   - get_all_possible_edges
   - not_adjacent
   - compare_friendship_paradox
   - load_igraph_from_csv
-  - plot_friendship_paradox
-
-
