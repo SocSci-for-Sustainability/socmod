@@ -82,13 +82,14 @@ Computational experiments can be created in a similar declarative style,
 beginning with a user-defined model generation function:
 
 ``` r
-# Model generator
 abm_gen <- function(params) {
-  do.call(make_abm, params) %>%
-    initialize_agents(
-      initial_prevalence = params$initial_prevalence,
-      adaptive_fitness = params$adaptive_fitness
-    )
+  params$graph <- make_small_world(params$n_agents, 6, 0.5)
+  return (do.call(make_abm, params) %>%
+            initialize_agents(
+              initial_prevalence = params$initial_prevalence,
+              adaptive_fitness = params$adaptive_fitness
+            )
+  )
 }
 ```
 
@@ -109,12 +110,13 @@ adaptive_fitness_vals <- c(0.9, 1.1, 1.4)
 trials <-
   run_trials(
     abm_gen,
-    n_trials_per_param = 5,
+    n_trials_per_param = 2,
     stop = socmod::fixated,
     n_agents = 20,
     initial_prevalence = 0.1,
     adaptive_fitness = adaptive_fitness_vals
-  )
+)
+
 # Summarize within trials only; rename and factor adaptive fitness for display
 summary <- summarise_prevalence(
   trials, input_parameters = "adaptive_fitness", across_trials = F
