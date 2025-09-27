@@ -16,11 +16,7 @@ TRUE if all agents have the same behavior
 Predicate function: has the model fixated on a single behavior?
 }
 \examples{
-agents <- list(
-  Agent$new(name = "1", behavior = "Legacy", fitness = 1),
-  Agent$new(name = "2", behavior = "Adaptive", fitness = 4)
-)
 net <- igraph::make_graph(~ 1-2)
-model <- AgentBasedModel$new(agents = agents, graph = net)
+model <- make_abm(graph = net)
 trial <- run_trial(model, stop = fixated) # <- "stop trial when fixated"
 }

@@ -17,6 +17,9 @@ Loads a graph from a CSV file containing a two-column edge list.
 Assumes columns are either \code{from} and \code{to}, or \code{source} and \code{target}.
 }
 \examples{
-fnet <- load_igraph_from_csv("marketville-friends-coleman-feld.csv")
+load_igraph_from_csv(
+  system.file("extdata", "marketville-friends-coleman-feld.csv", 
+              package = "socmod")
+)
 
 }

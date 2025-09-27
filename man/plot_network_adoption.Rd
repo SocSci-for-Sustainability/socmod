@@ -36,20 +36,18 @@ Visualizes agent behaviors in a network using ggnetwork. Accepts a Trial
 or AgentBasedModel and colors nodes by behavior.
 }
 \examples{
-trial <- example_trial()
-plot_network_adoption(trial)
+sw_net <- socmod::make_small_world(N = 20, k = 6, p = 0.5)
+abm <- make_abm(graph = sw_net) |> initialize_agents(initial_prevalence = 0.2)
+plot_network_adoption(abm)
 
 # Use degree centrality to size nodes
-plot_network_adoption(trial, node_size = list(Degree = igraph::degree))
+plot_network_adoption(abm, node_size = list(Degree = igraph::degree))
 
 # Add a title and modify legend position
 plot_network_adoption(
-  trial,
+  abm,
   plot_mod = . \%>\%
-    ggtitle("Adoption at t = 0") \%>\%
-    theme(legend.position = "bottom")
+    ggplot2::ggtitle("Adoption at t = 0") \%>\%
+    ggplot2::theme(legend.position = "bottom")
 )
-
-# Specify a circular layout
-plot_network_adoption(make_abm(graph = make_small_world(10, 4, 0.2)), layout = "circle")
 }

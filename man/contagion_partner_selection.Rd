@@ -18,7 +18,7 @@ A single neighbor Agent.
 Selects one neighbor at random for potential contagion interaction.
 }
 \examples{
-model <- example_model_with_params()
+model <- make_abm(graph = igraph::make_graph(~ 1-2), adoption_rate = 1.0)
 learner <- model$get_agent(1)
-contagion_partner_selection(learner, model)
+teacher <- contagion_partner_selection(learner, model)
 }

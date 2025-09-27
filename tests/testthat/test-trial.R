@@ -37,7 +37,14 @@ test_that("Trial stops after max steps and adapts outcomes", {
     "null strategy"
   )
   
-  model <- AgentBasedModel$new(make_model_parameters(lstrat, n_agents = 4))
+  model <- 
+    AgentBasedModel$new(
+      make_model_parameters(
+        lstrat, 
+        n_agents = 4,
+        graph = igraph::make_full_graph(4)
+      )
+    )
 
   model$agents[[1]]$set_behavior("Adaptive")
   model$agents[[2]]$set_behavior("Legacy")
@@ -91,6 +98,7 @@ test_that("summarise_outcomes correctly summarizes grouped trial outcomes", {
     # Create model based on parameters...
     trial <- make_model_parameters(
         n_agents = 10, 
+        graph = igraph::make_full_graph(10),
         seed_set = ifelse(ii <= 2, "A", "B"),
         adaptive_fitness = ifelse(ii %% 2 == 0, 1.2, 1.0), 
       ) %>%

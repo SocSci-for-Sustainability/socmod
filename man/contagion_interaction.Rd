@@ -20,10 +20,11 @@ None. Modifies the learner's next behavior and fitness.
 Updates learner behavior based on interaction with an Adaptive neighbor.
 }
 \examples{
-model <- example_model_with_params(list(adopt_rate = 1.0))
+model <- make_abm(n_agents = 2, adoption_rate = 1.0)
 learner <- model$get_agent(1)
 teacher <- model$get_agent(2)
 learner$set_behavior("Legacy")
 teacher$set_behavior("Adaptive")
 contagion_interaction(learner, teacher, model)
+print(learner$get_next_behavior())  # expect "Adaptive"
 }

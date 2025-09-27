@@ -182,7 +182,9 @@ frequency_bias_interact <- function(learner, ., model) {
 #' @param model An AgentBasedModel instance (not used directly here, but included for consistency with other learning functions).
 #' @return An Agent object: the selected teacher.
 #' @examples
-#' model <- ?
+#' agents <- c(Agent$new(id = 1), Agent$new(id = 2), Agent$new(id = 3))
+#' graph <- igraph::make_graph(~ 1-2, 1-3)
+#' model <- make_abm(graph = graph)
 #' learner <- model$get_agent(1)
 #' teacher <- success_bias_select_teacher(learner, model)
 #' @export
@@ -236,9 +238,9 @@ success_bias_interact <- function(learner, teacher, model) {
 #' @param model An AgentBasedModel instance.
 #' @return A single neighbor Agent.
 #' @examples
-#' model <- example_model_with_params()
+#' model <- make_abm(graph = igraph::make_graph(~ 1-2), adoption_rate = 1.0)
 #' learner <- model$get_agent(1)
-#' contagion_partner_selection(learner, model)
+#' teacher <- contagion_partner_selection(learner, model)
 #' @export
 contagion_partner_selection <- function(learner, model) {
   return (learner$get_neighbors()$sample(1))
@@ -253,12 +255,13 @@ contagion_partner_selection <- function(learner, model) {
 #' @param model An AgentBasedModel instance with parameter "adopt_rate".
 #' @return None. Modifies the learner's next behavior and fitness.
 #' @examples
-#' model <- example_model_with_params(list(adopt_rate = 1.0))
+#' model <- make_abm(n_agents = 2, adoption_rate = 1.0)
 #' learner <- model$get_agent(1)
 #' teacher <- model$get_agent(2)
 #' learner$set_behavior("Legacy")
 #' teacher$set_behavior("Adaptive")
 #' contagion_interaction(learner, teacher, model)
+#' print(learner$get_next_behavior())  # expect "Adaptive"
 #' @export
 contagion_interaction <- function(learner, teacher, model) {
 

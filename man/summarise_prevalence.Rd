@@ -39,17 +39,30 @@ either returning a summary for each individual trial or averaging across multipl
 Prevalence is normalized by the number of agents in each trial.
 }
 \examples{
-mps <- make_model_parameters(n_agents = 10, adoption_rate = 1.0, model_dynamics = contagion_model_dynamics)
-abm <- make_abm(mps)
-trial <- make_trial(abm)
-trial$run(steps = 5)
-
-# Summary aggregated across trials (default)
-summary <- summarise_prevalence(trial, tracked_behaviors = c("A", "B"))
-print(summary)
-
-# Per-trial summary without aggregation
-summary_per_trial <- summarise_prevalence(trial, tracked_behaviors = c("A", "B"), between_trials = FALSE)
-print(summary_per_trial)
+abm_gen <- function(params) {
+  params$graph <- make_small_world(params$n_agents, 6, 0.5)
+  return (do.call(make_abm, params) \%>\%
+            initialize_agents(
+              initial_prevalence = params$initial_prevalence,
+              adaptive_fitness = params$adaptive_fitness
+            )
+  )
+}
+adaptive_fitness_vals <- c(0.9, 1.1) 
+trials <-
+  run_trials(
+    abm_gen,
+    n_trials_per_param = 2,
+    stop = socmod::fixated,
+    n_agents = 20,
+    initial_prevalence = 0.1,
+    adaptive_fitness = adaptive_fitness_vals
+)
+summary <- summarise_prevalence(
+  trials, input_parameters = "adaptive_fitness", across_trials = F
+) \%>\% 
+  dplyr::mutate(
+    `Adaptive fitness` = factor(adaptive_fitness, adaptive_fitness_vals)
+  )
 
 }
