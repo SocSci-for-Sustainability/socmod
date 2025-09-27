@@ -22,13 +22,42 @@ This function summarizes trial-level outcomes by grouping across input parameter
 It computes the mean of specified outcome measures across all trials sharing the same input parameter values.
 }
 \examples{
-mps <- make_model_parameters(n_agents = 10, adoption_rate = 1.0, model_dynamics = contagion_model_dynamics)
-abm <- make_abm(mps)
-trial <- make_trial(abm)
-trial$run(steps = 5)
+abm_gen <- function(params) {
+  params$graph <- make_small_world(params$n_agents, 6, 0.5)
+  return (do.call(make_abm, params) \%>\%
+            initialize_agents(
+              initial_prevalence = params$initial_prevalence,
+              adaptive_fitness = params$adaptive_fitness
+            )
+  )
+}
+adaptive_fitness_vals <- c(0.9, 1.1)
+trials <-
+  run_trials(
+    abm_gen,
+    n_trials_per_param = 2,
+    stop = socmod::fixated,
+    n_agents = 20,
+    initial_prevalence = 0.1,
+    adaptive_fitness = adaptive_fitness_vals
+)
+outcomes <- summarise_outcomes(
+  trials, 
+  input_parameters = "adaptive_fitness", 
+  outcome_measures = c("success_rate", "mean_fixation_steps")
+) 
 
-trials <- list(trial, trial)
-
-summary <- summarise_outcomes(trials, input_parameters = "adoption_rate", outcome_measures = "success_rate")
-print(summary)
+max_fix_time <- max(outcomes$Value[outcomes$Measure == "mean_fixation_steps"])
+# Normalize to calculate mean fixation time as a fraction of maximum
+outcomes_norm <- outcomes \%>\%
+  dplyr::mutate(Value = dplyr::case_when(
+    Measure == "mean_fixation_steps" ~ Value / max_fix_time,
+    TRUE ~ Value
+  ))
+# Rename and set order of Measure factors to avoid messing with the legend in plotting
+outcomes_norm$Measure[outcomes_norm$Measure == "success_rate"] <- "Success rate"
+outcomes_norm$Measure[outcomes_norm$Measure == "mean_fixation_steps"] <- "Normalized fixation time"
+outcomes_norm$Measure <- factor(outcomes_norm$Measure, levels = c(
+  "Success rate", "Normalized fixation time"
+))
 }

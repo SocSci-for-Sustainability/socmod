@@ -36,9 +36,9 @@ network by first assigning all within-group edges.
 \examples{
 # Two groups size 5 and 10.
 hnet_2grp <- make_homophily_network(c(5, 10), mean_degree = 3, homophily = 0.5)
-plot_homophilynet(hnet_2grp)
+abm <- make_abm(graph = hnet_2grp) |> initialize_agents(initial_prevalence = 0.2)
 
 # Five groups all size 5 with out-group preference (neg. homophily).
 hnet_5grp <- make_homophily_network(rep(5, 5), mean_degree = 2, homophily = -0.5)
-plot_homophilynet(hnet_5grp)
+abm <- make_abm(graph = hnet_2grp) |> initialize_agents(initial_prevalence = 0.2)
 }

@@ -18,7 +18,9 @@ An Agent object: the selected teacher.
 Selects the most successful neighbor (highest fitness) to learn from. Ties are broken at random.
 }
 \examples{
-model <- ?
+agents <- c(Agent$new(id = 1), Agent$new(id = 2), Agent$new(id = 3))
+graph <- igraph::make_graph(~ 1-2, 1-3)
+model <- make_abm(graph = graph)
 learner <- model$get_agent(1)
 teacher <- success_bias_select_teacher(learner, model)
 }

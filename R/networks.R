@@ -239,9 +239,10 @@ make_preferential_attachment <- function(N) {
 #' @returns ggplot 
 #' @export
 #'
-#' @examples
-#' hnet_5grp <- make_homophily_network(rep(5, 5), mean_degree = 2, homophily = -0.5)
-#' plot_homophilynet(hnet_5grp)
+# @examples
+# hnet_5grp <- make_homophily_network(rep(5, 5), mean_degree = 2, homophily = -0.5)
+# plot_homophilynet(hnet_5grp)
+#' @noRd
 plot_homophilynet <- function(net, node_size = 3, line_width = 0.1, 
                               theme_base_size = 10) {
   ggplot(ggnetwork(net, layout = "circular"), aes(x=x, y=y, xend=xend, yend=yend)) + 
@@ -267,11 +268,11 @@ plot_homophilynet <- function(net, node_size = 3, line_width = 0.1,
 #' @examples
 #' # Two groups size 5 and 10.
 #' hnet_2grp <- make_homophily_network(c(5, 10), mean_degree = 3, homophily = 0.5)
-#' plot_homophilynet(hnet_2grp)
+#' abm <- make_abm(graph = hnet_2grp) |> initialize_agents(initial_prevalence = 0.2)
 #' 
 #' # Five groups all size 5 with out-group preference (neg. homophily).
 #' hnet_5grp <- make_homophily_network(rep(5, 5), mean_degree = 2, homophily = -0.5)
-#' plot_homophilynet(hnet_5grp)
+#' abm <- make_abm(graph = hnet_2grp) |> initialize_agents(initial_prevalence = 0.2)
 #' @return igraph Graph
 #' @export
 make_homophily_network <- function(group_sizes = c(3, 7), 
@@ -435,62 +436,6 @@ make_homophily_network <- function(group_sizes = c(3, 7),
 }
 
 
-#' Simulate Feld's 1991 Marketville Network
-#'
-#' Creates an undirected network using the degree distribution from
-#' Feld (1991) based on the "Marketville" high school data. Uses
-#' the configuration model to generate the network structure.
-#'
-#' The friendship paradox—where most individuals have fewer friends
-#' than their friends do—emerges naturally due to degree heterogeneity
-#' in this network.
-#'
-#' @param seed Integer. Random seed for reproducibility. Default is 42.
-#'
-#' @return An igraph object representing the simulated network.
-#'
-#' @examples
-#' # Generate the network
-#' g <- simulate_feld_1991(seed = 42)
-#'
-#' # Plot degree vs. mean degree of friends to show the paradox
-#' deg <- igraph::degree(g)
-#' mean_neighbor_deg <- sapply(igraph::V(g), function(v) {
-#'   nbs <- igraph::neighbors(g, v)
-#'   if (length(nbs) == 0) return(NA)
-#'   mean(igraph::degree(g, v = nbs))
-#' })
-#'
-#' plot(deg, mean_neighbor_deg,
-#'      xlab = "Individual's Friends",
-#'      ylab = "Mean Friends of Friends")
-#' abline(0, 1, col = "red")
-#'
-#' # Proportion of individuals with fewer friends than their friends
-#' mean(deg < mean_neighbor_deg, na.rm = TRUE)
-#'
-#' @export
-simulate_feld_1991 <- function(seed = 42) {
-  if (!requireNamespace("igraph", quietly = TRUE)) {
-    stop("Please install the 'igraph' package to use this function.")
-  }
-  
-  # Degree distribution from Feld (1991), Fig. 3a
-  degree_dist <- data.frame(
-    degree = 1:7,
-    count = c(20, 29, 35, 20, 14, 20, 8)
-  )
-  
-  # Create degree sequence
-  degrees <- rep(degree_dist$degree, degree_dist$count)
-  
-  # Generate network
-  set.seed(seed)
-  g <- igraph::sample_degseq(degrees, method = "simple.no.multiple")
-  
-  return(g)
-}
-
 #' Compare Friendship Paradox in a Network
 #'
 #' For each node, compares the number of friends (degree) to the mean number
@@ -511,7 +456,7 @@ simulate_feld_1991 <- function(seed = 42) {
 #' \dontrun{
 #' # Use with an igraph network
 #' library(igraph)
-#' g_ig <- simulate_feld_1991()
+#' g_ig <- get_feld_1991_network()
 #' compare_friendship_paradox(g_ig)
 #'
 #' # Return node-level metrics too
@@ -556,66 +501,6 @@ compare_friendship_paradox <- function(graph, return_node_data = FALSE) {
 }
 
 
-#' Plot Friendship Paradox Comparison
-#'
-#' Plots each node's number of friends (degree) against the mean number
-#' of friends among their friends (mean neighbor degree), with a 1:1 reference line.
-#' Useful for visualizing the strength and spread of the friendship paradox.
-#'
-#' @param graph An `igraph` or `tidygraph::tbl_graph` object.
-#' @param label Logical. If TRUE, adds node labels.
-#' @param point_size Size of points in the scatterplot.
-#' @param ... Additional arguments passed to `ggplot2::geom_point()`.
-#'
-#' @return A `ggplot2` object.
-#'
-#' @examples
-#' library(tidygraph)
-#' library(ggplot2)
-#'
-#' g <- simulate_feld_1991_tbl()
-#' plot_friendship_paradox(g)
-#'
-#' @export
-plot_friendship_paradox <- function(graph, label = FALSE, point_size = 2, ...) {
-  if (!requireNamespace("ggplot2", quietly = TRUE)) {
-    stop("The 'ggplot2' package is required.")
-  }
-  
-  if (inherits(graph, "tbl_graph")) {
-    g <- graph
-  } else if (inherits(graph, "igraph")) {
-    g <- tidygraph::as_tbl_graph(graph)
-  } else {
-    stop("Input must be an igraph or tbl_graph object.")
-  }
-  
-  g <- g %>%
-    tidygraph::mutate(
-      degree = tidygraph::centrality_degree(),
-      mean_neighbor_degree = tidygraph::map_local(~ mean(.x$degree, na.rm = TRUE))
-    )
-  
-  df <- as.data.frame(g)
-  df$id <- seq_len(nrow(df))  # fallback label
-  
-  p <- ggplot2::ggplot(df, ggplot2::aes(x = degree, y = mean_neighbor_degree)) +
-    ggplot2::geom_point(size = point_size, ...) +
-    ggplot2::geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "red") +
-    ggplot2::labs(
-      x = "Individual's Number of Friends",
-      y = "Mean Number of Friends of Friends",
-      title = "Friendship Paradox: Degree vs. Friends-of-Friends"
-    ) +
-    ggplot2::theme_minimal()
-  
-  if (label && "name" %in% names(df)) {
-    p <- p + ggplot2::geom_text(ggplot2::aes(label = name), hjust = 1.2, vjust = 1.2, size = 3)
-  }
-  
-  return(p)
-}
-
 #' Load Feld's 1991 data.
 #' 
 #' @example 
@@ -647,7 +532,10 @@ get_feld_1991_network <- function() {
 #' @return An undirected igraph object.
 #'
 #' @examples
-#' fnet <- load_igraph_from_csv("marketville-friends-coleman-feld.csv")
+#' load_igraph_from_csv(
+#'   system.file("extdata", "marketville-friends-coleman-feld.csv", 
+#'               package = "socmod")
+#' )
 #'
 #' @export
 load_igraph_from_csv <- function(csv_file) {

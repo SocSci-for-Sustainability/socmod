@@ -33,23 +33,22 @@ Runs trial ensembles across a parameter grid. All scalar and function-valued par
 used in model construction or trial dynamics are included in metadata for transparency.
 }
 \examples{
-agents = c(Agent$new(1), Agent$new(2))
-mod_gen <- function(mparam_list) { 
-  return (
-    make_abm(
-      make_model_parameters(
-        # The first three positional ModelParameters fields go first.
-        success_biased_model_dynamics, graph,
-        # Then any auxiliary label-value pairs may be flexibly added here.
-        adaptive_fitness = mparam_list$adaptive_fitness
-      ), 
-      agents = agents
-    )
+abm_gen <- function(params) {
+  params$graph <- make_small_world(params$n_agents, 6, 0.5)
+  return (do.call(make_abm, params) \%>\%
+            initialize_agents(
+              initial_prevalence = params$initial_prevalence,
+              adaptive_fitness = params$adaptive_fitness
+            )
   )
 }
-# Run 2 trials per parameter setting, stopping after 10 time steps. 
-trials <- run_trials(mod_gen, n_trials_per_param = 2, stop = 10,
-  model_dynamics = success_bias_model_dynamics,
-  adaptive_fitness = c(0.8, 1.0, 1.2)
-)  # With this we'll have six total trials, two for each adaptive_fitness.
+trials <-
+  run_trials(
+    abm_gen,
+    n_trials_per_param = 2,
+    stop = socmod::fixated,
+    n_agents = 20,
+    initial_prevalence = 0.1,
+    adaptive_fitness = c(0.9, 1.1, 1.3)
+)
 }

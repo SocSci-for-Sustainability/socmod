@@ -27,5 +27,5 @@ abm2 <- make_abm(parameters = make_model_parameters(n_agents = 10))
 abm_g <- make_abm(graph = socmod::make_small_world(N = 20, k = 6, p = 0.2))
 abm_g2 <- make_model_parameters(
   graph = socmod::make_small_world(N = 20, k = 6, p = 0.2)
-) \%>\% make_abm
+) |> make_abm()
 }

@@ -14,22 +14,20 @@
 #' @return A `ggplot` object.
 #'
 #' @examples
-#' trial <- example_trial()
-#' plot_network_adoption(trial)
+#' sw_net <- socmod::make_small_world(N = 20, k = 6, p = 0.5)
+#' abm <- make_abm(graph = sw_net) |> initialize_agents(initial_prevalence = 0.2)
+#' plot_network_adoption(abm)
 #'
 #' # Use degree centrality to size nodes
-#' plot_network_adoption(trial, node_size = list(Degree = igraph::degree))
+#' plot_network_adoption(abm, node_size = list(Degree = igraph::degree))
 #'
 #' # Add a title and modify legend position
 #' plot_network_adoption(
-#'   trial,
+#'   abm,
 #'   plot_mod = . %>%
-#'     ggtitle("Adoption at t = 0") %>%
-#'     theme(legend.position = "bottom")
+#'     ggplot2::ggtitle("Adoption at t = 0") %>%
+#'     ggplot2::theme(legend.position = "bottom")
 #' )
-#' 
-#' # Specify a circular layout
-#' plot_network_adoption(make_abm(graph = make_small_world(10, 4, 0.2)), layout = "circle")
 #' @export
 plot_network_adoption <- function(
     x, layout = NULL, behaviors = c("Adaptive", "Legacy"),
@@ -193,18 +191,31 @@ plot_prevalence <- function(trials_or_tibble,
 #'   }
 #'
 #' @examples
-#' mps <- make_model_parameters(n_agents = 10, adoption_rate = 1.0, model_dynamics = contagion_model_dynamics)
-#' abm <- make_abm(mps)
-#' trial <- make_trial(abm)
-#' trial$run(steps = 5)
-#'
-#' # Summary aggregated across trials (default)
-#' summary <- summarise_prevalence(trial, tracked_behaviors = c("A", "B"))
-#' print(summary)
-#'
-#' # Per-trial summary without aggregation
-#' summary_per_trial <- summarise_prevalence(trial, tracked_behaviors = c("A", "B"), between_trials = FALSE)
-#' print(summary_per_trial)
+#' abm_gen <- function(params) {
+#'   params$graph <- make_small_world(params$n_agents, 6, 0.5)
+#'   return (do.call(make_abm, params) %>%
+#'             initialize_agents(
+#'               initial_prevalence = params$initial_prevalence,
+#'               adaptive_fitness = params$adaptive_fitness
+#'             )
+#'   )
+#' }
+#' adaptive_fitness_vals <- c(0.9, 1.1) 
+#' trials <-
+#'   run_trials(
+#'     abm_gen,
+#'     n_trials_per_param = 2,
+#'     stop = socmod::fixated,
+#'     n_agents = 20,
+#'     initial_prevalence = 0.1,
+#'     adaptive_fitness = adaptive_fitness_vals
+#' )
+#' summary <- summarise_prevalence(
+#'   trials, input_parameters = "adaptive_fitness", across_trials = F
+#' ) %>% 
+#'   dplyr::mutate(
+#'     `Adaptive fitness` = factor(adaptive_fitness, adaptive_fitness_vals)
+#'   )
 #'
 #' @export
 summarise_prevalence <- function(trials_or_trial,
@@ -305,15 +316,45 @@ summarise_prevalence <- function(trials_or_trial,
 #'   containing the mean of each specified outcome measure.
 #'
 #' @examples
-#' mps <- make_model_parameters(n_agents = 10, adoption_rate = 1.0, model_dynamics = contagion_model_dynamics)
-#' abm <- make_abm(mps)
-#' trial <- make_trial(abm)
-#' trial$run(steps = 5)
-#'
-#' trials <- list(trial, trial)
-#'
-#' summary <- summarise_outcomes(trials, input_parameters = "adoption_rate", outcome_measures = "success_rate")
-#' print(summary)
+#' abm_gen <- function(params) {
+#'   params$graph <- make_small_world(params$n_agents, 6, 0.5)
+#'   return (do.call(make_abm, params) %>%
+#'             initialize_agents(
+#'               initial_prevalence = params$initial_prevalence,
+#'               adaptive_fitness = params$adaptive_fitness
+#'             )
+#'   )
+#' }
+#' adaptive_fitness_vals <- c(0.9, 1.1)
+#' trials <-
+#'   run_trials(
+#'     abm_gen,
+#'     n_trials_per_param = 2,
+#'     stop = socmod::fixated,
+#'     n_agents = 20,
+#'     initial_prevalence = 0.1,
+#'     adaptive_fitness = adaptive_fitness_vals
+#' )
+#' outcomes <- summarise_outcomes(
+#'   trials, 
+#'   input_parameters = "adaptive_fitness", 
+#'   outcome_measures = c("success_rate", "mean_fixation_steps")
+#' ) 
+#' 
+#' max_fix_time <- max(outcomes$Value[outcomes$Measure == "mean_fixation_steps"])
+#' # Normalize to calculate mean fixation time as a fraction of maximum
+#' outcomes_norm <- outcomes %>%
+#'   dplyr::mutate(Value = dplyr::case_when(
+#'     Measure == "mean_fixation_steps" ~ Value / max_fix_time,
+#'     TRUE ~ Value
+#'   ))
+#' # Rename and set order of Measure factors to avoid messing with the legend in plotting
+#' outcomes_norm$Measure[outcomes_norm$Measure == "success_rate"] <- "Success rate"
+#' outcomes_norm$Measure[outcomes_norm$Measure == "mean_fixation_steps"] <- "Normalized fixation time"
+#' outcomes_norm$Measure <- factor(outcomes_norm$Measure, levels = c(
+#'   "Success rate", "Normalized fixation time"
+#' ))
+
 #' @export
 summarise_outcomes <- function(trials, input_parameters, 
                                outcome_measures = NULL) {

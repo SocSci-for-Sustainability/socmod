@@ -21,11 +21,10 @@ AgentBasedModel <- R6::R6Class(
     agents = NULL,
     graph = NULL,
 
-
-    #' @description Create a new AgentBasedModel instance.
+    #' @description Create a new AgentBasedModel instance
     #' @param parameters A `ModelParameters` object specifying the model parameters.
-    #'   Defaults to `DEFAULT_PARAMETERS`.
-    #' @param agents A list of agent instances for the model.
+    #'   Defaults to `DEFAULT_PARAMETERS`
+    #' @param agents A list of agent instances for the model
     initialize = function(parameters = DEFAULT_PARAMETERS, agents = NULL) {
       if (!inherits(parameters, "ModelParameters")) {
         stop("parameters must be a ModelParameters instance")
@@ -35,48 +34,52 @@ AgentBasedModel <- R6::R6Class(
       
       private$.parameters_instance <- parameters
       
-      # If the graph is defined, check it's an igraph and read it in.
+      # otherwise read graph and n_agents from 
       graph <- parameters$get_graph()
       n_agents <- parameters$get_n_agents()
+
+      # set n_agents for next step if user *only* gives agents — a bit hacky
+      if (!is.null(agents) && is.null(graph) && is.null(n_agents)) {
+        n_agents <- length(agents)
+      } 
+
+      # init graph...
       if (!is.null(graph)) {
         stopifnot(igraph::is_igraph(graph))
         self$graph <- graph
-
-      # If n_agents is defined when the graph is not, make a full graph for agents.
+      # if n_agents given but not graph, init an empty graph by default
       } else if (!is.null(n_agents)) {
+        self$graph <- igraph::make_empty_graph(n_agents, directed = FALSE)
 
-        self$graph <- igraph::make_full_graph(n_agents, directed = FALSE)
-
-        # Update model parameters with newly-created graph.
+        # update model parameters with new empty graph
         parameters$set_graph(self$graph)
-
-      } else {
-        stop("Either 'graph' or 'n_agents' must be provided.")
-      }
+      } # ... end of graph init
       
-      # Initialize model parameters, stored as key-value list.
+      # initialize agent names as "a1", "a2", etc
       if (is.null(igraph::V(self$graph)$name)) {
         igraph::V(self$graph)$name <- 
           paste0("a", seq_len(igraph::vcount(self$graph)))
       }
       
-      # If agents are provided, make sure names sync
+      # init with user-provided agents list if provided...
       if (!is.null(agents)) {
+        # build named list to track agents in this abm's `agents` field
         self$agents <- agents
         names(self$agents) <- purrr::map_chr(self$agents, \(a) a$get_name())
-        
+        # user-provided agent names supersede igraph::graph names.
         graph_names <- igraph::V(self$graph)$name
         agent_names <- names(self$agents)
         
         if (!all(agent_names %in% graph_names)) {
-          # Overwrite igraph vertex names to match agent names.
+          # overwrite igraph vertex names to match agent names
           igraph::V(self$graph)$name <- agent_names  
         }
         
+        # ensure agents know who their neighbors are
         self$sync_network("neighbors_only")
 
+        # set n_agents model param for O(1) lookup
         parameters$set_n_agents(length(agents))
-
       } else {
 
         legacy_fitness <- parameters$as_list()$legacy_fitness
@@ -272,7 +275,7 @@ AgentBasedModel <- R6::R6Class(
 #' abm_g <- make_abm(graph = socmod::make_small_world(N = 20, k = 6, p = 0.2))
 #' abm_g2 <- make_model_parameters(
 #'   graph = socmod::make_small_world(N = 20, k = 6, p = 0.2)
-#' ) %>% make_abm
+#' ) |> make_abm()
 #' @export
 make_abm <- function(parameters = NULL, agents = NULL, ...) {
 

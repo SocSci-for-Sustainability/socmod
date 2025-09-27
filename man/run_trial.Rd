@@ -26,11 +26,11 @@ A Trial object
 Trial runner helper function
 }
 \examples{
-agents <- list(
-  Agent$new(name = "1", behavior = "Legacy", fitness = 1),
-  Agent$new(name = "2", behavior = "Adaptive", fitness = 4)
+agents <- c(
+  Agent$new(id = 1, name = "1", behavior = "Legacy", fitness = 1),
+  Agent$new(id = 2, name = "2", behavior = "Adaptive", fitness = 4)
 )
 net <- igraph::make_graph(~ 1-2)
-model <- AgentBasedModel$new(agents = agents, graph = net)
+model <- make_abm(agents = agents, graph = net)
 trial <- run_trial(model, stop = 10)
 }

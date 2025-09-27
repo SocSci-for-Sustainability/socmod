@@ -31,7 +31,7 @@ Supports both \code{igraph} and \code{tidygraph::tbl_graph} inputs.
 \dontrun{
 # Use with an igraph network
 library(igraph)
-g_ig <- simulate_feld_1991()
+g_ig <- get_feld_1991_network()
 compare_friendship_paradox(g_ig)
 
 # Return node-level metrics too

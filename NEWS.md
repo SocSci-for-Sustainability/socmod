@@ -1,3 +1,10 @@
+# socmod 0.2.4 (2025-10-24)
+
+- If only `agents` are provided to `make_abm` an empty graph is created by
+  default.
+- If both `agents` and `graph` are provided to `make_abm`, the provided graph is
+  used. Previously `make_abm` would create a fully connected network.
+
 # socmod 0.2.3 (2025-09-03)
 
 - Changed LearningStrategy and related functions to be ModelDynamics and

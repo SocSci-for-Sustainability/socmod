@@ -157,12 +157,8 @@ Trial <- R6::R6Class(
 #' @return TRUE if all agents have the same behavior
 #' @export
 #' @examples
-#' agents <- list(
-#'   Agent$new(name = "1", behavior = "Legacy", fitness = 1),
-#'   Agent$new(name = "2", behavior = "Adaptive", fitness = 4)
-#' )
 #' net <- igraph::make_graph(~ 1-2)
-#' model <- AgentBasedModel$new(agents = agents, graph = net)
+#' model <- make_abm(graph = net)
 #' trial <- run_trial(model, stop = fixated) # <- "stop trial when fixated"
 fixated <- function(model) {
   behaviors <- unlist(
@@ -182,12 +178,12 @@ fixated <- function(model) {
 #' @param adaptive_behavior The behavior treated as "adaptation success". Default is "Adaptive".
 #' @return A Trial object
 #' @examples
-#' agents <- list(
-#'   Agent$new(name = "1", behavior = "Legacy", fitness = 1),
-#'   Agent$new(name = "2", behavior = "Adaptive", fitness = 4)
+#' agents <- c(
+#'   Agent$new(id = 1, name = "1", behavior = "Legacy", fitness = 1),
+#'   Agent$new(id = 2, name = "2", behavior = "Adaptive", fitness = 4)
 #' )
 #' net <- igraph::make_graph(~ 1-2)
-#' model <- AgentBasedModel$new(agents = agents, graph = net)
+#' model <- make_abm(agents = agents, graph = net)
 #' trial <- run_trial(model, stop = 10)
 #' @export
 run_trial <- function(model,
@@ -218,25 +214,24 @@ run_trial <- function(model,
 #'
 #' @return A list of Trial objects 
 #' @examples
-#' agents = c(Agent$new(1), Agent$new(2))
-#' mod_gen <- function(mparam_list) { 
-#'   return (
-#'     make_abm(
-#'       make_model_parameters(
-#'         # The first three positional ModelParameters fields go first.
-#'         success_biased_model_dynamics, graph,
-#'         # Then any auxiliary label-value pairs may be flexibly added here.
-#'         adaptive_fitness = mparam_list$adaptive_fitness
-#'       ), 
-#'       agents = agents
-#'     )
+#' abm_gen <- function(params) {
+#'   params$graph <- make_small_world(params$n_agents, 6, 0.5)
+#'   return (do.call(make_abm, params) %>%
+#'             initialize_agents(
+#'               initial_prevalence = params$initial_prevalence,
+#'               adaptive_fitness = params$adaptive_fitness
+#'             )
 #'   )
 #' }
-#' # Run 2 trials per parameter setting, stopping after 10 time steps. 
-#' trials <- run_trials(mod_gen, n_trials_per_param = 2, stop = 10,
-#'   model_dynamics = success_bias_model_dynamics,
-#'   adaptive_fitness = c(0.8, 1.0, 1.2)
-#' )  # With this we'll have six total trials, two for each adaptive_fitness.
+#' trials <-
+#'   run_trials(
+#'     abm_gen,
+#'     n_trials_per_param = 2,
+#'     stop = socmod::fixated,
+#'     n_agents = 20,
+#'     initial_prevalence = 0.1,
+#'     adaptive_fitness = c(0.9, 1.1, 1.3)
+#' )
 #' @export
 run_trials <- function(model_generator, n_trials_per_param = 10,
                        stop = 10, .progress = TRUE, 

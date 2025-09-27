@@ -1,15 +1,14 @@
 
 # socmod <a href="https://css4s.github.io/socmod/"><img src="man/figures/logo.png" align="right" height="130" alt="socmod website" /></a>
 
-## tidy social behavior models in R
+### tidy social behavior models in R
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-The goal of `socmod` is to simplify development of models of social
-behavior for beginners and experts alike. The current focus is
-agent-based models of adaptive behavior diffusion. The framework is
-designed to be extensible to other contexts in social behavior modeling
-and beyond.
+`socmod` streamlines the development of computational models of social
+change, focused on agent-based modeling. It is a work-in-progress. For
+questions or comments please [open an
+issue](https://github.com/SocSci-for-Sustainability/socmod/issues).
 
 ## Quickstart examples
 
@@ -23,14 +22,27 @@ defining models of social behavior.
     for different adaptive fitness values when agents learn using
     success-biased partner selection
 
-### Prereq: load required libraries.
+### Prereq: install & load required libraries.
+
+#### Install
+
+You can install the development version of socmod from
+[GitHub](https://github.com/) with `remotes` ([plan to be CRAN-ready
+soon](https://github.com/SocSci-for-Sustainability/socmod/issues/25)):
+
+``` r
+remotes::install_github("SocSci-for-Sustainability/socmod")
+```
+
+#### Load libraries (install if necessary using `install.packages`)
 
 ``` r
 library(ggnetwork)
 library(igraph)
 library(magrittr) # Loads %>%
-library(socmod)
 library(purrr)
+
+library(socmod)
 ```
 
 ### Example 1: single model trial and visualization
@@ -187,24 +199,3 @@ outcomes_norm %>%
 ```
 
 <img src="man/figures/readme/success_fixsteps.png" width="600" />
-
-### Installation
-
-You can install the development version of socmod from
-[GitHub](https://github.com/) with `devtools` or `pak`:
-
-**devtools**
-
-``` r
-# Install this if you don't have devtools.
-install.packages("devtools")
-devtools::install_github("css4s/socmod")
-```
-
-**pak**
-
-``` r
-# Install this if you don't have pak.
-install.packages("pak")
-pak::pak("css4s/socmod")
-```

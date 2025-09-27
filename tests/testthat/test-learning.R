@@ -3,7 +3,7 @@
 # 
 test_that("Success-bias selects the agent with highest fitness", {
   
-  model <- make_abm(make_model_parameters(n_agents = 3))
+  model <- make_abm(make_model_parameters(n_agents = 3, graph = igraph::make_full_graph(3)))
   expect_equal(model$get_parameter("model_dynamics")$get_label(), 
                "Success-biased")
 
@@ -35,7 +35,13 @@ test_that("Success-bias selects the agent with highest fitness", {
 
 test_that("Frequency bias adopts more common behavior", {
 
-  model <- AgentBasedModel$new(make_model_parameters(n_agents = 4))
+  model <- 
+    AgentBasedModel$new(
+      make_model_parameters(
+        n_agents = 4, 
+        graph = igraph::make_full_graph(4)
+      )
+    )
 
   model$get_agent(1)$set_behavior("Legacy")
   model$get_agent(2)$set_behavior("Adaptive")
@@ -62,7 +68,7 @@ test_that("Frequency bias fixates roughly equally when starting with tie", {
     model <- make_abm(
       make_model_parameters(
         model_dynamics = frequency_bias_model_dynamics,
-        n_agents = 4
+        n_agents = 4, graph = igraph::make_full_graph(4)
       )
     )
     
@@ -182,7 +188,8 @@ test_that("If drop rate is 0 an agent doing Adaptive will never revert to Legacy
 
 # Test contagion model step with drop
 
-test_that("contagion_model_step causes one doing Adaptive to do Legacy when drop_rate = 1.0", {
+test_that(
+  "contagion_model_step causes one doing Adaptive to do Legacy when drop_rate = 1.0", {
   
   model <- make_abm(make_model_parameters(
     graph = make_small_world(10, 2, 0.1),

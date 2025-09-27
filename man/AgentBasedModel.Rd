@@ -43,7 +43,7 @@ Creates a new AgentBasedModel with the given parameters and agents.
 \if{html}{\out{<a id="method-AgentBasedModel-new"></a>}}
 \if{latex}{\out{\hypertarget{method-AgentBasedModel-new}{}}}
 \subsection{Method \code{new()}}{
-Create a new AgentBasedModel instance.
+Create a new AgentBasedModel instance
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{AgentBasedModel$new(parameters = DEFAULT_PARAMETERS, agents = NULL)}\if{html}{\out{</div>}}
 }
@@ -52,9 +52,9 @@ Create a new AgentBasedModel instance.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{parameters}}{A \code{ModelParameters} object specifying the model parameters.
-Defaults to \code{DEFAULT_PARAMETERS}.}
+Defaults to \code{DEFAULT_PARAMETERS}}
 
-\item{\code{agents}}{A list of agent instances for the model.}
+\item{\code{agents}}{A list of agent instances for the model}
 }
 \if{html}{\out{</div>}}
 }

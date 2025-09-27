@@ -1,6 +1,7 @@
 test_that("summarise_prevalence summarizes prevalence across trials", {
   # Create mock trials
-  abm_gen <- \(.) make_abm(n_agents = 10) %>% initialize_agents(initial_prevalence = 0.4)
+  abm_gen <- \(.) make_abm(n_agents = 10, graph = igraph::make_full_graph(10)) %>% 
+    initialize_agents(initial_prevalence = 0.4)
   trials <- run_trials(abm_gen, n_trials_per_param = 2)
   
   # Summarize within each trial's series indexed by trial_id
